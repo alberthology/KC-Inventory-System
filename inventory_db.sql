@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 11, 2024 at 03:19 AM
+-- Generation Time: Nov 11, 2024 at 11:11 PM
 -- Server version: 8.3.0
 -- PHP Version: 8.2.18
 
@@ -34,7 +34,26 @@ CREATE TABLE IF NOT EXISTS `brand_table` (
   `description` text,
   `country_of_origin` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`brand_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `brand_table`
+--
+
+INSERT INTO `brand_table` (`brand_id`, `brand_name`, `description`, `country_of_origin`) VALUES
+(1, 'Nike', 'A leading global brand known for its sportswear, footwear, and athletic equipment.', 'USA'),
+(2, 'Adidas', 'A multinational corporation that designs and manufactures sports shoes, clothing, and accessories.', 'Germany'),
+(3, 'Apple', 'An American multinational technology company that designs and manufactures consumer electronics.', 'USA'),
+(4, 'Samsung', 'A South Korean multinational conglomerate known for its electronics, including smartphones and TVs.', 'South Korea'),
+(5, 'Levi\'s', 'Famous for its denim jeans and other apparel, Levi\'s is a global leader in casual wear.', 'USA'),
+(6, 'Wrangler', 'A brand known for its denim jeans and casual wear, popular in the Western fashion segment.', 'USA'),
+(7, 'Canon', 'A Japanese multinational specializing in imaging and optical products, including cameras and printers.', 'Japan'),
+(8, 'Nikon', 'A Japanese multinational corporation that specializes in optics and imaging products.', 'Japan'),
+(9, 'L\'Oréal', 'A global cosmetics and beauty company, one of the largest in the world.', 'France'),
+(10, 'Estée Lauder', 'A leading American manufacturer and marketer of prestige skincare, makeup, and fragrance products.', 'USA'),
+(11, 'Bosch', 'A global engineering and technology company, Bosch is a leader in power tools and home appliances.', 'Germany'),
+(12, 'DeWalt', 'Known for high-quality power tools and equipment used by construction professionals.', 'USA'),
+(13, 'Panasonic', ' Japanese multinational electronics company', 'Japan');
 
 -- --------------------------------------------------------
 
@@ -48,14 +67,28 @@ CREATE TABLE IF NOT EXISTS `category_table` (
   `category_name` varchar(100) NOT NULL,
   `description` text,
   PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `category_table`
 --
 
 INSERT INTO `category_table` (`category_id`, `category_name`, `description`) VALUES
-(1, 'Shoes', 'Shoes');
+(3, 'Apparel', 'Apparel'),
+(4, 'Electronics', 'Electronics'),
+(5, 'Furniture', 'Furniture'),
+(6, 'Food & Beverages', 'Food & Beverages'),
+(7, 'Beauty & Personal Care', 'Beauty & Personal Care'),
+(8, 'Books', 'Books'),
+(9, 'Automotive', 'Automotive'),
+(10, 'Health & Wellness', 'Health & Wellness'),
+(11, 'Stationery', 'Stationery'),
+(12, 'Toys & Games', 'Toys & Games'),
+(13, 'Appliances', 'Appliances'),
+(15, 'Sports Equipment', 'Sports Equipment'),
+(16, 'Hardware & Tools', 'Hardware & Tools'),
+(17, 'Pet Supplies', 'Pet Supplies'),
+(18, 'Wearable Accessories', 'Different Accessories that adds fashion and style');
 
 -- --------------------------------------------------------
 
@@ -144,10 +177,30 @@ CREATE TABLE IF NOT EXISTS `product_table` (
   `quantity_in_stock` int DEFAULT '0',
   `price` decimal(10,2) DEFAULT NULL,
   `supplier_id` int DEFAULT NULL,
+  `brand_id` int DEFAULT NULL,
   PRIMARY KEY (`product_id`),
   KEY `category_id` (`category_id`),
-  KEY `supplier_id` (`supplier_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `supplier_id` (`supplier_id`),
+  KEY `fk_product_brand` (`brand_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `product_table`
+--
+
+INSERT INTO `product_table` (`product_id`, `product_name`, `category_id`, `description`, `quantity_in_stock`, `price`, `supplier_id`, `brand_id`) VALUES
+(3, 'Nike Air Max 270', 15, 'A stylish, comfortable running shoe with air cushioning.', 50, 129.99, NULL, 1),
+(4, 'Adidas Ultraboost', 15, 'Premium running shoe with Boost technology for comfort.', 30, 179.99, NULL, 2),
+(5, 'iPhone 15', 4, 'The latest iPhone with advanced features and performance.', 100, 999.99, NULL, 3),
+(6, 'Samsung Galaxy S24', 4, 'Powerful smartphone with AMOLED display and 5G support.', 75, 899.99, NULL, 4),
+(7, 'Levi\'s 501 Jeans', 3, 'Classic straight-leg jeans made from premium denim.', 200, 59.99, NULL, 5),
+(8, 'Wrangler Bootcut', 3, 'Bootcut jeans, perfect for casual and work settings.', 150, 49.99, NULL, 6),
+(9, 'Canon EOS 90D', 4, 'High-performance DSLR camera with 32.5 MP sensor.', 20, 1199.99, NULL, 7),
+(10, 'Nikon D7500', 4, 'DSLR camera with 4K video recording and fast autofocus.', 25, 899.99, NULL, 8),
+(11, 'L\'Oréal Revitalift', 10, 'Anti-aging cream that smoothes and firms the skin.', 100, 29.99, NULL, 9),
+(12, 'Estée Lauder Advanced Night Repair', 10, 'Overnight serum that reduces the look of wrinkles.', 80, 89.99, NULL, 10),
+(13, 'Bosch Drill Set', 16, 'Compact power drill with multiple bits for various tasks.', 40, 99.99, NULL, 11),
+(14, 'DeWalt Cordless Drill', 16, 'Durable cordless drill with high torque for heavy-duty tasks.', 60, 149.99, NULL, 12);
 
 -- --------------------------------------------------------
 
@@ -268,6 +321,7 @@ ALTER TABLE `order_table`
 -- Constraints for table `product_table`
 --
 ALTER TABLE `product_table`
+  ADD CONSTRAINT `fk_product_brand` FOREIGN KEY (`brand_id`) REFERENCES `brand_table` (`brand_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `product_table_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category_table` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `product_table_ibfk_2` FOREIGN KEY (`supplier_id`) REFERENCES `supplier_table` (`supplier_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 

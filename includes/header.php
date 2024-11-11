@@ -20,7 +20,8 @@ include 'functions/db_con.php';
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
 
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+<!-- css -->
+    <link rel="stylesheet" type="text/css" href="assets/css/main.css">
 
     <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">

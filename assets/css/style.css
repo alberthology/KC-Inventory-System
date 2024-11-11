@@ -32,29 +32,6 @@ body {
     background: #f0f0f0;
 }
 
-.col-md-12{
-    margin-bottom: 5%;
-}
-
-.description {
-    width: 100%;                  /* Make it stretch full width */
-    padding: 12px 15px;           /* Add some space inside */
-    border-radius: 8px;           /* Rounded corners */
-    border: 1px solid #ccc;       /* Light border */
-    background-color: #f9f9f9;    /* Slightly grey background */
-    font-size: 16px;               /* Bigger text for readability */
-    line-height: 1.5;              /* Increased line height for better readability */
-    height: 200%;              
-    resize: vertical;             /* Allow resizing vertically (like a textarea) */
-    box-sizing: border-box;       /* Include padding and border in the width */
-}
-
-.description:focus {
-    border-color: #007bff;        /* Change border color when focused */
-    background-color: #fff;       /* White background on focus */
-    outline: none;                /* Remove default outline */
-}
-
 
 @media (min-width: 1024px) {
     body {

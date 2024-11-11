@@ -1,0 +1,55 @@
+/* Sidebar styles */
+.main-sidebar {
+    position: fixed !important; /* Make the sidebar fixed */
+    top: 0;          /* Stick it to the top of the screen */
+    left: 0;         /* Stick it to the left of the screen */
+    width: 250px;    /* Set the width of the sidebar */
+    height: 100vh;   /* Make it the full height of the viewport */
+    background-color: #343a40; 
+    z-index: 1050;   /* Ensure it sits above other content */
+    overflow-y: auto; /* Add scroll to sidebar if needed */
+}
+
+.sidebar-dark-teal {
+/*    background-color: #008080 !important;*/
+}
+
+/* Ensure the content area doesn't get hidden behind the sidebar */
+.content-wrapper {
+    margin-left: 250px; /* Adjust this value based on the width of your sidebar */
+}
+
+body {
+    padding-left: 0 !important; /* Remove default body padding */
+    overflow-x: hidden; /* Disable horizontal overflow (optional) */
+}
+
+.nav-sidebar {
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+}
+
+
+.col-md-12{
+    margin-bottom: 5%;
+}
+
+.description {
+    width: 100%;                  /* Make it stretch full width */
+    padding: 12px 15px;           /* Add some space inside */
+    border-radius: 8px;           /* Rounded corners */
+    border: 1px solid #ccc;       /* Light border */
+    background-color: #f9f9f9;    /* Slightly grey background */
+    font-size: 16px;               /* Bigger text for readability */
+    line-height: 1.5;              /* Increased line height for better readability */
+    height: 200%;              
+    resize: vertical;             /* Allow resizing vertically (like a textarea) */
+    box-sizing: border-box;       /* Include padding and border in the width */
+}
+
+.description:focus {
+    border-color: #007bff;        /* Change border color when focused */
+    background-color: #fff;       /* White background on focus */
+    outline: none;                /* Remove default outline */
+}

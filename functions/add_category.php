@@ -4,9 +4,10 @@ include 'db_con.php';
 
 if (isset($_POST['submit-category'])) {
     $category = $_POST['category'];
+    $description = $_POST['description'];
 
     // Insert query
-    $sql = "INSERT INTO category_table (cat_name) VALUES ('$category')";
+    $sql = "INSERT INTO category_table( `category_name`, `description`) VALUES ('$category', '$category')";
 
     if ($conn->query($sql) === TRUE) {
         $_SESSION['message'] = "Category added successfully!";

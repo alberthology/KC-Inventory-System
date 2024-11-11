@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 11, 2024 at 02:08 AM
+-- Generation Time: Nov 11, 2024 at 03:19 AM
 -- Server version: 8.3.0
 -- PHP Version: 8.2.18
 
@@ -24,6 +24,21 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `brand_table`
+--
+
+DROP TABLE IF EXISTS `brand_table`;
+CREATE TABLE IF NOT EXISTS `brand_table` (
+  `brand_id` int NOT NULL AUTO_INCREMENT,
+  `brand_name` varchar(100) NOT NULL,
+  `description` text,
+  `country_of_origin` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`brand_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `category_table`
 --
 
@@ -33,6 +48,29 @@ CREATE TABLE IF NOT EXISTS `category_table` (
   `category_name` varchar(100) NOT NULL,
   `description` text,
   PRIMARY KEY (`category_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `category_table`
+--
+
+INSERT INTO `category_table` (`category_id`, `category_name`, `description`) VALUES
+(1, 'Shoes', 'Shoes');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `customer_table`
+--
+
+DROP TABLE IF EXISTS `customer_table`;
+CREATE TABLE IF NOT EXISTS `customer_table` (
+  `customer_id` int NOT NULL AUTO_INCREMENT,
+  `customer_name` varchar(100) NOT NULL,
+  `contact_number` varchar(20) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `address` text,
+  PRIMARY KEY (`customer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -53,6 +91,42 @@ CREATE TABLE IF NOT EXISTS `inventory_transaction_table` (
   PRIMARY KEY (`transaction_id`),
   KEY `product_id` (`product_id`),
   KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_item_table`
+--
+
+DROP TABLE IF EXISTS `order_item_table`;
+CREATE TABLE IF NOT EXISTS `order_item_table` (
+  `order_item_id` int NOT NULL AUTO_INCREMENT,
+  `order_id` int NOT NULL,
+  `product_id` int NOT NULL,
+  `quantity` int NOT NULL,
+  `unit_price` decimal(10,2) NOT NULL,
+  `total_price` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`order_item_id`),
+  KEY `order_id` (`order_id`),
+  KEY `product_id` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_table`
+--
+
+DROP TABLE IF EXISTS `order_table`;
+CREATE TABLE IF NOT EXISTS `order_table` (
+  `order_id` int NOT NULL AUTO_INCREMENT,
+  `customer_id` int NOT NULL,
+  `order_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `total_amount` decimal(10,2) DEFAULT NULL,
+  `status` enum('completed','pending','cancelled') DEFAULT NULL,
+  PRIMARY KEY (`order_id`),
+  KEY `customer_id` (`customer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -115,6 +189,24 @@ CREATE TABLE IF NOT EXISTS `purchase_table` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `stock_adjustment_table`
+--
+
+DROP TABLE IF EXISTS `stock_adjustment_table`;
+CREATE TABLE IF NOT EXISTS `stock_adjustment_table` (
+  `adjustment_id` int NOT NULL AUTO_INCREMENT,
+  `product_id` int NOT NULL,
+  `adjustment_type` enum('increase','decrease') NOT NULL,
+  `quantity` int NOT NULL,
+  `adjustment_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `reason` text,
+  PRIMARY KEY (`adjustment_id`),
+  KEY `product_id` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `supplier_table`
 --
 
@@ -160,6 +252,19 @@ ALTER TABLE `inventory_transaction_table`
   ADD CONSTRAINT `inventory_transaction_table_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_table` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `order_item_table`
+--
+ALTER TABLE `order_item_table`
+  ADD CONSTRAINT `order_item_table_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `order_table` (`order_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `order_item_table_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `product_table` (`product_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--
+-- Constraints for table `order_table`
+--
+ALTER TABLE `order_table`
+  ADD CONSTRAINT `order_table_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer_table` (`customer_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `product_table`
 --
 ALTER TABLE `product_table`
@@ -178,6 +283,12 @@ ALTER TABLE `purchase_item_table`
 --
 ALTER TABLE `purchase_table`
   ADD CONSTRAINT `purchase_table_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `supplier_table` (`supplier_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `stock_adjustment_table`
+--
+ALTER TABLE `stock_adjustment_table`
+  ADD CONSTRAINT `stock_adjustment_table_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product_table` (`product_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

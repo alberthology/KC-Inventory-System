@@ -30,7 +30,7 @@
                                              <div class="card-header">
                                                  <div class="row">
                                                      <div class="col-auto">
-                                                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-category"><i class="fas fa-plus"></i> add category</button>
+                                                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-category"><i class="fas fa-plus"></i>  &nbsp Category</button>
                                                      </div>
                                                  </div>
                                                  <!-- /.card-header -->
@@ -46,17 +46,17 @@
                                                              <?php
 
                                                                 // Query to fetch data from the category_table
-                                                                $query = "SELECT cat_id, cat_name FROM category_table";
+                                                                $query = "SELECT category_id, category_name FROM category_table";
                                                                 $result = mysqli_query($conn, $query);
 
                                                                 // Check if any categories exist
                                                                 if (mysqli_num_rows($result) > 0) {
                                                                     // Iterate through each category and display in the table
                                                                     while ($row = mysqli_fetch_assoc($result)) {
-                                                                        echo "<tr id='category-row-{$row['cat_id']}'>
-                                                                                <td>{$row['cat_name']}</td>
+                                                                        echo "<tr id='category-row-{$row['category_id']}'>
+                                                                                <td>{$row['category_name']}</td>
                                                                                 <td style='text-align:center;'>
-                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['cat_id']})'>Remove</button>
+                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['category_id']})'>Remove</button>
                                                                                 </td>
                                                                             </tr>";
                                                                     }
@@ -249,10 +249,10 @@
 
 
                              <div class="modal fade" id="add-category">
-                                 <div class="modal-dialog modal-sm">
+                                 <div class="modal-dialog modal-md">
                                      <div class="modal-content">
                                          <div class="modal-header">
-                                             <h4 class="modal-title"><i class="fas fa-boxes"></i> Add Category Modal</h4>
+                                             <h4 class="modal-title"><i class="fas fa-boxes"></i> Add Product Category</h4>
                                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                  <span aria-hidden="true">&times;</span>
                                              </button>
@@ -261,7 +261,11 @@
                                              <form action="functions/add_category.php" method="post">
                                                  <div class="row">
                                                      <div class="col-md-12">
-                                                         <input type="text" name="category" class="form-control form-control-sm" placeholder="Category Name">
+                                                         <input type="text" name="category" class="form-control form-control-md" placeholder="Category Name">
+                                                     </div>
+                                                     <div class="col-md-12">
+
+                                                         <input type="text" name="description" class="description" placeholder="Category Description">
                                                      </div>
                                                  </div>
                                                  <hr>
@@ -366,7 +370,7 @@
  </script>
 
  <script>
-     function removeCategory(cat_id) {
+     function removeCategory(category_id) {
          Swal.fire({
              title: 'Are you sure?',
              text: "You won't be able to revert this!",
@@ -374,7 +378,9 @@
              showCancelButton: true,
              confirmButtonColor: '#3085d6',
              cancelButtonColor: '#d33',
-             confirmButtonText: 'Yes, delete it!'
+             confirmButtonText: 'Yes, delete it!',
+             width: '30%',  // Adjust the width here
+
          }).then((result) => {
              if (result.isConfirmed) {
                  // Perform AJAX request to remove category
@@ -389,7 +395,7 @@
                          // Check if the removal was successful
                          if (response.status === "success") {
                              // Remove the row from the table
-                             var row = document.getElementById("category-row-" + cat_id);
+                             var row = document.getElementById("category-row-" + category_id);
                              if (row) {
                                  row.parentNode.removeChild(row);
                              }
@@ -419,7 +425,7 @@
                          }
                      }
                  };
-                 xhr.send("cat_id=" + cat_id);
+                 xhr.send("category_id=" + category_id);
              }
          });
      }

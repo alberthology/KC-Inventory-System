@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 11, 2024 at 11:11 PM
+-- Generation Time: Nov 12, 2024 at 09:11 AM
 -- Server version: 8.3.0
--- PHP Version: 8.2.18
+-- PHP Version: 8.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -31,29 +31,31 @@ DROP TABLE IF EXISTS `brand_table`;
 CREATE TABLE IF NOT EXISTS `brand_table` (
   `brand_id` int NOT NULL AUTO_INCREMENT,
   `brand_name` varchar(100) NOT NULL,
+  `category_id` int DEFAULT NULL,
   `description` text,
   `country_of_origin` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`brand_id`)
+  PRIMARY KEY (`brand_id`),
+  KEY `fk_product_category` (`category_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `brand_table`
 --
 
-INSERT INTO `brand_table` (`brand_id`, `brand_name`, `description`, `country_of_origin`) VALUES
-(1, 'Nike', 'A leading global brand known for its sportswear, footwear, and athletic equipment.', 'USA'),
-(2, 'Adidas', 'A multinational corporation that designs and manufactures sports shoes, clothing, and accessories.', 'Germany'),
-(3, 'Apple', 'An American multinational technology company that designs and manufactures consumer electronics.', 'USA'),
-(4, 'Samsung', 'A South Korean multinational conglomerate known for its electronics, including smartphones and TVs.', 'South Korea'),
-(5, 'Levi\'s', 'Famous for its denim jeans and other apparel, Levi\'s is a global leader in casual wear.', 'USA'),
-(6, 'Wrangler', 'A brand known for its denim jeans and casual wear, popular in the Western fashion segment.', 'USA'),
-(7, 'Canon', 'A Japanese multinational specializing in imaging and optical products, including cameras and printers.', 'Japan'),
-(8, 'Nikon', 'A Japanese multinational corporation that specializes in optics and imaging products.', 'Japan'),
-(9, 'L\'Oréal', 'A global cosmetics and beauty company, one of the largest in the world.', 'France'),
-(10, 'Estée Lauder', 'A leading American manufacturer and marketer of prestige skincare, makeup, and fragrance products.', 'USA'),
-(11, 'Bosch', 'A global engineering and technology company, Bosch is a leader in power tools and home appliances.', 'Germany'),
-(12, 'DeWalt', 'Known for high-quality power tools and equipment used by construction professionals.', 'USA'),
-(13, 'Panasonic', ' Japanese multinational electronics company', 'Japan');
+INSERT INTO `brand_table` (`brand_id`, `brand_name`, `category_id`, `description`, `country_of_origin`) VALUES
+(1, 'Nike', 3, 'A leading global brand known for its sportswear, footwear, and athletic equipment.', 'USA'),
+(2, 'Adidas', 15, 'A multinational corporation that designs and manufactures sports shoes, clothing, and accessories.', 'Germany'),
+(3, 'Apple', 4, 'An American multinational technology company that designs and manufactures consumer electronics.', 'USA'),
+(4, 'Samsung', 4, 'A South Korean multinational conglomerate known for its electronics, including smartphones and TVs.', 'South Korea'),
+(5, 'Levi\'s', 3, 'Famous for its denim jeans and other apparel, Levi\'s is a global leader in casual wear.', 'USA'),
+(6, 'Wrangler', 3, 'A brand known for its denim jeans and casual wear, popular in the Western fashion segment.', 'USA'),
+(7, 'Canon', 4, 'A Japanese multinational specializing in imaging and optical products, including cameras and printers.', 'Japan'),
+(8, 'Nikon', 4, 'A Japanese multinational corporation that specializes in optics and imaging products.', 'Japan'),
+(9, 'L\'Oréal', 10, 'A global cosmetics and beauty company, one of the largest in the world.', 'France'),
+(10, 'Estée Lauder', 10, 'A leading American manufacturer and marketer of prestige skincare, makeup, and fragrance products.', 'USA'),
+(11, 'Bosch', 16, 'A global engineering and technology company, Bosch is a leader in power tools and home appliances.', 'Germany'),
+(12, 'DeWalt', 16, 'Known for high-quality power tools and equipment used by construction professionals.', 'USA'),
+(13, 'Panasonic', NULL, ' Japanese multinational electronics company', 'Japan');
 
 -- --------------------------------------------------------
 
@@ -182,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `product_table` (
   KEY `category_id` (`category_id`),
   KEY `supplier_id` (`supplier_id`),
   KEY `fk_product_brand` (`brand_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `product_table`
@@ -191,7 +193,6 @@ CREATE TABLE IF NOT EXISTS `product_table` (
 INSERT INTO `product_table` (`product_id`, `product_name`, `category_id`, `description`, `quantity_in_stock`, `price`, `supplier_id`, `brand_id`) VALUES
 (3, 'Nike Air Max 270', 15, 'A stylish, comfortable running shoe with air cushioning.', 50, 129.99, NULL, 1),
 (4, 'Adidas Ultraboost', 15, 'Premium running shoe with Boost technology for comfort.', 30, 179.99, NULL, 2),
-(5, 'iPhone 15', 4, 'The latest iPhone with advanced features and performance.', 100, 999.99, NULL, 3),
 (6, 'Samsung Galaxy S24', 4, 'Powerful smartphone with AMOLED display and 5G support.', 75, 899.99, NULL, 4),
 (7, 'Levi\'s 501 Jeans', 3, 'Classic straight-leg jeans made from premium denim.', 200, 59.99, NULL, 5),
 (8, 'Wrangler Bootcut', 3, 'Bootcut jeans, perfect for casual and work settings.', 150, 49.99, NULL, 6),
@@ -200,7 +201,9 @@ INSERT INTO `product_table` (`product_id`, `product_name`, `category_id`, `descr
 (11, 'L\'Oréal Revitalift', 10, 'Anti-aging cream that smoothes and firms the skin.', 100, 29.99, NULL, 9),
 (12, 'Estée Lauder Advanced Night Repair', 10, 'Overnight serum that reduces the look of wrinkles.', 80, 89.99, NULL, 10),
 (13, 'Bosch Drill Set', 16, 'Compact power drill with multiple bits for various tasks.', 40, 99.99, NULL, 11),
-(14, 'DeWalt Cordless Drill', 16, 'Durable cordless drill with high torque for heavy-duty tasks.', 60, 149.99, NULL, 12);
+(14, 'DeWalt Cordless Drill', 16, 'Durable cordless drill with high torque for heavy-duty tasks.', 60, 149.99, NULL, 12),
+(20, 'iPhone 11', 4, 'Sample data', 6, 17000.00, NULL, 3),
+(21, 'iPhone 15', 4, 'Sample data 2', 6, 20000.00, NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -296,6 +299,12 @@ CREATE TABLE IF NOT EXISTS `user_table` (
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `brand_table`
+--
+ALTER TABLE `brand_table`
+  ADD CONSTRAINT `fk_product_category` FOREIGN KEY (`category_id`) REFERENCES `category_table` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `inventory_transaction_table`

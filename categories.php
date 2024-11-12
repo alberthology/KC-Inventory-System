@@ -31,15 +31,16 @@
                                                      <table id="category-table" class="table table-bordered table-striped table-hover">
                                                          <thead>
                                                              <tr>
+                                                                 <th>Category ID</th>
                                                                  <th>Category Name</th>
-                                                                 <th>Action</th>
+                                                                 <th>Description</th>
                                                              </tr>
                                                          </thead>
                                                          <tbody>
                                                              <?php
 
                                                                 // Query to fetch data from the category_table
-                                                                $query = "SELECT category_id, category_name FROM category_table";
+                                                                $query = "SELECT * FROM category_table";
                                                                 $result = mysqli_query($conn, $query);
 
                                                                 // Check if any categories exist
@@ -47,9 +48,12 @@
                                                                     // Iterate through each category and display in the table
                                                                     while ($row = mysqli_fetch_assoc($result)) {
                                                                         echo "<tr id='category-row-{$row['category_id']}'>
-                                                                                <td>{$row['category_name']}</td>
-                                                                                <td style='text-align:center;'>
-                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['category_id']})'>Remove</button>
+                                                                                <td>{$row['category_id']}</td>
+                                                                                <td>
+                                                                                    {$row['category_name']}
+                                                                                </td>
+                                                                                <td>
+                                                                                    {$row['description']}
                                                                                 </td>
                                                                             </tr>";
                                                                     }

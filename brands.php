@@ -15,7 +15,7 @@
                  <div class="col-md-12 mt-2">
                      <div class="card">
                          <div class="card-header p-3">
-                            <h3>List of Product Brands</h3>
+                            <h3>List of Product Brands Available in the System</h3>
                          </div>
                          <div class="card-body">
                              <div class="tab-content">
@@ -25,17 +25,29 @@
                                              <div class="card-header">
                                                  <!-- /.card-header -->
                                                  <div class="card-body">
-                                                     <table id="brand-table" class="table table-bordered table-striped table-hover">
+                                                    <table id="brand-table" class="table table-bordered table-striped table-hover">
                                                          <thead>
-                                                             <tr>
-                                                                 <th>Brand Name</th>
-                                                                 <th>Action</th>
-                                                             </tr>
-                                                         </thead>
+                                                            <tr>
+                                                                <th>Brand ID</th>
+                                                                <th>Brand Name</th>
+                                                                <th>Brand Category</th>
+                                                                <th>Country Originated</th>
+                                                                <th>Description</th>
+                                                            </tr>
+                                                        </thead>
                                                         <tbody>
                                             <?php
                                                 // Query to fetch data from the brand_table
-                                                $query = "SELECT * FROM brand_table";
+                                                $query = "
+                                                SELECT 
+                                                    b.brand_id,
+                                                    b.brand_name,
+                                                    c.category_name,
+                                                    b.description,
+                                                    b.country_of_origin
+                                                FROM brand_table b
+                                                LEFT JOIN category_table c ON b.category_id = c.category_id
+                                                ";
                                                 $result = mysqli_query($conn, $query);
 
                                                 // Check if any brands exist
@@ -43,19 +55,23 @@
                                                     // Iterate through each brand and display in the table
                                                     while ($row = mysqli_fetch_assoc($result)) {
                                                         echo "<tr id='brand-row-{$row['brand_id']}'>
-                                                                <td>{$row['brand_name']}</td>
-                                                                <td style='text-align:center;'>
-                                                                    <button class='btn btn-primary' onclick='openEditModal({$row['brand_id']}, \"{$row['brand_name']}\", \"{$row['country_of_origin']}\", \"{$row['description']}\")'>
-                                                                        <i class='fas fa-edit'></i>
-                                                                    </button> &nbsp 
-                                                                    <button class='btn btn-danger' onclick='removeBrand({$row['brand_id']})'>
-                                                                        <i class='fas fa-trash'></i>
-                                                                    </button>
+                                                                <td>{$row['brand_id']}</td>
+                                                                <td>
+                                                                {$row['brand_name']}
+                                                                </td>
+                                                                <td>
+                                                                {$row['category_name']}
+                                                                </td>
+                                                                <td>
+                                                                {$row['country_of_origin']}
+                                                                </td>
+                                                                <td>
+                                                                {$row['description']}
                                                                 </td>
                                                             </tr>";
                                                     }
                                                 } else {
-                                                    echo "<tr><td colspan='2'>No brands found.</td></tr>";
+                                                    echo "<tr><td colspan='5'>No brands found.</td></tr>";
                                                 }
                                             ?>
                                                         </tbody>

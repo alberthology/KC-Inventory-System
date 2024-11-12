@@ -103,7 +103,7 @@
             echo "<tr id='brand-row-{$row['brand_id']}'>
                     <td>{$row['brand_name']}</td>
                     <td style='text-align:center;'>
-                        <button class='btn btn-primary' onclick='openEditModal({$row['brand_id']}, \"{$row['brand_name']}\", \"{$row['country_of_origin']}\", \"{$row['description']}\")'>
+                        <button class='btn btn-primary' onclick='openEditModal({$row['brand_id']}, \"{$row['brand_name']}\", \"{$row['category_id']}\" , \"{$row['country_of_origin']}\", \"{$row['description']}\")'>
                             <i class='fas fa-edit'></i>
                         </button> &nbsp 
                         <button class='btn btn-danger' onclick='removeBrand({$row['brand_id']})'>
@@ -145,6 +145,25 @@
                                                     <div class="col-md-12">
                                                         <input type="text" name="brand" class="form-control form-control-md" placeholder="Brand Name">
                                                     </div>
+                                                    <div class="col-md-12">
+                                                        <select class="form-control form-control-md" name="category_id">
+                                                            <option selected hidden disabled>Select Category</option>
+        <?php           // Query to fetch data from the category_table
+                $query = "SELECT * FROM category_table";
+                $result = mysqli_query($conn, $query);
+
+                // Check if any categories exist
+                if (mysqli_num_rows($result) > 0) {
+                    // Iterate through each category and display in the table
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
+                    }
+                } else {
+                    echo "<option disabled>No Category Available</option>";
+                }
+                ?>
+                                                        </select>
+                                                    </div>
                                                    <div class="col-md-12">
                                                         <input type="text" name="origin_country" class="form-control form-control-md" placeholder="Originated Country">
                                                     </div>
@@ -164,45 +183,53 @@
                                 </div>
                                  <!-- /.modal-dialog -->
                             </div>
-                            <!-- Edit Stock Modal -->
-                            <div class="modal fade" id="edit-stocks">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"><i class="fas fa-dolly"></i> &nbsp; Edit Product Brand</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form id="editStockForm" action="functions/edit_sql.php" method="post">
 
-                                                <!-- Hidden field to store the ID of the record to edit -->
-                                                <input type="hidden" name="brand_id" id="edit_brand_id">
+                        <!-- Edit Stock Modal -->
+                        <div class="modal fade" id="edit-stocks">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title"><i class="fas fa-dolly"></i> &nbsp; Edit Product Brand</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="editStockForm" action="functions/edit_sql.php" method="post">
+                                            <!-- Hidden field to store the ID of the record to edit -->
+                                            <input type="hidden" name="brand_id" id="edit_brand_id">
 
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <label for="edit_brand_name">Brand Name</label>
-                                                        <input type="text" name="brand" id="edit_brand_name" class="form-control form-control-md" placeholder="Brand Name">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <label for="edit_origin_country">Origin Country</label>
-                                                        <input type="text" name="origin_country" id="edit_origin_country" class="form-control form-control-md" placeholder="Originated Country">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <label for="edit_description">Description</label>
-                                                        <input type="text" name="description" id="edit_description" class="form-control" placeholder="Brand Description">
-                                                    </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label for="edit_brand_name">Brand Name</label>
+                                                    <input type="text" name="brand" id="edit_brand_name" class="form-control form-control-md" placeholder="Brand Name">
                                                 </div>
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer justify-content-between">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                            <button type="submit" form="editStockForm" class="btn btn-primary">Save Changes</button>
-                                        </div>
+                                                <div class="col-md-12">
+                                                    <label for="edit_category_id">Category</label>
+                                                    <select class="form-control form-control-md" name="category_id" id="edit_category_id">
+                                                        <option selected hidden disabled>Select Category</option>
+                                                        <!-- Categories will be populated here by JavaScript -->
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label for="edit_origin_country">Origin Country</label>
+                                                    <input type="text" name="origin_country" id="edit_origin_country" class="form-control form-control-md" placeholder="Originated Country">
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label for="edit_description">Description</label>
+                                                    <input type="text" name="description" id="edit_description" class="form-control" placeholder="Brand Description">
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer justify-content-between">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        <button type="submit" form="editStockForm" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
 <!-- ============================ future proofing ========================= -->
                         <?php
                         // Display message if it exists
@@ -309,16 +336,45 @@
 
 
 // Function to open the edit modal and populate it with data
-function openEditModal(id, brand, origin_country, description) {
+function openEditModal(id, brand, category_id, origin_country, description) {
     // Set the values in the modal fields
     $('#edit_brand_id').val(id);
     $('#edit_brand_name').val(brand);
     $('#edit_origin_country').val(origin_country);
     $('#edit_description').val(description);
 
+    // Now, load the categories into the dropdown and select the current category
+    loadCategories(category_id);
+
     // Show the modal
     $('#edit-stocks').modal('show');
 }
+
+// Function to load categories dynamically via AJAX
+function loadCategories(selectedCategoryId) {
+    $.ajax({
+        url: 'functions/get_categories.php',  // Adjust the path to where your PHP script is
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            var selectElement = $('#edit_category_id');
+            selectElement.empty();  // Clear existing options
+
+            // Add the default "Select Category" option
+            selectElement.append('<option selected hidden disabled>Select Category</option>');
+
+            // Add the options for each category
+            data.forEach(function(category) {
+                var selected = (category.category_id == selectedCategoryId) ? 'selected' : '';
+                selectElement.append('<option value="' + category.category_id + '" ' + selected + '>' + category.category_name + '</option>');
+            });
+        },
+        error: function() {
+            alert('Failed to load categories.');
+        }
+    });
+}
+
      function removeCategory(category_id) {
          Swal.fire({
              title: 'Are you sure?',

@@ -40,13 +40,14 @@ if (isset($_POST['submit-category'])) {
 if (isset($_POST['submit-brand'])) {
     $brand = $_POST['brand'];
     $origin_country = $_POST['origin_country'];
+    $category_id = $_POST['category_id'];
     $description = $_POST['description'];
 
     // Call insert function for brand
     insertRecord(
         'brand_table',
-        '`brand_name`, `description`, `country_of_origin`',
-        "'$brand', '$description', '$origin_country'",
+        '`brand_name`, `category_id`,`description`, `country_of_origin`',
+        "'$brand','$category_id', '$description', '$origin_country'",
         "Brand added successfully!",
         "Error adding brand! Please try again. "
     );

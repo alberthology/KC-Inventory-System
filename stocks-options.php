@@ -33,7 +33,7 @@
                                                  </div>
                                                  <!-- /.card-header -->
                                                  <div class="card-body">
-                                                     <table id="category-table" class="table table-bordered table-striped">
+                                                     <table id="category-table" class="table table-bordered table-striped table-hover">
                                                          <thead>
                                                              <tr>
                                                                  <th>Category Name</th>

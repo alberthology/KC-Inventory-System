@@ -15,9 +15,7 @@
                  <div class="col-md-12 mt-2">
                      <div class="card">
                          <div class="card-header p-3">
-                             <ul class="nav nav-pills">
-                                 <li class="nav-item"><a class="nav-link active" href="#Product" data-toggle="tab"><b>Product Lists</b></a></li>
-                             </ul>
+                             <h3>List of Products</h3>
                          </div>
                          <div class="card-body">
                              <div class="tab-content">
@@ -32,7 +30,7 @@
                                                 </div>
                                                  <!-- /.card-header -->
                                                 <div class="card-body">
-                                                    <table id="product-table" class="table table-bordered table-striped">
+                                                    <table id="product-table" class="table table-bordered table-striped table-hover">
                                                         <thead>
                                                             <tr>
                                                                 <th>Product Code</th>
@@ -69,7 +67,7 @@ $result = mysqli_query($conn, $query);
 if (mysqli_num_rows($result) > 0) {
     // Iterate through each Product and display in the table
     while ($row = mysqli_fetch_assoc($result)) {
-        echo "<tr id='Product-row-{$row['product_id']}'>
+        echo "<tr id='product-row-{$row['product_id']}'>
                 <td>{$row['product_id']}</td>
                 <td>{$row['product_name']}</td>
                 <td>{$row['category_name']}</td> <!-- Show category name -->
@@ -116,7 +114,7 @@ if (mysqli_num_rows($result) > 0) {
                                                     </div>
 
                                                     <div class="col-md-12">
-                                                        <select class="form-control form-control-md">
+                                                        <select class="form-control form-control-md" name="category_id">
                                                             <option selected hidden disabled>Select Category</option>
         <?php           // Query to fetch data from the category_table
                 $query = "SELECT * FROM category_table";
@@ -135,7 +133,7 @@ if (mysqli_num_rows($result) > 0) {
                                                         </select>
                                                     </div>
                                                     <div class="col-md-12">
-                                                        <select class="form-control form-control-md">
+                                                        <select class="form-control form-control-md" name="brand_id">
                                                             <option selected hidden disabled>Select Brand</option>
         <?php           // Query to fetch data from the brand_table
                 $query = "SELECT * FROM brand_table";
@@ -154,7 +152,7 @@ if (mysqli_num_rows($result) > 0) {
                                                         </select>
                                                     </div>
                                                     <div class="col-md-12">
-                                                        <select class="form-control form-control-md">
+                                                        <select class="form-control form-control-md" name="supplier_id">
                                                             <option selected hidden disabled>Select Supplier</option>
         <?php           // Query to fetch data from the supplier_table
                 $query = "SELECT * FROM supplier_table";
@@ -189,7 +187,7 @@ if (mysqli_num_rows($result) > 0) {
                                                          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
                                                      </div>
                                                      <div class="col-md-6">
-                                                         <button type="submit" name="submit-Product" class="btn btn-primary btn-sm" style="float: right;">Add</button>
+                                                         <button type="submit" name="submit-product" class="btn btn-primary btn-sm" style="float: right;">Add</button>
                                                      </div>
                                                  </div>
                                              </form>
@@ -285,123 +283,82 @@ function openEditModal(id, brand, origin_country, description) {
     // Show the modal
     $('#edit-stocks').modal('show');
 }
-     function removeProduct(Product_id) {
-         Swal.fire({
-             title: 'Are you sure?',
-             text: "You won't be able to revert this!",
-             icon: 'warning',
-             showCancelButton: true,
-             confirmButtonColor: '#3085d6',
-             cancelButtonColor: '#d33',
-             confirmButtonText: 'Yes, delete it!',
-             width: '30%',  // Adjust the width here
+function removeProduct(product_id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        width: '30%',  // Adjust the width here
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Perform AJAX request to remove Product
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "functions/delete_sql.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-         }).then((result) => {
-             if (result.isConfirmed) {
-                 // Perform AJAX request to remove Product
-                 var xhr = new XMLHttpRequest();
-                 xhr.open("POST", "functions/delete_sql.php", true);
-                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                 xhr.onreadystatechange = function() {
-                     if (xhr.readyState == 4 && xhr.status == 200) {
-                         // Parse the JSON response
-                         var response = JSON.parse(xhr.responseText);
+            // Check the response status
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        console.log(response); // For debugging purposes
 
-                         // Check if the removal was successful
-                         if (response.status === "success") {
-                             // Remove the row from the table
-                             var row = document.getElementById("Product-row-" + Product_id);
-                             if (row) {
-                                 row.parentNode.removeChild(row);
-                             }
-                             // Show SweetAlert message
-                             Swal.fire({
-                                 icon: 'success',
-                                 title: response.message,
-                                 position: 'top-end',
-                                 showConfirmButton: false,
-                                 timer: 1500,
-                                 customClass: {
-                                     popup: 'swal2-popup'
-                                 }
-                             });
-                         } else {
-                             // Show error message
-                             Swal.fire({
-                                 icon: 'error',
-                                 title: response.message,
-                                 position: 'top-end',
-                                 showConfirmButton: false,
-                                 timer: 1500,
-                                 customClass: {
-                                     popup: 'swal2-popup'
-                                 }
-                             });
-                         }
-                     }
-                 };
-                 xhr.send("Product_id=" + Product_id);
-             }
-         });
-     }
+                        if (response.status === "success") {
+                            // Successfully deleted product from the database
+                            
+                            // Remove the row from the table
+                            var row = document.getElementById("product-row-" + product_id);
+                            if (row) {
+                                row.parentNode.removeChild(row); // Remove the row from DOM immediately
+                            }
 
-     function removeBrand(brand_id) {
-         Swal.fire({
-             title: 'Are you sure?',
-             text: "You won't be able to revert this!",
-             icon: 'warning',
-             showCancelButton: true,
-             confirmButtonColor: '#3085d6',
-             cancelButtonColor: '#d33',
-             confirmButtonText: 'Yes, delete it!',
-             width: '30%',  // Adjust the width here
+                            // Show success message
+                            Swal.fire({
+                                icon: 'success',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                customClass: { popup: 'swal2-popup' }
+                            });
+                        } else {
+                            // Show error message if deletion failed
+                            Swal.fire({
+                                icon: 'error',
+                                title: response.message,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                customClass: { popup: 'swal2-popup' }
+                            });
+                        }
+                    } catch (e) {
+                        console.error("Error parsing response:", e);
+                    }
+                }
+            };
 
-         }).then((result) => {
-             if (result.isConfirmed) {
-                 // Perform AJAX request to remove brand
-                 var xhr = new XMLHttpRequest();
-                 xhr.open("POST", "functions/delete_sql.php", true);
-                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                 xhr.onreadystatechange = function() {
-                     if (xhr.readyState == 4 && xhr.status == 200) {
-                         // Parse the JSON response
-                         var response = JSON.parse(xhr.responseText);
+            // Handle network or other errors in the request
+            xhr.onerror = function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'An error occurred while processing your request.',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: { popup: 'swal2-popup' }
+                });
+            };
 
-                         // Check if the removal was successful
-                         if (response.status === "success") {
-                             // Remove the row from the table
-                             var row = document.getElementById("brand-row-" + brand_id);
-                             if (row) {
-                                 row.parentNode.removeChild(row);
-                             }
-                             // Show SweetAlert message
-                             Swal.fire({
-                                 icon: 'success',
-                                 title: response.message,
-                                 position: 'top-end',
-                                 showConfirmButton: false,
-                                 timer: 1500,
-                                 customClass: {
-                                     popup: 'swal2-popup'
-                                 }
-                             });
-                         } else {
-                             // Show error message
-                             Swal.fire({
-                                 icon: 'error',
-                                 title: response.message,
-                                 position: 'top-end',
-                                 showConfirmButton: false,
-                                 timer: 1500,
-                                 customClass: {
-                                     popup: 'swal2-popup'
-                                 }
-                             });
-                         }
-                     }
-                 };
-                 xhr.send("brand_id=" + brand_id);
-             }
-         });
-     }
+            // Send the product_id to the backend for deletion
+            xhr.send("product_id=" + product_id);
+        }
+    });
+}
+
+
  </script>

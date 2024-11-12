@@ -8,7 +8,7 @@ include 'functions/db_con.php';
     <meta charset="utf-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard</title>
+    <title>KC'Closet Inventory System</title>
     <link rel="icon" type="image/x-icon" href="assets/images/closet.png">
 
     <!-- Google Font: Source Sans Pro -->

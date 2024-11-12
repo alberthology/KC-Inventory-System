@@ -44,7 +44,7 @@ if (isset($_POST['submit-brand'])) {
 
     // Call insert function for brand
     insertRecord(
-        'brand_table', // Assuming there's a table named brand_table
+        'brand_table',
         '`brand_name`, `description`, `country_of_origin`',
         "'$brand', '$description', '$origin_country'",
         "Brand added successfully!",
@@ -53,6 +53,32 @@ if (isset($_POST['submit-brand'])) {
 
     // Redirect to stocks-options.php
     header("Location: ../stocks-options.php");
+    exit();
+}
+
+if (isset($_POST['submit-product'])) {
+    $Product = $_POST['Product'];
+    $category_id  = $_POST['category_id'];
+    $brand_id = $_POST['brand_id'];
+    $supplier_id = isset($_POST['supplier_id']) ? $_POST['supplier_id'] : 'NULL'; // Set to NULL if not provided
+    $Quantity = $_POST['Quantity'];
+    $Price = $_POST['Price'];
+    $description = $_POST['description'];
+
+    // Build values string, replacing supplier_id with NULL if it's empty
+    $values = "'$Product', '$category_id', '$description', '$Quantity', '$Price', $supplier_id, '$brand_id'";
+
+    // Call insert function for brand
+    insertRecord(
+        'product_table',
+        '`product_name`, `category_id`, `description`, `quantity_in_stock`, `price`, `supplier_id`, `brand_id` ',
+        $values,
+        "Product added successfully!",
+        "Error adding Product! Please try again. "
+    );
+
+    // Redirect to products.php (if uncommented)
+    header("Location: ../products.php");
     exit();
 }
 

@@ -2,6 +2,11 @@
 session_start();
 include 'db_con.php';
 
+// Enable error reporting for debugging purposes
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// The rest of your PHP code follows
 function deleteRecord($table, $condition, $successMsg, $errorMsg) {
     global $conn;
     $query = "DELETE FROM $table WHERE $condition";
@@ -66,5 +71,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['category_id'])) {
     echo json_encode($result);
 }
 
-$conn->close();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
+    $product_id = $_POST['product_id'];
+
+    // Call the deleteRecord function for category deletion
+    $result = deleteRecord(
+        'product_table', // Table name
+        "product_id = $product_id", // WHERE condition
+        "Product removed successfully!",
+        "Error removing Product!"
+    );
+
+    // Return JSON response for AJAX request
+    echo json_encode($result);
+}
+
+if ($conn) {
+    $conn->close();
+}
+
 ?>

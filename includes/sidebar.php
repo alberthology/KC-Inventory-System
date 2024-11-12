@@ -28,8 +28,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <!-- Product Management -->
                 <li class="nav-item has-treeview <?php echo in_array($current_page, ['products.php', 'categories.php', 'brands.php']) ? 'menu-open' : ''; ?>">
                     <a href="products.php" class="nav-link <?php echo in_array($current_page, ['products.php', 'categories.php', 'brands.php']) ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-box"></i>
-                        <p>Products <i class="right fas fa-angle-left"></i></p>
+                        <i class="nav-icon fas fa-warehouse"></i>
+                        <p>Inventory<i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
@@ -54,12 +54,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <!-- Inventory -->
-                <li class="nav-item">
-                    <a href="inventory.php" class="nav-link <?php echo ($current_page == 'inventory.php') ? 'active' : ''; ?>">
+                <!--<li class="nav-item">
+                    <a href="inventory.php" class="nav-link <?php //echo ($current_page == 'inventory.php') ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-warehouse"></i>
                         <p>Inventory</p>
                     </a>
-                </li>
+                </li> -->
 
                 <!-- Transactions -->
                 <li class="nav-item">

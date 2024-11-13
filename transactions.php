@@ -1,129 +1,356 @@
  <?php
+    session_start();
+    include 'functions/db_con.php';
     include 'includes/header.php';
     include 'includes/nav.php';
     include 'includes/sidebar.php';
     ?>
- <style>
-     .nav-pills .nav-link[href="#ongoing"] {
-         background-color: yellow;
-         color: black;
-         /* Adjust text color for better contrast */
-     }
 
-     .nav-pills .nav-link[href="#complete"] {
-         background-color: green;
-         color: white;
-         /* Adjust text color for better contrast */
-     }
-
-     .nav-pills .nav-link {
-         transition: transform 0.2s;
-         /* Smooth transition for scaling */
-     }
-
-     .nav-pills .nav-link.active {
-         background-color: yellow;
-         /* Active color for ONGOING tab */
-         color: black;
-         /* Text color for ONGOING tab */
-         transform: scale(1.1);
-         /* Zoom in effect */
-         opacity: 0.8;
-         /* Slight opacity for emphasis */
-     }
-
-     .nav-pills .nav-link[href="#complete"] {
-         background-color: green;
-         /* Background color for COMPLETE tab */
-         color: white;
-         /* Text color for COMPLETE tab */
-     }
-
-     .nav-pills .nav-link[href="#ongoing"] {
-         background-color: yellow;
-         /* Background color for ONGOING tab */
-         color: black;
-         /* Text color for ONGOING tab */
-     }
- </style>
  <div class="content-wrapper">
 
      <div class="content">
          <div class="container-fluid">
              <div class="row">
+
                  <div class="col-md-12 mt-2">
                      <div class="card">
                          <div class="card-header p-3">
                              <ul class="nav nav-pills">
-                                 <li class="nav-item"><a class="nav-link active" href="#ongoing" data-toggle="tab"><b>ONGOING</b></a></li>
-                                 <li class="nav-item"><a class="nav-link" href="#complete" data-toggle="tab"><b>COMPLETE</b></a></li>
+                                 <li class="nav-item"><a class="nav-link active" href="#order" data-toggle="tab"><b>Order Transaction</b></a></li>
+                                 <li class="nav-item"><a class="nav-link" href="#ongoing" data-toggle="tab"><b>Ongoing Transaction</b></a></li>
+                                 <li class="nav-item"><a class="nav-link" href="#completed" data-toggle="tab"><b>Completed Transaction</b></a></li>
                              </ul>
-                         </div><!-- /.card-header -->
+                         </div>
                          <div class="card-body">
                              <div class="tab-content">
-                                 <div class="active tab-pane" id="ongoing">
-                                     <div class="col-12">
-                                         <div class="card">
-                                             <div class="card-header">
-                                                 <button type="submit" class="btn btn-success btn sm"><i class="fa fa-plus"></i> Add Transaction</button>
+                                 <div class="active tab-pane" id="order">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="row">
+                                                    <div class="col-auto">
+                                                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-order"><i class="fas fa-plus"></i>  &nbsp Transaction Order</button>
+                                                    </div>
+                                                </div>
+                                                 <!-- /.card-header -->
+                                                <div class="card-body">
+                                                    <table id="order-table" class="table table-bordered table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Order ID</th>
+                                                            <th>Product</th>
+                                                            <th>Quantity</th>
+                                                            <th>Unit Price</th>
+                                                            <th>Total Price</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                        <tbody>
+                                                             <?php
+
+                                                                // Query to fetch data from the order_table
+                                                                $query = "
+                                                                SELECT
+                                                                    o.order_item_id,
+                                                                    c.order_id,
+                                                                    p.product_name,
+                                                                    o.quantity,
+                                                                    o.unit_price,
+                                                                    o.total_price,
+                                                                    p.quantity_in_stock,
+                                                                    b.brand_name,
+                                                                    a.category_name,
+                                                                    p.price,
+                                                                    c.order_date,
+                                                                    c.total_amount,
+                                                                    c.status
+                                                                FROM order_item_table o
+                                                                LEFT JOIN order_table c ON o.order_id = c.order_id
+                                                                LEFT JOIN product_table p ON o.product_id = p.product_id
+                                                                LEFT JOIN category_table a ON p.category_id = a.category_id
+                                                                LEFT JOIN brand_table b ON p.brand_id = b.brand_id";
+                                                                $result = mysqli_query($conn, $query);
+
+                                                                // Check if any categories exist
+                                                                if (mysqli_num_rows($result) > 0) {
+                                                                    // Iterate through each category and display in the table
+                                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                                        echo "<tr id='category-row-{$row['order_item_id']}'>
+                                                                                <td>{$row['order_id']}</td>
+                                                                                <td>{$row['product_name']}</td>
+                                                                                <td>{$row['quantity']}</td>
+                                                                                <td>{$row['unit_price']}</td>
+                                                                                <td>{$row['total_price']}</td>
+                                                                                <td style='text-align:center;'>
+                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['order_id']})'>Remove</button>
+                                                                                </td>
+                                                                            </tr>";
+                                                                    }
+                                                                } else {
+                                                                    echo "<tr><td colspan='7'>No categories found.</td></tr>";
+                                                                }
+                                                                ?>
+                                                         </tbody>
+                                                     </table>
+                                                 </div>
+                                                 <!-- /.card-body -->
                                              </div>
-                                             <!-- /.card-header -->
-                                             <div class="card-body">
-                                                 <table id="ongoing-table" class="table table-bordered table-striped">
-                                                     <thead>
-                                                         <tr>
-                                                             <th>Customer Name</th>
-                                                             <th>Category</th>
-                                                             <th>Brand</th>
-                                                             <th>Quantity</th>
-                                                             <th>Price</th>
-                                                             <th>Payment Status</th>
-                                                             <th>Action</th>
-                                                         </tr>
-                                                     </thead>
-                                                     <tbody>
-                                                     </tbody>
-                                                 </table>
-                                             </div>
-                                             <!-- /.card-body -->
+                                             <!-- /.card -->
                                          </div>
-                                         <!-- /.card -->
                                      </div>
                                  </div>
-                                 <!-- /.tab-pane -->
-                                 <div class="tab-pane" id="complete">
-                                     <div class="col-12">
-                                         <div class="card">
-                                             <!-- /.card-header -->
-                                             <div class="card-body">
-                                                 <table id="complete-table" class="table table-bordered table-striped">
-                                                     <thead>
-                                                         <tr>
-                                                             <th>Customer Name</th>
-                                                             <th>Category</th>
-                                                             <th>Brand</th>
-                                                             <th>Quantity</th>
-                                                             <th>Price</th>
-                                                             <th>Payment Status</th>
-                                                             <th>Action</th>
-                                                         </tr>
-                                                     </thead>
-                                                     <tbody>
-                                                     </tbody>
-                                                 </table>
+
+                                <div class="tab-pane" id="ongoing">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+
+                                                 <!-- /.card-header -->
+                                                <div class="card-body">
+                                                    <table id="ongoing-table" class="table table-bordered table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Order ID</th>
+                                                            <th>Customer</th>
+                                                            <th>Date Ordered</th>
+                                                            <th>Total Amount</th>
+                                                            <th>Status</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                        <tbody>
+                                                             <?php
+
+                                                                // Query to fetch data from the order_table
+                                                                $query = "
+                                                                SELECT
+                                                                    o.order_id,
+                                                                    c.customer_name,
+                                                                    o.order_date,
+                                                                    o.total_amount,
+                                                                    o.status
+                                                                FROM order_table o
+                                                                LEFT JOIN customer_table c ON o.customer_id = c.customer_id";
+                                                                $result = mysqli_query($conn, $query);
+
+                                                                // Check if any categories exist
+                                                                if (mysqli_num_rows($result) > 0) {
+                                                                    // Iterate through each category and display in the table
+                                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                                        echo "<tr id='category-row-{$row['order_id']}'>
+                                                                                <td>{$row['order_id']}</td>
+                                                                                <td>{$row['customer_name']}</td>
+                                                                                <td>{$row['order_date']}</td>
+                                                                                <td>{$row['total_amount']}</td>
+                                                                                <td>{$row['status']}</td>
+                                                                                <td style='text-align:center;'>
+                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['order_id']})'>Remove</button>
+                                                                                </td>
+                                                                            </tr>";
+                                                                    }
+                                                                } else {
+                                                                    echo "<tr><td colspan='7'>No categories found.</td></tr>";
+                                                                }
+                                                                ?>
+                                                         </tbody>
+                                                     </table>
+                                                 </div>
+                                                 <!-- /.card-body -->
                                              </div>
-                                             <!-- /.card-body -->
+                                             <!-- /.card -->
                                          </div>
-                                         <!-- /.card -->
+                                     </div>    
+                                </div>
+
+
+                                <div class="tab-pane" id="completed">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header">
+
+                                                 <!-- /.card-header -->
+                                                <div class="card-body">
+                                                    <table id="completed-table" class="table table-bordered table-striped table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Order ID</th>
+                                                            <th>Customer</th>
+                                                            <th>Date Ordered</th>
+                                                            <th>Total Amount</th>
+                                                            <th>Status</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                        <tbody>
+                                                             <?php
+
+                                                                // Query to fetch data from the order_table
+                                                                $query = "
+                                                                SELECT
+                                                                    o.order_id,
+                                                                    c.customer_name,
+                                                                    o.order_date,
+                                                                    o.total_amount,
+                                                                    o.status
+                                                                FROM order_table o
+                                                                LEFT JOIN customer_table c ON o.customer_id = c.customer_id";
+                                                                $result = mysqli_query($conn, $query);
+
+                                                                // Check if any categories exist
+                                                                if (mysqli_num_rows($result) > 0) {
+                                                                    // Iterate through each category and display in the table
+                                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                                        echo "<tr id='category-row-{$row['order_id']}'>
+                                                                                <td>{$row['order_id']}</td>
+                                                                                <td>{$row['customer_name']}</td>
+                                                                                <td>{$row['order_date']}</td>
+                                                                                <td>{$row['total_amount']}</td>
+                                                                                <td>{$row['status']}</td>
+                                                                                <td style='text-align:center;'>
+                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['order_id']})'>Remove</button>
+                                                                                </td>
+                                                                            </tr>";
+                                                                    }
+                                                                } else {
+                                                                    echo "<tr><td colspan='7'>No categories found.</td></tr>";
+                                                                }
+                                                                ?>
+                                                         </tbody>
+                                                     </table>
+                                                 </div>
+                                                 <!-- /.card-body -->
+                                             </div>
+                                             <!-- /.card -->
+                                         </div>
                                      </div>
+                                </div>
+                            </div>
+
+                        <!-- Edit Stock Modal -->
+                        <div class="modal fade" id="edit-stocks">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title"><i class="fas fa-dolly"></i> &nbsp; Edit Product Brand</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="editStockForm" action="functions/edit_sql.php" method="post">
+                                            <!-- Hidden field to store the ID of the record to edit -->
+                                            <input type="hidden" name="brand_id" id="edit_brand_id">
+
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label for="edit_brand_name">Brand Name</label>
+                                                    <input type="text" name="brand" id="edit_brand_name" class="form-control form-control-md" placeholder="Brand Name">
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label for="edit_category_id">Category</label>
+                                                    <select class="form-control form-control-md" name="category_id" id="edit_category_id">
+                                                        <option selected hidden disabled>Select Category</option>
+                                                        <!-- Categories will be populated here by JavaScript -->
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label for="edit_origin_country">Origin Country</label>
+                                                    <input type="text" name="origin_country" id="edit_origin_country" class="form-control form-control-md" placeholder="Originated Country">
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <label for="edit_description">Description</label>
+                                                    <input type="text" name="description" id="edit_description" class="form-control" placeholder="Brand Description">
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer justify-content-between">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        <button type="submit" form="editStockForm" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="modal fade" id="add-order">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title"><i class="fas fa-tags"></i> Order Product</h4>
+
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="functions/insert_sql.php" method="post">
+                                                <div class="row">
+                                                    <h5> &nbsp Customer Information:</h5>
+                                                    <div class="col-md-12">
+                                                        <input type="text" name="customer_name" class="form-control form-control-md" placeholder="Customer Name">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <input type="text" name="email" class="form-control form-control-md" placeholder="Email">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <input type="text" name="address" class="form-control form-control-md" placeholder="Address">
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="row">
+                                                    <h5> &nbsp Order Detail:</h5>
+                                                    <div class="col-md-12">
+                                                        <select class="form-control form-control-md" name="product_id">
+                                                            <option selected hidden disabled>Select Category</option>
+        <?php           // Query to fetch data from the category_table
+                $query = "SELECT * FROM product_table";
+                $result = mysqli_query($conn, $query);
+
+                // Check if any categories exist
+                if (mysqli_num_rows($result) > 0) {
+                    // Iterate through each category and display in the table
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<option value='". $row['product_id'] ."'>". $row['product_name']."</option>";
+                    }
+                } else {
+                    echo "<option disabled>No Product Available</option>";
+                }
+                ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <input type="number" name="quantity" class="form-control form-control-md" placeholder="Quantity">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <input type="text" name="email" class="form-control form-control-md" placeholder="Email">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <input type="text" name="address" class="form-control form-control-md" placeholder="Address">
+                                                    </div>
+                                                 </div>
+                                                <div class="row">
+                                                     <div class="col-md-6">
+                                                         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                                                     </div>
+                                                     <div class="col-md-6">
+                                                         <button type="submit" name="submit-category" class="btn btn-primary btn-sm" style="float: right;">Add</button>
+                                                     </div>
+                                                 </div>
+                                             </form>
+                                         </div>
+                                     </div>
+                                     <!-- /.modal-content -->
                                  </div>
-                                 <!-- /.tab-pane -->
+                                 <!-- /.modal-dialog -->
                              </div>
-                             <!-- /.tab-content -->
-                         </div><!-- /.card-body -->
+
+                         </div>
                      </div>
-                     <!-- /.card -->
+
                  </div>
+
              </div>
          </div>
 
@@ -134,12 +361,13 @@
 
  <?php
     include 'includes/footer.php';
+    include 'message.php';
     ?>
 
  <script>
      $(document).ready(function() {
          // Initialize shoes-table by default
-         $('#ongoing-table').DataTable({
+         $('#order-table').DataTable({
              "paging": true,
              "lengthChange": true,
              "searching": true,
@@ -154,9 +382,27 @@
          $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
              var target = $(e.target).attr("href"); // Get the target tab
 
-             if (target === "#complete") {
-                 if (!$.fn.DataTable.isDataTable('#complete-table')) {
-                     $('#complete-table').DataTable({
+             if (target === "#ongoing") {
+                 if (!$.fn.DataTable.isDataTable('#ongoing-table')) {
+                     $('#ongoing-table').DataTable({
+                         "paging": true,
+                         "lengthChange": true,
+                         "searching": true,
+                         "ordering": true,
+                         "info": true,
+                         "autoWidth": true,
+                         "responsive": true,
+                         "pageLength": 10 // Display 10 items per page
+                     });
+                 }
+             }
+         });
+         $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+             var target = $(e.target).attr("href"); // Get the target tab
+
+             if (target === "#Completed") {
+                 if (!$.fn.DataTable.isDataTable('#completed-table')) {
+                     $('#Completed-table').DataTable({
                          "paging": true,
                          "lengthChange": true,
                          "searching": true,
@@ -170,22 +416,165 @@
              }
          });
      });
- </script>
 
- <script>
-     $(document).ready(function() {
-         // Check if there's a saved active tab in localStorage
-         var activeTab = localStorage.getItem('activeTab');
-         if (activeTab) {
-             // Activate the saved tab
-             $('.nav-pills a[href="' + activeTab + '"]').tab('show');
-         }
 
-         // Add click event to tabs
-         $('.nav-pills a').on('shown.bs.tab', function(e) {
-             // Save the active tab to localStorage
-             var href = $(e.target).attr('href');
-             localStorage.setItem('activeTab', href);
+// Function to open the edit modal and populate it with data
+function openEditModal(id, brand, category_id, origin_country, description) {
+    // Set the values in the modal fields
+    $('#edit_brand_id').val(id);
+    $('#edit_brand_name').val(brand);
+    $('#edit_origin_country').val(origin_country);
+    $('#edit_description').val(description);
+
+    // Now, load the categories into the dropdown and select the current category
+    loadCategories(category_id);
+
+    // Show the modal
+    $('#edit-stocks').modal('show');
+}
+
+// Function to load categories dynamically via AJAX
+function loadCategories(selectedCategoryId) {
+    $.ajax({
+        url: 'functions/get_categories.php',  // Adjust the path to where your PHP script is
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            var selectElement = $('#edit_category_id');
+            selectElement.empty();  // Clear existing options
+
+            // Add the default "Select Category" option
+            selectElement.append('<option selected hidden disabled>Select Category</option>');
+
+            // Add the options for each category
+            data.forEach(function(category) {
+                var selected = (category.category_id == selectedCategoryId) ? 'selected' : '';
+                selectElement.append('<option value="' + category.category_id + '" ' + selected + '>' + category.category_name + '</option>');
+            });
+        },
+        error: function() {
+            alert('Failed to load categories.');
+        }
+    });
+}
+
+     function removeCategory(category_id) {
+         Swal.fire({
+             title: 'Are you sure?',
+             text: "You won't be able to revert this!",
+             icon: 'warning',
+             showCancelButton: true,
+             confirmButtonColor: '#3085d6',
+             cancelButtonColor: '#d33',
+             confirmButtonText: 'Yes, delete it!',
+             width: '30%',  // Adjust the width here
+
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 // Perform AJAX request to remove category
+                 var xhr = new XMLHttpRequest();
+                 xhr.open("POST", "functions/delete_sql.php", true);
+                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                 xhr.onreadystatechange = function() {
+                     if (xhr.readyState == 4 && xhr.status == 200) {
+                         // Parse the JSON response
+                         var response = JSON.parse(xhr.responseText);
+
+                         // Check if the removal was successful
+                         if (response.status === "success") {
+                             // Remove the row from the table
+                             var row = document.getElementById("category-row-" + category_id);
+                             if (row) {
+                                 row.parentNode.removeChild(row);
+                             }
+                             // Show SweetAlert message
+                             Swal.fire({
+                                 icon: 'success',
+                                 title: response.message,
+                                 position: 'top-end',
+                                 showConfirmButton: false,
+                                 timer: 1500,
+                                 customClass: {
+                                     popup: 'swal2-popup'
+                                 }
+                             });
+                         } else {
+                             // Show error message
+                             Swal.fire({
+                                 icon: 'error',
+                                 title: response.message,
+                                 position: 'top-end',
+                                 showConfirmButton: false,
+                                 timer: 1500,
+                                 customClass: {
+                                     popup: 'swal2-popup'
+                                 }
+                             });
+                         }
+                     }
+                 };
+                 xhr.send("category_id=" + category_id);
+             }
          });
-     });
+     }
+
+     function removeBrand(brand_id) {
+         Swal.fire({
+             title: 'Are you sure?',
+             text: "You won't be able to revert this!",
+             icon: 'warning',
+             showCancelButton: true,
+             confirmButtonColor: '#3085d6',
+             cancelButtonColor: '#d33',
+             confirmButtonText: 'Yes, delete it!',
+             width: '30%',  // Adjust the width here
+
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 // Perform AJAX request to remove brand
+                 var xhr = new XMLHttpRequest();
+                 xhr.open("POST", "functions/delete_sql.php", true);
+                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                 xhr.onreadystatechange = function() {
+                     if (xhr.readyState == 4 && xhr.status == 200) {
+                         // Parse the JSON response
+                         var response = JSON.parse(xhr.responseText);
+
+                         // Check if the removal was successful
+                         if (response.status === "success") {
+                             // Remove the row from the table
+                             var row = document.getElementById("brand-row-" + brand_id);
+                             if (row) {
+                                 row.parentNode.removeChild(row);
+                             }
+                             // Show SweetAlert message
+                             Swal.fire({
+                                 icon: 'success',
+                                 title: response.message,
+                                 position: 'top-end',
+                                 showConfirmButton: false,
+                                 timer: 1500,
+                                 customClass: {
+                                     popup: 'swal2-popup'
+                                 }
+                             });
+                         } else {
+                             // Show error message
+                             Swal.fire({
+                                 icon: 'error',
+                                 title: response.message,
+                                 position: 'top-end',
+                                 showConfirmButton: false,
+                                 timer: 1500,
+                                 customClass: {
+                                     popup: 'swal2-popup'
+                                 }
+                             });
+                         }
+                     }
+                 };
+                 xhr.send("brand_id=" + brand_id);
+             }
+         });
+     }
  </script>

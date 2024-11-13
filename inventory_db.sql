@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 12, 2024 at 09:11 AM
+-- Generation Time: Nov 13, 2024 at 09:03 AM
 -- Server version: 8.3.0
 -- PHP Version: 8.3.6
 
@@ -55,7 +55,7 @@ INSERT INTO `brand_table` (`brand_id`, `brand_name`, `category_id`, `description
 (10, 'Estée Lauder', 10, 'A leading American manufacturer and marketer of prestige skincare, makeup, and fragrance products.', 'USA'),
 (11, 'Bosch', 16, 'A global engineering and technology company, Bosch is a leader in power tools and home appliances.', 'Germany'),
 (12, 'DeWalt', 16, 'Known for high-quality power tools and equipment used by construction professionals.', 'USA'),
-(13, 'Panasonic', NULL, ' Japanese multinational electronics company', 'Japan');
+(13, 'Panasonic', 13, ' Japanese multinational electronics company', 'Japan');
 
 -- --------------------------------------------------------
 
@@ -106,7 +106,14 @@ CREATE TABLE IF NOT EXISTS `customer_table` (
   `email` varchar(100) DEFAULT NULL,
   `address` text,
   PRIMARY KEY (`customer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `customer_table`
+--
+
+INSERT INTO `customer_table` (`customer_id`, `customer_name`, `contact_number`, `email`, `address`) VALUES
+(1, 'John Doe', '09676629818', 'jdoe@gmail.com', 'Philippines');
 
 -- --------------------------------------------------------
 
@@ -145,7 +152,18 @@ CREATE TABLE IF NOT EXISTS `order_item_table` (
   PRIMARY KEY (`order_item_id`),
   KEY `order_id` (`order_id`),
   KEY `product_id` (`product_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `order_item_table`
+--
+
+INSERT INTO `order_item_table` (`order_item_id`, `order_id`, `product_id`, `quantity`, `unit_price`, `total_price`) VALUES
+(3, 5, 3, 2, 15.00, 0.00),
+(4, 5, 4, 1, 20.00, 0.00),
+(5, 5, 6, 3, 10.00, 0.00),
+(7, 7, 3, 2, 50.00, 100.00),
+(8, 7, 6, 1, 100.00, 100.00);
 
 -- --------------------------------------------------------
 
@@ -162,7 +180,19 @@ CREATE TABLE IF NOT EXISTS `order_table` (
   `status` enum('completed','pending','cancelled') DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   KEY `customer_id` (`customer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `order_table`
+--
+
+INSERT INTO `order_table` (`order_id`, `customer_id`, `order_date`, `total_amount`, `status`) VALUES
+(2, 1, '2024-11-13 14:33:30', NULL, NULL),
+(3, 1, '2024-11-13 14:39:14', NULL, NULL),
+(4, 1, '2024-11-13 14:39:35', NULL, NULL),
+(5, 1, '2024-11-13 14:40:41', 80.00, NULL),
+(6, 1, '2024-11-13 00:00:00', 200.00, NULL),
+(7, 1, '2024-11-13 00:00:00', 200.00, NULL);
 
 -- --------------------------------------------------------
 

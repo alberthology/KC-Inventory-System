@@ -28,11 +28,11 @@
                                                     <table id="brand-table" class="table table-bordered table-striped table-hover">
                                                          <thead>
                                                             <tr>
-                                                                <th>Brand ID</th>
-                                                                <th>Brand Name</th>
-                                                                <th>Brand Category</th>
-                                                                <th>Country Originated</th>
+                                                                <th>ID</th>
+                                                                <th>Brand</th>
+                                                                <th>Category</th>
                                                                 <th>Description</th>
+                                                                <th>Originated From</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -63,10 +63,10 @@
                                                                 {$row['category_name']}
                                                                 </td>
                                                                 <td>
-                                                                {$row['country_of_origin']}
+                                                                {$row['description']}
                                                                 </td>
                                                                 <td>
-                                                                {$row['description']}
+                                                                {$row['country_of_origin']}
                                                                 </td>
                                                             </tr>";
                                                     }

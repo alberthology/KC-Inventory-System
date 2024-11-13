@@ -52,16 +52,18 @@ function editRecord($table, $columns, $whereCondition, $successMessage, $errorMe
 }
 
 // Check if the edit form was submitted
-if (isset($_POST['brand_id'], $_POST['brand'], $_POST['origin_country'], $_POST['description'])) {
+if (isset($_POST['brand_id'], $_POST['brand'], $_POST['category_id'], $_POST['origin_country'], $_POST['description'])) {
     // Retrieve the POST data
     $brand_id = $_POST['brand_id'];
     $brand_name = $_POST['brand'];
+    $category_id = $_POST['category_id'];
     $country_of_origin = $_POST['origin_country'];
     $description = $_POST['description'];
 
     // Prepare the columns and values for the update
     $columns = [
         'brand_name' => $brand_name,
+        'category_id' => $category_id,
         'country_of_origin' => $country_of_origin,
         'description' => $description
     ];

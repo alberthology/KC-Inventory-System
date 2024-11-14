@@ -32,7 +32,10 @@ body {
 
 
 .col-md-12{
-    margin-bottom: 5%;
+    margin-bottom: 3%;
+}
+.inp{
+    margin-bottom: 3% !important;
 }
 
 .description {

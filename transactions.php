@@ -29,7 +29,7 @@
                                             <div class="card-header">
                                                 <div class="row">
                                                     <div class="col-auto">
-                                                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-order"><i class="fas fa-plus"></i>  &nbsp Transaction Order</button>
+                                                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-order"><i class="fas fa-plus"></i>  &nbsp Place Customer Order</button>
                                                     </div>
                                                 </div>
                                                  <!-- /.card-header -->
@@ -87,7 +87,7 @@
                                                                             </tr>";
                                                                     }
                                                                 } else {
-                                                                    echo "<tr><td colspan='7'>No categories found.</td></tr>";
+                                                                    echo "<tr><td colspan='7'>No orders found.</td></tr>";
                                                                 }
                                                                 ?>
                                                          </tbody>
@@ -149,7 +149,7 @@
                                                                             </tr>";
                                                                     }
                                                                 } else {
-                                                                    echo "<tr><td colspan='7'>No categories found.</td></tr>";
+                                                                    echo "<tr><td colspan='7'>No orders found.</td></tr>";
                                                                 }
                                                                 ?>
                                                          </tbody>
@@ -212,7 +212,7 @@
                                                                             </tr>";
                                                                     }
                                                                 } else {
-                                                                    echo "<tr><td colspan='7'>No categories found.</td></tr>";
+                                                                    echo "<tr><td colspan='7'>No orders found.</td></tr>";
                                                                 }
                                                                 ?>
                                                          </tbody>
@@ -271,80 +271,170 @@
                                 </div>
                             </div>
                         </div>
-                            <div class="modal fade" id="add-order">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"><i class="fas fa-tags"></i> Order Product</h4>
+<!-- Place Order modal form -->
+<div class="modal fade" id="add-order">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fas fa-tags"></i> Order Product</h4>
 
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="functions/insert_sql.php" method="post">
-                                                <div class="row">
-                                                    <h5> &nbsp Customer Information:</h5>
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="customer_name" class="form-control form-control-md" placeholder="Customer Name">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="email" class="form-control form-control-md" placeholder="Email">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="address" class="form-control form-control-md" placeholder="Address">
-                                                    </div>
-                                                </div>
-                                                <hr>
-                                                <div class="row">
-                                                    <h5> &nbsp Order Detail:</h5>
-                                                    <div class="col-md-12">
-                                                        <select class="form-control form-control-md" name="product_id">
-                                                            <option selected hidden disabled>Select Category</option>
-        <?php           // Query to fetch data from the category_table
-                $query = "SELECT * FROM product_table";
-                $result = mysqli_query($conn, $query);
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="functions/insert_sql.php" method="post">
+                    <!-- Customer Information Section -->
+                    <div class="row">
+                        <h5 class="col-12"> &nbsp Customer Information:</h5>
+                        <div class="col-md-6 mb-3"> <!-- Added mb-3 here for spacing -->
+                            <input type="text" name="customer_name" class="form-control form-control-md" placeholder="Customer Name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <input type="text" name="email" class="form-control form-control-md" placeholder="Email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <input type="text" name="address" class="form-control form-control-md" placeholder="Address">
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- Order Detail Section -->
+                    <div class="row">
+                        <h5 class="col-12"> &nbsp Order Detail:</h5>
+                        <div class="col-md-6 mb-3">
+    <select class="form-control form-control-md" name="category_id" id="categorySelect" onchange="fetchBrand()">
+        <option selected hidden disabled>Select Category</option>
+        <?php
+        $query = "SELECT * FROM category_table";
+        $result = mysqli_query($conn, $query);
 
-                // Check if any categories exist
-                if (mysqli_num_rows($result) > 0) {
-                    // Iterate through each category and display in the table
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<option value='". $row['product_id'] ."'>". $row['product_name']."</option>";
-                    }
+        if (mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
+            }
+        } else {
+            echo "<option disabled>No Categories Available</option>";
+        }
+        ?>
+    </select>
+</div>
+<div class="col-md-6 mb-3">
+    <select class="form-control form-control-md" name="brand_id" id="brandSelect" onchange="fetchProducts()">
+        <option selected hidden disabled>Select Brand</option>
+    </select>
+</div>
+
+<div class="col-md-6 mb-3">
+    <select class="form-control form-control-md" name="product_id" id="productSelect" onchange="fetchPrice()">
+        <option selected hidden disabled>Select Product</option>
+    </select>
+</div>
+<div class="col-md-6 mb-3">
+    <input type="number" name="quantity" class="form-control form-control-md" placeholder="Quantity">
+</div>
+<div class="col-md-6 mb-3">
+    <input type="number" name="payment" class="form-control form-control-md" placeholder="Payment Amount (₱)">
+</div>
+<div class="col-md-6 mb-3">
+    <input type="text" class="form-control" name="price" id="priceInput" placeholder="Product Price (₱)" readonly>
+</div>
+
+<script>
+    function fetchBrand() {
+        const categoryId = document.getElementById('categorySelect').value;
+        const brandSelect = document.getElementById('brandSelect');
+
+        brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>';
+
+        fetch(`functions/fetch_brands.php?category_id=${categoryId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    data.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = brand.brand_id;
+                        option.textContent = brand.brand_name;
+                        brandSelect.appendChild(option);
+                    });
                 } else {
-                    echo "<option disabled>No Product Available</option>";
+                    const option = document.createElement('option');
+                    option.disabled = true;
+                    option.textContent = 'No Brands Available';
+                    brandSelect.appendChild(option);
                 }
-                ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="number" name="quantity" class="form-control form-control-md" placeholder="Quantity">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="email" class="form-control form-control-md" placeholder="Email">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="address" class="form-control form-control-md" placeholder="Address">
-                                                    </div>
-                                                 </div>
-                                                <div class="row">
-                                                     <div class="col-md-6">
-                                                         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
-                                                     </div>
-                                                     <div class="col-md-6">
-                                                         <button type="submit" name="submit-category" class="btn btn-primary btn-sm" style="float: right;">Add</button>
-                                                     </div>
-                                                 </div>
-                                             </form>
-                                         </div>
-                                     </div>
-                                     <!-- /.modal-content -->
-                                 </div>
-                                 <!-- /.modal-dialog -->
-                             </div>
+            })
+            .catch(error => console.error('Error fetching brands:', error));
+    }
+
+    function fetchProducts() {
+        const brandId = document.getElementById('brandSelect').value;
+        const productSelect = document.getElementById('productSelect');
+
+        productSelect.innerHTML = '<option selected hidden disabled>Select Product</option>';
+
+        fetch(`functions/fetch_products.php?brand_id=${brandId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    data.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = product.product_id;
+                        option.textContent = product.product_name;
+                        productSelect.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.disabled = true;
+                    option.textContent = 'No Products Available';
+                    productSelect.appendChild(option);
+                }
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    }
+
+
+    function fetchPrice() {
+        const productId = document.getElementById('productSelect').value;
+        const priceInput = document.getElementById('priceInput');
+
+        fetch(`functions/fetch_price.php?product_id=${productId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.price) {
+                    priceInput.value = data.price;
+                } else {
+                    priceInput.value = 'Price Not Available';
+                }
+            })
+            .catch(error => console.error('Error fetching price:', error));
+    }
+</script>
+
+
+                        
+                    </div>
+                    <hr>
+                    <!-- Action Buttons -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <button type="button" class="btn btn-default btn-md" data-dismiss="modal">Close</button>
+                        </div>
+                        <div class="col-md-6 text-right mb-3">
+                            <button type="submit" name="submit-order" class="btn btn-primary btn-md">Add</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
 
                          </div>
                      </div>

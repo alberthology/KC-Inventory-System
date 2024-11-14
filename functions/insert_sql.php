@@ -2,6 +2,7 @@
 session_start();
 include 'db_con.php';
 
+
 // Function to handle the insert and set session messages
 function insertRecord($table, $columns, $values, $successMessage, $errorMessage) {
     global $conn;
@@ -13,9 +14,11 @@ function insertRecord($table, $columns, $values, $successMessage, $errorMessage)
     if ($conn->query($sql) === TRUE) {
         $_SESSION['message'] = $successMessage;
         $_SESSION['message_type'] = "success"; // success type
+        return $conn->insert_id; // Return the auto-generated ID (for order_id or customer_id)
     } else {
         $_SESSION['message'] = $errorMessage . $conn->error;
         $_SESSION['message_type'] = "error"; // error type
+        return false;
     }
 }
 
@@ -82,6 +85,54 @@ if (isset($_POST['submit-product'])) {
     header("Location: ../products.php");
     exit();
 }
+
+// Assuming order is placed then handle the customer and order items
+if (isset($_POST['submit-order'])) {
+    $customer_name = $_POST['customer_name'];
+    $contact_number = $_POST['contact_number'];
+    $email = $_POST['email'];
+    $address = $_POST['address'];
+
+    // Insert customer data first
+    $sqlCustomer = "INSERT INTO customer_table (customer_name, contact_number, email, address) VALUES ('$customer_name', '$contact_number', '$email', '$address')";
+    if ($conn->query($sqlCustomer) === TRUE) {
+        $customer_id = $conn->insert_id;  // Get the new customer_id
+
+        // Insert order data
+        $sqlOrder = "INSERT INTO order_table (customer_id, total_amount) VALUES ('$customer_id', 0)";
+        if ($conn->query($sqlOrder) === TRUE) {
+            $order_id = $conn->insert_id;  // Get the new order_id
+
+            // Loop through each product in the order
+            $product_ids = $_POST['product_id'];
+            $quantities = $_POST['quantity'];
+            $prices = $_POST['price'];
+
+            $totalAmount = 0;
+
+            foreach ($product_ids as $index => $product_id) {
+                $quantity = $quantities[$index];
+                $unit_price = $prices[$index];
+                $total_price = $quantity * $unit_price;
+
+                // Insert each product into the order_item_table
+                $sqlOrderItem = "INSERT INTO order_item_table (order_id, product_id, quantity, unit_price, total_price) VALUES ('$order_id', '$product_id', '$quantity', '$unit_price', '$total_price')";
+                $conn->query($sqlOrderItem);
+
+                $totalAmount += $total_price;  // Update total amount for the order
+            }
+
+            // Update total amount in order_table
+            $conn->query("UPDATE order_table SET total_amount = '$totalAmount' WHERE order_id = '$order_id'");
+            $_SESSION['message'] = "Order placed successfully!";
+        } else {
+            $_SESSION['message'] = "Error inserting order: " . $conn->error;
+        }
+    } else {
+        $_SESSION['message'] = "Error inserting customer: " . $conn->error;
+    }
+}
+
 
 $conn->close();
 ?>

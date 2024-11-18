@@ -60,103 +60,121 @@ if (isset($_POST['submit-brand'])) {
     exit();
 }
 
-if (isset($_POST['submit-product'])) {
-    $Product = $_POST['Product'];
-    $category_id  = $_POST['category_id'];
-    $brand_id = $_POST['brand_id'];
-    $supplier_id = isset($_POST['supplier_id']) ? $_POST['supplier_id'] : 'NULL'; // Set to NULL if not provided
-    $Quantity = $_POST['Quantity'];
-    $Price = $_POST['Price'];
-    $description = $_POST['description'];
 
-    // Build values string, replacing supplier_id with NULL if it's empty
-    $values = "'$Product', '$category_id', '$description', '$Quantity', '$Price', $supplier_id, '$brand_id'";
+if (isset($_POST['submit-order'])) {
+    // Step 1: Insert into customer_table
+    $customer_name = mysqli_real_escape_string($conn, $_POST['customer_name']);
+    $contact_number = mysqli_real_escape_string($conn, $_POST['contact_number']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $address = mysqli_real_escape_string($conn, $_POST['address']);
 
-    // Call insert function for brand
-    insertRecord(
-        'product_table',
-        '`product_name`, `category_id`, `description`, `quantity_in_stock`, `price`, `supplier_id`, `brand_id` ',
-        $values,
-        "Product added successfully!",
-        "Error adding Product! Please try again. "
+    // Insert the customer and retrieve the customer_id
+    $customer_id = insertRecord(
+        'customer_table',
+        '`customer_name`, `contact_number`, `email`, `address`',
+        "'$customer_name', '$contact_number', '$email', '$address'",
+        "Customer added successfully!",
+        "Error adding customer! Please try again."
     );
 
-    // Redirect to products.php (if uncommented)
-    header("Location: ../products.php");
-    exit();
-}
+    if ($customer_id) {
+        // Step 2: Insert into order_table with customer_id and payment status
+        $order_date = date('Y-m-d');
+        $payment_status = mysqli_real_escape_string($conn, $_POST['order_table_status']); // Get the payment status from the form
 
+        // Get arrays for product_name, product_color, product_size, quantity, and price
+        $product_names = $_POST['product_name'];  // Array of product names
+        $product_colors = $_POST['product_color'];  // Array of product colors
+        $product_sizes = $_POST['product_size'];  // Array of product sizes
+        $quantities = $_POST['quantity'];
+        $prices = $_POST['price'];
 
-// Check if the form is submitted
-if (isset($_POST['submit-order'])) {
-    // Start a transaction to ensure atomicity (all or nothing)
-    mysqli_begin_transaction($conn);
+        // Calculate the total amount based on the provided items
+        $total_amount = 0;
 
-    try {
-        // Insert customer data
-        $customerName = mysqli_real_escape_string($conn, $_POST['customer_name']);
-        $contactNumber = mysqli_real_escape_string($conn, $_POST['contact_number']);
-        $email = mysqli_real_escape_string($conn, $_POST['email']);
-        $address = mysqli_real_escape_string($conn, $_POST['address']);
+        // Loop through each product and fetch the corresponding product_id
+        foreach ($product_names as $index => $product_name) {
+            $product_color = mysqli_real_escape_string($conn, $product_colors[$index]);
+            $product_size = mysqli_real_escape_string($conn, $product_sizes[$index]);
 
-        $customerQuery = "INSERT INTO customer_table (customer_name, contact_number, email, address) 
-                          VALUES ('$customerName', '$contactNumber', '$email', '$address')";
-        if (!mysqli_query($conn, $customerQuery)) {
-            throw new Exception('Error inserting customer data');
-        }
+            // Query to get the product_id based on product_name, product_color, and product_size
+            $sql = "SELECT product_id FROM product_table 
+                    WHERE product_name = '$product_name' 
+                    AND product_color = '$product_color' 
+                    AND product_size = '$product_size' 
+                    LIMIT 1";
+            $result = mysqli_query($conn, $sql);
 
-        // Get the last inserted customer ID
-        $customerId = mysqli_insert_id($conn);
+            if ($result && mysqli_num_rows($result) > 0) {
+                // Fetch product_id from the result
+                $product = mysqli_fetch_assoc($result);
+                $product_id = $product['product_id'];
 
-        // Insert order data
-        $orderQuery = "INSERT INTO order_table (customer_id, order_date) 
-                       VALUES ('$customerId', NOW())";
-        if (!mysqli_query($conn, $orderQuery)) {
-            throw new Exception('Error inserting order data');
-        }
-
-        // Get the last inserted order ID
-        $orderId = mysqli_insert_id($conn);
-
-        // Insert order items data
-        $categoryIds = $_POST['category_id'];  // Array of selected category IDs
-        $brandIds = $_POST['brand_id'];        // Array of selected brand IDs
-        $productIds = $_POST['product_id'];    // Array of selected product IDs
-        $quantities = $_POST['quantity'];      // Array of product quantities
-        $prices = $_POST['price'];             // Array of product prices
-
-        for ($i = 0; $i < count($productIds); $i++) {
-            // Prepare order item data for each product
-            $categoryId = $categoryIds[$i];
-            $brandId = $brandIds[$i];
-            $productId = $productIds[$i];
-            $quantity = $quantities[$i];
-            $price = $prices[$i];
-
-            // Insert data into order_item_table
-            $orderItemQuery = "INSERT INTO order_item_table (order_id, product_id, category_id, brand_id, quantity, price) 
-                               VALUES ('$orderId', '$productId', '$categoryId', '$brandId', '$quantity', '$price')";
-            if (!mysqli_query($conn, $orderItemQuery)) {
-                throw new Exception('Error inserting order item data');
+                // Get quantity and price for the item
+                $quantity = mysqli_real_escape_string($conn, $quantities[$index]);
+                $price = mysqli_real_escape_string($conn, $prices[$index]);
+                $total_price = $quantity * $price;  // Calculate total price for each item
+                $total_amount += $total_price;  // Add item total to the overall total amount
+            } else {
+                // If the product is not found, exit with an error
+                die("Error: Product not found in the product table.");
             }
         }
 
-        // Commit the transaction
-        mysqli_commit($conn);
-        
-        // Redirect or show success message
-        echo "Order has been successfully placed!";
-        
-    } catch (Exception $e) {
-        // Rollback the transaction in case of error
-        mysqli_rollback($conn);
-        echo "Error: " . $e->getMessage();
+        // Insert the order and retrieve the order_id
+        $order_id = insertRecord(
+            'order_table',
+            '`customer_id`, `order_date`, `total_amount`, `status`',
+            "'$customer_id', '$order_date', '$total_amount', '$payment_status'",
+            "Order placed successfully!",
+            "Error placing order! Please try again."
+        );
+
+        if ($order_id) {
+            // Step 3: Insert each product into order_item_table using the order_id
+            foreach ($product_names as $index => $product_name) {
+                $product_color = mysqli_real_escape_string($conn, $product_colors[$index]);
+                $product_size = mysqli_real_escape_string($conn, $product_sizes[$index]);
+
+                // Query to get the product_id based on product_name, product_color, and product_size
+                $sql = "SELECT product_id FROM product_table 
+                        WHERE product_name = '$product_name' 
+                        AND product_color = '$product_color' 
+                        AND product_size = '$product_size' 
+                        LIMIT 1";
+                $result = mysqli_query($conn, $sql);
+
+                if ($result && mysqli_num_rows($result) > 0) {
+                    $product = mysqli_fetch_assoc($result);
+                    $product_id = $product['product_id'];
+
+                    // Proceed with the insert into order_item_table
+                    $quantity = mysqli_real_escape_string($conn, $quantities[$index]);
+                    $price = mysqli_real_escape_string($conn, $prices[$index]);
+                    $total_price = $quantity * $price;
+
+                    // Insert the order item into the database
+                    $item_values = "'$order_id', '$product_id', '$quantity', '$price', '$total_price'";
+                    insertRecord(
+                        'order_item_table',
+                        '`order_id`, `product_id`, `quantity`, `unit_price`, `total_price`',
+                        $item_values,
+                        "Item added successfully!",
+                        "Error adding item! Please try again."
+                    );
+                } else {
+                    // Handle the case where the product does not exist
+                    die("Error: Product not found in the product table.");
+                }
+            }
+
+            // After inserting the order and its items, redirect or display success message
+            header("Location: ../sample.php"); // Redirect to the next page or success page
+            exit();
+        }
     }
 }
 
-// Close the database connection
-
-// mysqli_close($conn);
 
 $conn->close();
 ?>

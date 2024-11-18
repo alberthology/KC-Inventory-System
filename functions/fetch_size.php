@@ -2,10 +2,13 @@
 include 'db_con.php';
 
 if (isset($_GET['product_name'])) {
+
     $product_name = $_GET['product_name'];
+    // $product_name = 'Air Max 270';
 
     // Fetch product sizes and colors based on product_name
-    $query = "SELECT product_size, product_color FROM product_table WHERE product_name = ?";
+    $query = "SELECT product_size, product_color FROM product_table WHERE product_name LIKE ?";
+    $product_name = '%'.$product_name.'%'; // Add wildcards before binding
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $product_name);
     $stmt->execute();
@@ -15,16 +18,24 @@ if (isset($_GET['product_name'])) {
     while ($row = $result->fetch_assoc()) {
         // Handle NULL values for size and color
         if (is_null($row['product_size'])) {
-            $sizes_and_colors[] = ['product_size' => 'N/A', 'product_color' => $row['product_color']];
-        } elseif (is_null($row['product_color'])) {
-            $sizes_and_colors[] = ['product_size' => $row['product_size'], 'product_color' => 'N/A'];
+            $sizes_and_colors[] = ['product_size' => 'N/A', 'product_size' => $row['product_size']];
         } else {
             $sizes_and_colors[] = $row;
         }
     }
-
+    // echo $sizes_and_colors;
     // Return JSON response
     echo json_encode($sizes_and_colors);
+
+        // for testing results
+/*        echo '<pre>';  
+        print_r($sizes_and_colors);
+        echo '</pre>';
+
+        echo '<pre>';
+        var_dump($sizes_and_colors);
+        echo '</pre>';*/
+
 }
 
 $conn->close();

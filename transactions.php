@@ -333,6 +333,7 @@
                                     <select class="form-control form-control-md productSelect" name="product_id[]" onchange="fetchPrice(this)">
                                         <option selected hidden disabled>Select Product</option>
                                     </select>
+
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input type="number" name="quantity[]" class="form-control form-control-md" placeholder="Quantity">
@@ -512,6 +513,15 @@
     ?>
 
  <script>
+$(document).ready(function() {
+    // Initialize Select2 on the productSelect
+    $('.productSelect').select2({
+        placeholder: 'Select Product',  // Placeholder text
+        allowClear: true,               // Option to clear selection
+        width: '100%'                   // Make Select2 full width
+    });
+});
+
      $(document).ready(function() {
          // Initialize shoes-table by default
          $('#order-table').DataTable({

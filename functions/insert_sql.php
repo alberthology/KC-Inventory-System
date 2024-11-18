@@ -79,7 +79,7 @@ if (isset($_POST['submit-order'])) {
 
     if ($customer_id) {
         // Step 2: Insert into order_table with customer_id and payment status
-        $order_date = date('Y-m-d');
+        $order_date = date('Y-m-d H:i:s'); // This will store date and time in `YYYY-MM-DD HH:MM:SS` format
         $payment_status = mysqli_real_escape_string($conn, $_POST['order_table_status']); // Get the payment status from the form
 
         // Get arrays for product_name, product_color, product_size, quantity, and price

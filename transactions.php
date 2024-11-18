@@ -34,64 +34,74 @@
                                                 </div>
                                                  <!-- /.card-header -->
                                                 <div class="card-body">
-                                                    <table id="order-table" class="table table-bordered table-striped table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Order ID</th>
-                                                            <th>Customer</th>
-                                                            <th>Product</th>
-                                                            <th>Unit Quantity & Price</th>
-                                                            <th>Total Price</th>
-                                                            <th>Transaction Date</th>
-                                                        </tr>
-                                                    </thead>
-                                                        <tbody>
-                                                             <?php
+<table id="order-table" class="table table-bordered table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Unit Quantity & Price</th>
+            <th>Total Price</th>
+            <th>Transaction Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        // Query to fetch data from the order_table
+        $query = "
+    SELECT
+        c.order_item_id,
+        c.order_id,
+        p.product_name,
+        c.quantity,
+        c.unit_price,
+        c.total_price,
+        p.quantity_in_stock,
+        b.brand_name,
+        a.category_name,
+        p.price,
+        o.order_date,
+        o.total_amount,
+        o.status,
+        r.customer_name  -- Added customer_name
+    FROM order_table o
+    LEFT JOIN order_item_table c ON c.order_id = o.order_id
+    LEFT JOIN product_table p ON c.product_id = p.product_id
+    LEFT JOIN category_table a ON p.category_id = a.category_id
+    LEFT JOIN customer_table r ON o.customer_id = r.customer_id
+    LEFT JOIN brand_table b ON p.brand_id = b.brand_id
+    WHERE o.order_date >= DATE_SUB(CURDATE(), INTERVAL 14 DAY)
+";
 
-                                                                // Query to fetch data from the order_table
-                                                                $query = "
-                                                                SELECT
-                                                                    o.order_item_id,
-                                                                    c.order_id,
-                                                                    p.product_name,
-                                                                    o.quantity,
-                                                                    o.unit_price,
-                                                                    o.total_price,
-                                                                    p.quantity_in_stock,
-                                                                    b.brand_name,
-                                                                    a.category_name,
-                                                                    p.price,
-                                                                    c.order_date,
-                                                                    c.total_amount,
-                                                                    c.status
-                                                                FROM order_item_table o
-                                                                LEFT JOIN order_table c ON o.order_id = c.order_id
-                                                                LEFT JOIN product_table p ON o.product_id = p.product_id
-                                                                LEFT JOIN category_table a ON p.category_id = a.category_id
-                                                                LEFT JOIN brand_table b ON p.brand_id = b.brand_id";
-                                                                $result = mysqli_query($conn, $query);
+        
+        $result = mysqli_query($conn, $query);
 
-                                                                // Check if any categories exist
-                                                                if (mysqli_num_rows($result) > 0) {
-                                                                    // Iterate through each category and display in the table
-                                                                    while ($row = mysqli_fetch_assoc($result)) {
-                                                                        echo "<tr id='category-row-{$row['order_item_id']}'>
-                                                                                <td>{$row['order_id']}</td>
-                                                                                <td>{$row['customer_name']}</td>
-                                                                                <td>{$row['product_name']}</td>
-                                                                                <td>{$row['quantity']} items with ₱{$row['unit_price']} unit price</td>
-                                                                                <td>₱{$row['total_price']}</td>
-                                                                                <td style='text-align:center;'>
-                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['order_id']})'>Remove</button>
-                                                                                </td>
-                                                                            </tr>";
-                                                                    }
-                                                                } else {
-                                                                    echo "<tr><td colspan='7'>No orders found.</td></tr>";
-                                                                }
-                                                                ?>
-                                                         </tbody>
-                                                     </table>
+        // Check if any orders exist
+        if (mysqli_num_rows($result) > 0) {
+            // Iterate through each order and display in the table
+
+            while ($row = mysqli_fetch_assoc($result)) {
+                // Convert the stored date and time to a readable format
+                $orderDate = new DateTime($row['order_date']);
+                $orderDateFormatted = $orderDate->format('g:i A, l, F j, Y'); // Format: MM dd, yyyy HH:mm pm
+                echo "<tr id='category-row-{$row['order_item_id']}'>
+                        <td>{$row['order_id']}</td>
+                        <td>{$row['customer_name']}</td>  <!-- This should now work -->
+                        <td>{$row['product_name']}</td>
+                        <td>{$row['quantity']} items with ₱ {$row['unit_price']} unit price</td>
+                        <td>₱ {$row['total_price']}</td>
+                        <td style='text-align:center;'>
+                           {$orderDateFormatted}
+                        </td>
+                    </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='6'>No orders found.</td></tr>";
+        }
+        ?>
+    </tbody>
+</table>
+
                                                  </div>
                                                  <!-- /.card-body -->
                                              </div>
@@ -271,44 +281,257 @@
                                 </div>
                             </div>
                         </div>
-<!-- Place Order Modal Form -->
+<!-- Place Order modal form -->
 <div class="modal fade" id="add-order">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title"><i class="fas fa-tags"></i> Order Product</h4>
+
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="functions/insert_sql.php" method="post" id="orderForm">
+                <form action="functions/insert_sql.php" method="post">
                     <!-- Customer Information Section -->
                     <div class="row">
                         <h5 class="col-12"> &nbsp Customer Information:</h5>
-                        <div class="col-md-6 mb-3">
-                            <input type="text" name="customer_name" class="form-control form-control-md" placeholder="Customer Name" required>
+                        <div class="col-md-6 mb-3"> <!-- Added mb-3 here for spacing -->
+                            <input type="text" name="customer_name" class="form-control form-control-md" placeholder="Customer Name">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number" required>
+                            <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <input type="text" name="email" class="form-control form-control-md" placeholder="Email" required>
+                            <input type="text" name="email" class="form-control form-control-md" placeholder="Email">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <input type="text" name="address" class="form-control form-control-md" placeholder="Address" required>
+                            <input type="text" name="address" class="form-control form-control-md" placeholder="Address">
                         </div>
                     </div>
                     <hr>
-
                     <!-- Dynamic Order Items Section -->
-                    <div id="order-items">
-                        <!-- Initial Product Selection -->
-                        <div class="order-item">
-                            <h5 class="col-12"> &nbsp Order Detail:</h5>
+<div id="order-items">
+<!-- Initial Product Selection -->
+<div class="order-item" id="order-item-0">
+    <!-- Order Detail Section -->
+    <div class="row">
+        <h5 class="col-12"> &nbsp Order Detail:</h5>
+        <div class="col-md-6 mb-3">
+            <select class="form-control form-control-md" name="category_id[]" id="categorySelect-0" onchange="fetchBrand(0)">
+                <option selected hidden disabled>Select Category</option>
+                <?php
+                $query = "SELECT * FROM category_table";
+                $result = mysqli_query($conn, $query);
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
+                    }
+                } else {
+                    echo "<option disabled>No Categories Available</option>";
+                }
+                ?>
+            </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <select class="form-control form-control-md" name="brand_id[]" id="brandSelect-0" onchange="fetchProducts(0)">
+                <option selected hidden disabled>Select Brand</option>
+            </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <select class="form-control form-control-md" name="product_name[]" id="productSelect-0" onchange="fetchSize(0)">
+                <option selected hidden disabled>Select Product</option>
+            </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <select class="form-control form-control-md" name="product_size[]" id="sizeSelect-0" onchange="fetchColor(0)">
+                <option selected hidden disabled>Select Size</option>
+            </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <select class="form-control form-control-md" name="product_color[]" id="colorSelect-0" onchange="fetchPrice(0)">
+                <option selected hidden disabled>Select Color</option>
+            </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <input type="number" name="quantity[]" class="form-control form-control-md" placeholder="Quantity">
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <select class="form-control form-control-md" name="order_table_status" id="sizeSelect-0">
+                <option selected hidden disabled>Payment Status</option>
+                <option value="completed">Full Payment</option>
+                <option value="ongoing">Partial Payment</option>
+            </select>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <input type="text" class="form-control" name="price[]" id="priceInput-0" placeholder="Product Price (₱)" readonly>
+        </div>
+    </div>
+</div>
+                    <hr>
+
+                    <button type="button" class="btn btn-secondary" onclick="addItem()">Add Another Product</button>
+                    <hr>
+                    <script>
+                    // Global counter for dynamically added order items
+                    let itemCount = 0;
+
+                    // Fetch brands based on selected category
+                    function fetchBrand(itemId) {
+                        const categoryId = document.getElementById(`categorySelect-${itemId}`).value;
+                        const brandSelect = document.getElementById(`brandSelect-${itemId}`);
+                        brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>'; // Clear previous brands
+
+                        fetch(`functions/fetch_brands.php?category_id=${categoryId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.length > 0) {
+                                    data.forEach(brand => {
+                                        const option = document.createElement('option');
+                                        option.value = brand.brand_id;
+                                        option.textContent = brand.brand_name;
+                                        brandSelect.appendChild(option);
+                                    });
+                                } else {
+                                    const option = document.createElement('option');
+                                    option.disabled = true;
+                                    option.textContent = 'No Brands Available';
+                                    brandSelect.appendChild(option);
+                                }
+                            })
+                            .catch(error => console.error('Error fetching brands:', error));
+                    }
+
+                    // Fetch products based on selected brand
+                    function fetchProducts(itemId) {
+                        const brandId = document.getElementById(`brandSelect-${itemId}`).value;
+                        const productSelect = document.getElementById(`productSelect-${itemId}`);
+                        
+                        fetch(`functions/fetch_products.php?brand_id=${brandId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.length > 0) {
+                                    data.forEach(product => {
+                                        const option = document.createElement('option');
+                                        option.value = product.product_name;  // Set product_id as the value
+                                        option.textContent = product.product_name;
+                                        productSelect.appendChild(option);
+                                    });
+                                } else {
+                                    const option = document.createElement('option');
+                                    option.disabled = true;
+                                    option.textContent = 'No Products Available';
+                                    productSelect.appendChild(option);
+                                }
+                            })
+                            .catch(error => console.error('Error fetching products:', error));
+                    }
+
+
+                    // Fetch size and color based on selected product
+                    function fetchSize(itemId) {
+                        const productName = document.getElementById(`productSelect-${itemId}`).value;
+                        const sizeSelect = document.getElementById(`sizeSelect-${itemId}`);
+                        const colorSelect = document.getElementById(`colorSelect-${itemId}`);
+                        
+                        // Clear size and color options
+                        sizeSelect.innerHTML = '<option selected hidden disabled>Select Size</option>';
+                        colorSelect.innerHTML = '<option selected hidden disabled>Select Color</option>'; // Clear previous colors
+
+                        // Fetch size for the selected product
+                        fetch(`functions/fetch_size.php?product_name=${productName}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.length > 0) {
+                                    data.forEach(item => {
+                                        if (item.product_size !== 'N/A') {
+                                            const sizeOption = document.createElement('option');
+                                            sizeOption.value = item.product_size;
+                                            sizeOption.textContent = item.product_size;
+                                            sizeSelect.appendChild(sizeOption);
+                                        }
+                                    });
+                                } else {
+                                    const noOption = document.createElement('option');
+                                    noOption.disabled = true;
+                                    noOption.textContent = 'No Sizes Available';
+                                    sizeSelect.appendChild(noOption);
+                                }
+                            })
+                            .catch(error => console.error('Error fetching size:', error));
+                    }
+
+                    // Fetch color based on selected size
+                    function fetchColor(itemId) {
+                        const productName = document.getElementById(`productSelect-${itemId}`).value;
+                        const productSize = document.getElementById(`sizeSelect-${itemId}`).value;
+                        const colorSelect = document.getElementById(`colorSelect-${itemId}`);
+                        
+                        // Clear previous color options
+                        colorSelect.innerHTML = '<option selected hidden disabled>Select Color</option>';
+
+                        // Fetch color for the selected size
+                        fetch(`functions/fetch_color.php?product_size=${productSize}&product_name=${productName}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.length > 0) {
+                                    data.forEach(item => {
+                                        if (item.product_color !== 'N/A') {
+                                            const colorOption = document.createElement('option');
+                                            colorOption.value = item.product_color;
+                                            colorOption.textContent = item.product_color;
+                                            colorSelect.appendChild(colorOption);
+                                        }
+                                    });
+                                } else {
+                                    const noOption = document.createElement('option');
+                                    noOption.disabled = true;
+                                    noOption.textContent = 'No Colors Available';
+                                    colorSelect.appendChild(noOption);
+                                }
+                            })
+                            .catch(error => console.error('Error fetching color:', error));
+                    }
+
+                    // Fetch product price based on selected product
+                    function fetchPrice(itemId) {
+                        const product_name = document.getElementById(`productSelect-${itemId}`).value;
+                        const product_color = document.getElementById(`colorSelect-${itemId}`).value;
+                        const product_size = document.getElementById(`sizeSelect-${itemId}`).value;
+                        const priceInput = document.getElementById(`priceInput-${itemId}`);
+
+                        fetch(`functions/fetch_price.php?product_color=${product_color}&product_name=${product_name}&product_size=${product_size}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.price) {
+                                    priceInput.value = data.price;
+                                } else {
+                                    priceInput.value = 'Price Not Available';
+                                }
+                            })
+                            .catch(error => console.error('Error fetching price:', error));
+                    }
+
+                    // Add another order item dynamically
+                    function addItem() {
+                        itemCount++; // Increment item count for unique IDs
+
+                        const orderItemsDiv = document.getElementById('order-items');
+                        const newItem = document.createElement('div');
+                        newItem.classList.add('order-item');
+                        newItem.innerHTML = `
                             <div class="row">
+                                <h5 class="col-12"> &nbsp Order Detail number: ${itemCount}</h5>
                                 <div class="col-md-6 mb-3">
-                                    <select class="form-control form-control-md categorySelect" name="category_id[]" onchange="fetchBrand(this)">
+                                    <select class="form-control form-control-md" name="category_id[]" id="categorySelect-${itemCount}" onchange="fetchBrand(${itemCount})">
                                         <option selected hidden disabled>Select Category</option>
                                         <?php
                                         $query = "SELECT * FROM category_table";
@@ -323,176 +546,62 @@
                                         ?>
                                     </select>
                                 </div>
+
                                 <div class="col-md-6 mb-3">
-                                    <select class="form-control form-control-md brandSelect" name="brand_id[]" onchange="fetchProducts(this)">
+                                    <select class="form-control form-control-md" name="brand_id[]" id="brandSelect-${itemCount}" onchange="fetchProducts(${itemCount})">
                                         <option selected hidden disabled>Select Brand</option>
                                     </select>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <select class="form-control form-control-md productSelect" name="product_id[]" onchange="fetchPrice(this)">
+                                    <select class="form-control form-control-md" name="product_name[]" id="productSelect-${itemCount}" onchange="fetchSize(${itemCount})">
                                         <option selected hidden disabled>Select Product</option>
                                     </select>
-
                                 </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <select class="form-control form-control-md" name="product_size[]" id="sizeSelect-${itemCount}" onchange="fetchColor(${itemCount})">
+                                        <option selected hidden disabled>Select Size</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <select class="form-control form-control-md" name="product_color[]" id="colorSelect-${itemCount}" onchange="fetchPrice(${itemCount})">
+                                        <option selected hidden disabled>Select Color</option>
+                                    </select>
+                                </div>
+
                                 <div class="col-md-6 mb-3">
                                     <input type="number" name="quantity[]" class="form-control form-control-md" placeholder="Quantity">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <input type="number" name="payment[]" class="form-control form-control-md" placeholder="Payment Amount (₱)">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <input type="text" class="form-control" name="price[]" placeholder="Product Price (₱)" readonly>
+                                    <input type="text" class="form-control" name="price[]" id="priceInput-${itemCount}" placeholder="Product Price (₱)" readonly>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        `;
 
-                    <button type="button" class="btn btn-secondary" onclick="addItem()">Add Another Product</button>
-                    <hr>
+                        orderItemsDiv.appendChild(newItem);
+                    }
+                    </script>
+                </div>
 
                     <!-- Action Buttons -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <button type="button" class="btn btn-default btn-md" data-dismiss="modal">Close</button>
-                        </div>
-                        <div class="col-md-6 text-right mb-3">
-                            <button type="submit" name="submit-order" class="btn btn-primary btn-md">Submit Order</button>
-                        </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <button type="button" class="btn btn-default btn-md" data-dismiss="modal">Close</button>
+                                </div>
+                                <div class="col-md-6 text-right mb-3">
+                                    <button type="submit" name="submit-order" class="btn btn-primary btn-md">Add</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                </form>
+                </div>
+                <!-- /.modal-content -->
             </div>
+            <!-- /.modal-dialog -->
         </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
-
-<script>
-    // Fetch Brands based on selected category
-    function fetchBrand(selectElement) {
-        const categoryId = selectElement.value;
-        const brandSelect = selectElement.closest('.order-item').querySelector('.brandSelect');
-
-        brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>'; // Reset brands dropdown
-
-        fetch(`functions/fetch_brands.php?category_id=${categoryId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.length > 0) {
-                    data.forEach(brand => {
-                        const option = document.createElement('option');
-                        option.value = brand.brand_id;  // Use brand_id from the data
-                        option.textContent = brand.brand_name;  // Use brand_name from the data
-                        brandSelect.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement('option');
-                    option.disabled = true;
-                    option.textContent = 'No Brands Available';
-                    brandSelect.appendChild(option);
-                }
-            })
-            .catch(error => console.error('Error fetching brands:', error));
-    }
-
-    // Fetch Products based on selected brand
-    function fetchProducts(selectElement) {
-        const brandId = selectElement.value;
-        const productSelect = selectElement.closest('.order-item').querySelector('.productSelect');
-
-        productSelect.innerHTML = '<option selected hidden disabled>Select Product</option>'; // Reset products dropdown
-
-        fetch(`functions/fetch_products.php?brand_id=${brandId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.length > 0) {
-                    data.forEach(product => {
-                        const option = document.createElement('option');
-                        option.value = product.product_id;  // Use product_id from the data
-                        option.textContent = product.formatted_name;  // Use formatted product_name with size and color
-                        productSelect.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement('option');
-                    option.disabled = true;
-                    option.textContent = 'No Products Available';
-                    productSelect.appendChild(option);
-                }
-            })
-            .catch(error => console.error('Error fetching products:', error));
-    }
-
-    // Fetch Price based on selected product
-    function fetchPrice(selectElement) {
-        const productId = selectElement.value;
-        const priceInput = selectElement.closest('.order-item').querySelector('input[name="price[]"]');
-
-        fetch(`functions/fetch_price.php?product_id=${productId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.price) {
-                    priceInput.value = data.price;
-                } else {
-                    priceInput.value = 'Price Not Available';
-                }
-            })
-            .catch(error => console.error('Error fetching price:', error));
-    }
-
-    // Add another order item dynamically
-    function addItem() {
-        const orderItemsDiv = document.getElementById('order-items');
-        const newItem = document.createElement('div');
-        newItem.classList.add('order-item');
-        newItem.innerHTML = `
-            <h5 class="col-12"> &nbsp Order Detail:</h5>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <select class="form-control form-control-md categorySelect" name="category_id[]" onchange="fetchBrand(this)">
-                        <option selected hidden disabled>Select Category</option>
-                        <?php
-                        $query = "SELECT * FROM category_table";
-                        $result = mysqli_query($conn, $query);
-                        if (mysqli_num_rows($result) > 0) {
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
-                            }
-                        } else {
-                            echo "<option disabled>No Categories Available</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <select class="form-control form-control-md brandSelect" name="brand_id[]" onchange="fetchProducts(this)">
-                        <option selected hidden disabled>Select Brand</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <select class="form-control form-control-md productSelect" name="product_id[]" onchange="fetchPrice(this)">
-                        <option selected hidden disabled>Select Product</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <input type="number" name="quantity[]" class="form-control form-control-md" placeholder="Quantity">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <input type="number" name="payment[]" class="form-control form-control-md" placeholder="Payment Amount (₱)">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <input type="text" class="form-control" name="price[]" placeholder="Product Price (₱)" readonly>
-                </div>
-            </div>
-        `;
-        orderItemsDiv.appendChild(newItem);
-    }
-</script>
-
-
-
+        <!-- /.modal -->
 
                          </div>
                      </div>

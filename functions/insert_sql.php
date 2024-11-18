@@ -86,53 +86,77 @@ if (isset($_POST['submit-product'])) {
     exit();
 }
 
-// Assuming order is placed then handle the customer and order items
-if (isset($_POST['submit-order'])) {
-    $customer_name = $_POST['customer_name'];
-    $contact_number = $_POST['contact_number'];
-    $email = $_POST['email'];
-    $address = $_POST['address'];
 
-    // Insert customer data first
-    $sqlCustomer = "INSERT INTO customer_table (customer_name, contact_number, email, address) VALUES ('$customer_name', '$contact_number', '$email', '$address')";
-    if ($conn->query($sqlCustomer) === TRUE) {
-        $customer_id = $conn->insert_id;  // Get the new customer_id
+// Check if the form is submitted
+if (isset($_POST['submit-order'])) {
+    // Start a transaction to ensure atomicity (all or nothing)
+    mysqli_begin_transaction($conn);
+
+    try {
+        // Insert customer data
+        $customerName = mysqli_real_escape_string($conn, $_POST['customer_name']);
+        $contactNumber = mysqli_real_escape_string($conn, $_POST['contact_number']);
+        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $address = mysqli_real_escape_string($conn, $_POST['address']);
+
+        $customerQuery = "INSERT INTO customer_table (customer_name, contact_number, email, address) 
+                          VALUES ('$customerName', '$contactNumber', '$email', '$address')";
+        if (!mysqli_query($conn, $customerQuery)) {
+            throw new Exception('Error inserting customer data');
+        }
+
+        // Get the last inserted customer ID
+        $customerId = mysqli_insert_id($conn);
 
         // Insert order data
-        $sqlOrder = "INSERT INTO order_table (customer_id, total_amount) VALUES ('$customer_id', 0)";
-        if ($conn->query($sqlOrder) === TRUE) {
-            $order_id = $conn->insert_id;  // Get the new order_id
-
-            // Loop through each product in the order
-            $product_ids = $_POST['product_id'];
-            $quantities = $_POST['quantity'];
-            $prices = $_POST['price'];
-
-            $totalAmount = 0;
-
-            foreach ($product_ids as $index => $product_id) {
-                $quantity = $quantities[$index];
-                $unit_price = $prices[$index];
-                $total_price = $quantity * $unit_price;
-
-                // Insert each product into the order_item_table
-                $sqlOrderItem = "INSERT INTO order_item_table (order_id, product_id, quantity, unit_price, total_price) VALUES ('$order_id', '$product_id', '$quantity', '$unit_price', '$total_price')";
-                $conn->query($sqlOrderItem);
-
-                $totalAmount += $total_price;  // Update total amount for the order
-            }
-
-            // Update total amount in order_table
-            $conn->query("UPDATE order_table SET total_amount = '$totalAmount' WHERE order_id = '$order_id'");
-            $_SESSION['message'] = "Order placed successfully!";
-        } else {
-            $_SESSION['message'] = "Error inserting order: " . $conn->error;
+        $orderQuery = "INSERT INTO order_table (customer_id, order_date) 
+                       VALUES ('$customerId', NOW())";
+        if (!mysqli_query($conn, $orderQuery)) {
+            throw new Exception('Error inserting order data');
         }
-    } else {
-        $_SESSION['message'] = "Error inserting customer: " . $conn->error;
+
+        // Get the last inserted order ID
+        $orderId = mysqli_insert_id($conn);
+
+        // Insert order items data
+        $categoryIds = $_POST['category_id'];  // Array of selected category IDs
+        $brandIds = $_POST['brand_id'];        // Array of selected brand IDs
+        $productIds = $_POST['product_id'];    // Array of selected product IDs
+        $quantities = $_POST['quantity'];      // Array of product quantities
+        $prices = $_POST['price'];             // Array of product prices
+
+        for ($i = 0; $i < count($productIds); $i++) {
+            // Prepare order item data for each product
+            $categoryId = $categoryIds[$i];
+            $brandId = $brandIds[$i];
+            $productId = $productIds[$i];
+            $quantity = $quantities[$i];
+            $price = $prices[$i];
+
+            // Insert data into order_item_table
+            $orderItemQuery = "INSERT INTO order_item_table (order_id, product_id, category_id, brand_id, quantity, price) 
+                               VALUES ('$orderId', '$productId', '$categoryId', '$brandId', '$quantity', '$price')";
+            if (!mysqli_query($conn, $orderItemQuery)) {
+                throw new Exception('Error inserting order item data');
+            }
+        }
+
+        // Commit the transaction
+        mysqli_commit($conn);
+        
+        // Redirect or show success message
+        echo "Order has been successfully placed!";
+        
+    } catch (Exception $e) {
+        // Rollback the transaction in case of error
+        mysqli_rollback($conn);
+        echo "Error: " . $e->getMessage();
     }
 }
 
+// Close the database connection
+
+// mysqli_close($conn);
 
 $conn->close();
 ?>

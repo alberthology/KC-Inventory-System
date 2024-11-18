@@ -26,30 +26,25 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <!-- Product Management -->
-                <li class="nav-item has-treeview <?php echo in_array($current_page, ['products.php', 'categories.php', 'brands.php']) ? 'menu-open' : ''; ?>">
-                    <a href="products.php" class="nav-link <?php echo in_array($current_page, ['products.php', 'categories.php', 'brands.php']) ? 'active' : ''; ?>">
+                <li class="nav-item has-treeview <?php echo in_array($current_page, ['stocks-options.php', 'products.php']) ? 'menu-open' : ''; ?>">
+                    <a href="stocks-options.php" class="nav-link <?php echo in_array($current_page, ['stocks-options.php', 'products.php']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-warehouse"></i>
-                        <p>Inventory<i class="right fas fa-angle-left"></i></p>
+                        <p>Inventory Options<i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
+                            <a href="stocks-options.php" class="nav-link <?php echo ($current_page == 'stocks-options.php') ? 'active' : ''; ?>">
+                                <i class="fas fa-tags nav-icon"></i>
+                                <p>Stocks Management</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="products.php" class="nav-link <?php echo ($current_page == 'products.php') ? 'active' : ''; ?>">
                                 <i class="fas fa-cube nav-icon"></i>
-                                <p>Product List</p>
+                                <p>Product Management</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="categories.php" class="nav-link <?php echo ($current_page == 'categories.php') ? 'active' : ''; ?>">
-                                <i class="fas fa-tags nav-icon"></i>
-                                <p>Product Categories</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="brands.php" class="nav-link <?php echo ($current_page == 'brands.php') ? 'active' : ''; ?>">
-                                <i class="fas fa-industry nav-icon"></i>
-                                <p>Brands</p>
-                            </a>
-                        </li>
+
                     </ul>
                 </li>
 
@@ -70,12 +65,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <!-- Suppliers -->
-                <li class="nav-item">
-                    <a href="suppliers.php" class="nav-link <?php echo ($current_page == 'suppliers.php') ? 'active' : ''; ?>">
+<!--                 <li class="nav-item">
+                    <a href="suppliers.php" class="nav-link <?php //echo ($current_page == 'suppliers.php') ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-truck"></i>
                         <p>Suppliers</p>
                     </a>
-                </li>
+                </li> -->
 
                 <!-- Users -->
                 <li class="nav-item">

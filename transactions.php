@@ -17,8 +17,8 @@
                          <div class="card-header p-3">
                              <ul class="nav nav-pills">
                                  <li class="nav-item"><a class="nav-link active" href="#order" data-toggle="tab"><b>Order Transaction</b></a></li>
-                                 <li class="nav-item"><a class="nav-link" href="#ongoing" data-toggle="tab"><b>Ongoing Transaction</b></a></li>
-                                 <li class="nav-item"><a class="nav-link" href="#completed" data-toggle="tab"><b>Completed Transaction</b></a></li>
+                                 <li class="nav-item"><a class="nav-link" href="#ongoing" data-toggle="tab"><b>Ongoing Order</b></a></li>
+                                 <li class="nav-item"><a class="nav-link" href="#completed" data-toggle="tab"><b>Completed Order</b></a></li>
                              </ul>
                          </div>
                          <div class="card-body">
@@ -38,11 +38,11 @@
                                                     <thead>
                                                         <tr>
                                                             <th>Order ID</th>
+                                                            <th>Customer</th>
                                                             <th>Product</th>
-                                                            <th>Quantity</th>
-                                                            <th>Unit Price</th>
+                                                            <th>Unit Quantity & Price</th>
                                                             <th>Total Price</th>
-                                                            <th>Action</th>
+                                                            <th>Transaction Date</th>
                                                         </tr>
                                                     </thead>
                                                         <tbody>
@@ -77,10 +77,10 @@
                                                                     while ($row = mysqli_fetch_assoc($result)) {
                                                                         echo "<tr id='category-row-{$row['order_item_id']}'>
                                                                                 <td>{$row['order_id']}</td>
+                                                                                <td>{$row['customer_name']}</td>
                                                                                 <td>{$row['product_name']}</td>
-                                                                                <td>{$row['quantity']}</td>
-                                                                                <td>{$row['unit_price']}</td>
-                                                                                <td>{$row['total_price']}</td>
+                                                                                <td>{$row['quantity']} items with ₱{$row['unit_price']} unit price</td>
+                                                                                <td>₱{$row['total_price']}</td>
                                                                                 <td style='text-align:center;'>
                                                                                     <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['order_id']})'>Remove</button>
                                                                                 </td>
@@ -271,92 +271,119 @@
                                 </div>
                             </div>
                         </div>
-<!-- Place Order modal form -->
+<!-- Place Order Modal Form -->
 <div class="modal fade" id="add-order">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title"><i class="fas fa-tags"></i> Order Product</h4>
-
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="functions/insert_sql.php" method="post">
+                <form action="functions/insert_sql.php" method="post" id="orderForm">
                     <!-- Customer Information Section -->
                     <div class="row">
                         <h5 class="col-12"> &nbsp Customer Information:</h5>
-                        <div class="col-md-6 mb-3"> <!-- Added mb-3 here for spacing -->
-                            <input type="text" name="customer_name" class="form-control form-control-md" placeholder="Customer Name">
+                        <div class="col-md-6 mb-3">
+                            <input type="text" name="customer_name" class="form-control form-control-md" placeholder="Customer Name" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number">
+                            <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <input type="text" name="email" class="form-control form-control-md" placeholder="Email">
+                            <input type="text" name="email" class="form-control form-control-md" placeholder="Email" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <input type="text" name="address" class="form-control form-control-md" placeholder="Address">
+                            <input type="text" name="address" class="form-control form-control-md" placeholder="Address" required>
                         </div>
                     </div>
                     <hr>
-                    <!-- Order Detail Section -->
+
+                    <!-- Dynamic Order Items Section -->
+                    <div id="order-items">
+                        <!-- Initial Product Selection -->
+                        <div class="order-item">
+                            <h5 class="col-12"> &nbsp Order Detail:</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <select class="form-control form-control-md categorySelect" name="category_id[]" onchange="fetchBrand(this)">
+                                        <option selected hidden disabled>Select Category</option>
+                                        <?php
+                                        $query = "SELECT * FROM category_table";
+                                        $result = mysqli_query($conn, $query);
+                                        if (mysqli_num_rows($result) > 0) {
+                                            while ($row = mysqli_fetch_assoc($result)) {
+                                                echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
+                                            }
+                                        } else {
+                                            echo "<option disabled>No Categories Available</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <select class="form-control form-control-md brandSelect" name="brand_id[]" onchange="fetchProducts(this)">
+                                        <option selected hidden disabled>Select Brand</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <select class="form-control form-control-md productSelect" name="product_id[]" onchange="fetchPrice(this)">
+                                        <option selected hidden disabled>Select Product</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="number" name="quantity[]" class="form-control form-control-md" placeholder="Quantity">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="number" name="payment[]" class="form-control form-control-md" placeholder="Payment Amount (₱)">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <input type="text" class="form-control" name="price[]" placeholder="Product Price (₱)" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-secondary" onclick="addItem()">Add Another Product</button>
+                    <hr>
+
+                    <!-- Action Buttons -->
                     <div class="row">
-                        <h5 class="col-12"> &nbsp Order Detail:</h5>
                         <div class="col-md-6 mb-3">
-    <select class="form-control form-control-md" name="category_id" id="categorySelect" onchange="fetchBrand()">
-        <option selected hidden disabled>Select Category</option>
-        <?php
-        $query = "SELECT * FROM category_table";
-        $result = mysqli_query($conn, $query);
-
-        if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
-            }
-        } else {
-            echo "<option disabled>No Categories Available</option>";
-        }
-        ?>
-    </select>
+                            <button type="button" class="btn btn-default btn-md" data-dismiss="modal">Close</button>
+                        </div>
+                        <div class="col-md-6 text-right mb-3">
+                            <button type="submit" name="submit-order" class="btn btn-primary btn-md">Submit Order</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
 </div>
-<div class="col-md-6 mb-3">
-    <select class="form-control form-control-md" name="brand_id" id="brandSelect" onchange="fetchProducts()">
-        <option selected hidden disabled>Select Brand</option>
-    </select>
-</div>
-
-<div class="col-md-6 mb-3">
-    <select class="form-control form-control-md" name="product_id" id="productSelect" onchange="fetchPrice()">
-        <option selected hidden disabled>Select Product</option>
-    </select>
-</div>
-<div class="col-md-6 mb-3">
-    <input type="number" name="quantity" class="form-control form-control-md" placeholder="Quantity">
-</div>
-<div class="col-md-6 mb-3">
-    <input type="number" name="payment" class="form-control form-control-md" placeholder="Payment Amount (₱)">
-</div>
-<div class="col-md-6 mb-3">
-    <input type="text" class="form-control" name="price" id="priceInput" placeholder="Product Price (₱)" readonly>
-</div>
+<!-- /.modal -->
 
 <script>
-    function fetchBrand() {
-        const categoryId = document.getElementById('categorySelect').value;
-        const brandSelect = document.getElementById('brandSelect');
+    // Fetch Brands based on selected category
+    function fetchBrand(selectElement) {
+        const categoryId = selectElement.value;
+        const brandSelect = selectElement.closest('.order-item').querySelector('.brandSelect');
 
-        brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>';
+        brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>'; // Reset brands dropdown
 
         fetch(`functions/fetch_brands.php?category_id=${categoryId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.length > 0) {
-                    data.forEach(product => {
+                    data.forEach(brand => {
                         const option = document.createElement('option');
-                        option.value = brand.brand_id;
-                        option.textContent = brand.brand_name;
+                        option.value = brand.brand_id;  // Use brand_id from the data
+                        option.textContent = brand.brand_name;  // Use brand_name from the data
                         brandSelect.appendChild(option);
                     });
                 } else {
@@ -369,11 +396,12 @@
             .catch(error => console.error('Error fetching brands:', error));
     }
 
-    function fetchProducts() {
-        const brandId = document.getElementById('brandSelect').value;
-        const productSelect = document.getElementById('productSelect');
+    // Fetch Products based on selected brand
+    function fetchProducts(selectElement) {
+        const brandId = selectElement.value;
+        const productSelect = selectElement.closest('.order-item').querySelector('.productSelect');
 
-        productSelect.innerHTML = '<option selected hidden disabled>Select Product</option>';
+        productSelect.innerHTML = '<option selected hidden disabled>Select Product</option>'; // Reset products dropdown
 
         fetch(`functions/fetch_products.php?brand_id=${brandId}`)
             .then(response => response.json())
@@ -381,8 +409,8 @@
                 if (data.length > 0) {
                     data.forEach(product => {
                         const option = document.createElement('option');
-                        option.value = product.product_id;
-                        option.textContent = product.product_name;
+                        option.value = product.product_id;  // Use product_id from the data
+                        option.textContent = product.formatted_name;  // Use formatted product_name with size and color
                         productSelect.appendChild(option);
                     });
                 } else {
@@ -395,15 +423,15 @@
             .catch(error => console.error('Error fetching products:', error));
     }
 
-
-    function fetchPrice() {
-        const productId = document.getElementById('productSelect').value;
-        const priceInput = document.getElementById('priceInput');
+    // Fetch Price based on selected product
+    function fetchPrice(selectElement) {
+        const productId = selectElement.value;
+        const priceInput = selectElement.closest('.order-item').querySelector('input[name="price[]"]');
 
         fetch(`functions/fetch_price.php?product_id=${productId}`)
             .then(response => response.json())
             .then(data => {
-                if (data.price) {
+                if (data && data.price) {
                     priceInput.value = data.price;
                 } else {
                     priceInput.value = 'Price Not Available';
@@ -411,29 +439,58 @@
             })
             .catch(error => console.error('Error fetching price:', error));
     }
+
+    // Add another order item dynamically
+    function addItem() {
+        const orderItemsDiv = document.getElementById('order-items');
+        const newItem = document.createElement('div');
+        newItem.classList.add('order-item');
+        newItem.innerHTML = `
+            <h5 class="col-12"> &nbsp Order Detail:</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <select class="form-control form-control-md categorySelect" name="category_id[]" onchange="fetchBrand(this)">
+                        <option selected hidden disabled>Select Category</option>
+                        <?php
+                        $query = "SELECT * FROM category_table";
+                        $result = mysqli_query($conn, $query);
+                        if (mysqli_num_rows($result) > 0) {
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
+                            }
+                        } else {
+                            echo "<option disabled>No Categories Available</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <select class="form-control form-control-md brandSelect" name="brand_id[]" onchange="fetchProducts(this)">
+                        <option selected hidden disabled>Select Brand</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <select class="form-control form-control-md productSelect" name="product_id[]" onchange="fetchPrice(this)">
+                        <option selected hidden disabled>Select Product</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input type="number" name="quantity[]" class="form-control form-control-md" placeholder="Quantity">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input type="number" name="payment[]" class="form-control form-control-md" placeholder="Payment Amount (₱)">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input type="text" class="form-control" name="price[]" placeholder="Product Price (₱)" readonly>
+                </div>
+            </div>
+        `;
+        orderItemsDiv.appendChild(newItem);
+    }
 </script>
 
 
-                        
-                    </div>
-                    <hr>
-                    <!-- Action Buttons -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <button type="button" class="btn btn-default btn-md" data-dismiss="modal">Close</button>
-                        </div>
-                        <div class="col-md-6 text-right mb-3">
-                            <button type="submit" name="submit-order" class="btn btn-primary btn-md">Add</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
 
 
                          </div>

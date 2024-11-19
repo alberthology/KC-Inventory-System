@@ -169,7 +169,7 @@ if (isset($_POST['submit-order'])) {
             }
 
             // After inserting the order and its items, redirect or display success message
-            header("Location: ../sample.php"); // Redirect to the next page or success page
+            header("Location: ../transaction.php"); // Redirect to the next page or success page
             exit();
         }
     }

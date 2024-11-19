@@ -16,9 +16,9 @@
                      <div class="card">
                          <div class="card-header p-3">
                              <ul class="nav nav-pills">
-                                 <li class="nav-item"><a class="nav-link active" href="#order" data-toggle="tab"><b>Order Transaction</b></a></li>
-                                 <li class="nav-item"><a class="nav-link" href="#ongoing" data-toggle="tab"><b>Ongoing Order</b></a></li>
-                                 <li class="nav-item"><a class="nav-link" href="#completed" data-toggle="tab"><b>Completed Order</b></a></li>
+                                 <li class="nav-item"><a class="nav-link active" href="#order" data-toggle="tab"><b>Order Transactions</b></a></li>
+                                 <li class="nav-item"><a class="nav-link" href="#ongoing" data-toggle="tab"><b>Partially Paid Orders</b></a></li>
+                                 <li class="nav-item"><a class="nav-link" href="#completed" data-toggle="tab"><b>Completed Orders</b></a></li>
                              </ul>
                          </div>
                          <div class="card-body">
@@ -140,7 +140,8 @@
                                                                     o.total_amount,
                                                                     o.status
                                                                 FROM order_table o
-                                                                LEFT JOIN customer_table c ON o.customer_id = c.customer_id";
+                                                                LEFT JOIN customer_table c ON o.customer_id = c.customer_id
+                                                                WHERE status = ''";
                                                                 $result = mysqli_query($conn, $query);
 
                                                                 // Check if any categories exist
@@ -159,7 +160,7 @@
                                                                             </tr>";
                                                                     }
                                                                 } else {
-                                                                    echo "<tr><td colspan='7'>No orders found.</td></tr>";
+                                                                    echo "<tr><td colspan='7'>No ongoing orders found.</td></tr>";
                                                                 }
                                                                 ?>
                                                          </tbody>
@@ -203,7 +204,8 @@
                                                                     o.total_amount,
                                                                     o.status
                                                                 FROM order_table o
-                                                                LEFT JOIN customer_table c ON o.customer_id = c.customer_id";
+                                                                LEFT JOIN customer_table c ON o.customer_id = c.customer_id
+                                                                WHERE status = 'Completed'";
                                                                 $result = mysqli_query($conn, $query);
 
                                                                 // Check if any categories exist
@@ -286,7 +288,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title"><i class="fas fa-tags"></i> Order Product</h4>
+                <h4 class="modal-title"><i class="fas fa-tags"></i> &nbsp Order Product Detail: </h4>
 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -303,12 +305,12 @@
                         <div class="col-md-6 mb-3">
                             <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number">
                         </div>
-                        <div class="col-md-6 mb-3">
+<!--                         <div class="col-md-6 mb-3">
                             <input type="text" name="email" class="form-control form-control-md" placeholder="Email">
                         </div>
                         <div class="col-md-6 mb-3">
                             <input type="text" name="address" class="form-control form-control-md" placeholder="Address">
-                        </div>
+                        </div> -->
                     </div>
                     <hr>
                     <!-- Dynamic Order Items Section -->
@@ -317,10 +319,10 @@
 <div class="order-item" id="order-item-0">
     <!-- Order Detail Section -->
     <div class="row">
-        <h5 class="col-12"> &nbsp Order Detail:</h5>
-        <div class="col-md-6 mb-3">
+        <h5 class="col-12"> &nbsp Item Detail:</h5>
+        <div class="col-md-4 mb-3">
             <select class="form-control form-control-md" name="category_id[]" id="categorySelect-0" onchange="fetchBrand(0)">
-                <option selected hidden disabled>Select Category</option>
+                <option selected hidden disabled>Product Category</option>
                 <?php
                 $query = "SELECT * FROM category_table";
                 $result = mysqli_query($conn, $query);
@@ -335,52 +337,71 @@
             </select>
         </div>
 
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
             <select class="form-control form-control-md" name="brand_id[]" id="brandSelect-0" onchange="fetchProducts(0)">
-                <option selected hidden disabled>Select Brand</option>
+                <option selected hidden disabled>Brand</option>
             </select>
         </div>
 
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
             <select class="form-control form-control-md" name="product_name[]" id="productSelect-0" onchange="fetchSize(0)">
-                <option selected hidden disabled>Select Product</option>
+                <option selected hidden disabled>Select Item</option>
             </select>
         </div>
 
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
             <select class="form-control form-control-md" name="product_size[]" id="sizeSelect-0" onchange="fetchColor(0)">
-                <option selected hidden disabled>Select Size</option>
+                <option selected hidden disabled> Size Available</option>
             </select>
         </div>
 
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
             <select class="form-control form-control-md" name="product_color[]" id="colorSelect-0" onchange="fetchPrice(0)">
-                <option selected hidden disabled>Select Color</option>
+                <option selected hidden disabled>Color Available</option>
             </select>
         </div>
 
-        <div class="col-md-6 mb-3">
-            <input type="number" name="quantity[]" class="form-control form-control-md" placeholder="Quantity">
+        <div class="col-md-4 mb-3">
+            <select class="form-control form-control-md" name="order_table_status[]" id="statusSelect-0" onchange="handlePaymentStatusChange(0)">
+                <option selected hidden disabled>Payment Status</option>
+                <option value="Completed">Full Payment</option>
+                <option value="Ongoing">Partial Payment</option>
+            </select>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="quantityInput-0"> Quantity </label>
+            <input type="number" class="form-control" name="quantity[]" id="quantityInput-0" placeholder="Quantity" value="1" oninput="fetchPrice(0)">
         </div>
         
-        <div class="col-md-6 mb-3">
-            <select class="form-control form-control-md" name="order_table_status" id="sizeSelect-0">
-                <option selected hidden disabled>Payment Status</option>
-                <option value="completed">Full Payment</option>
-                <option value="ongoing">Partial Payment</option>
-            </select>
-        </div>
 
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
+            <label for="priceInput-0"> Price </label>
             <input type="text" class="form-control" name="price[]" id="priceInput-0" placeholder="Product Price (₱)" readonly>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="paymentInput-0"> Payment </label>
+            <input type="text" class="form-control" name="payment[]" id="paymentInput-0" placeholder="Payment (₱)" oninput="validatePaymentInput(this)">
         </div>
     </div>
 </div>
                     <hr>
 
-                    <button type="button" class="btn btn-secondary" onclick="addItem()">Add Another Product</button>
+                    <button type="button" class="btn btn-secondary" onclick="addItem()">Add Another Item</button>
                     <hr>
                     <script>
+                    function validatePaymentInput(inputElement) {
+                        // Remove non-numeric characters except for the decimal point
+                        inputElement.value = inputElement.value.replace(/[^0-9\.]/g, '');
+
+                        // Ensure only one decimal point is allowed
+                        if ((inputElement.value.match(/\./g) || []).length > 1) {
+                            inputElement.value = inputElement.value.replace(/\.(?=.*\.)/g, ''); // Remove extra decimal points
+                        }
+                    }
+
                     // Global counter for dynamically added order items
                     let itemCount = 0;
 
@@ -501,24 +522,67 @@
                             .catch(error => console.error('Error fetching color:', error));
                     }
 
-                    // Fetch product price based on selected product
-                    function fetchPrice(itemId) {
-                        const product_name = document.getElementById(`productSelect-${itemId}`).value;
-                        const product_color = document.getElementById(`colorSelect-${itemId}`).value;
-                        const product_size = document.getElementById(`sizeSelect-${itemId}`).value;
-                        const priceInput = document.getElementById(`priceInput-${itemId}`);
+                        // Fetch the price based on product, size, and color
+                        function fetchPrice(itemId) {
+                            const product_name = document.getElementById(`productSelect-${itemId}`).value;
+                            const product_color = document.getElementById(`colorSelect-${itemId}`).value;
+                            const product_size = document.getElementById(`sizeSelect-${itemId}`).value;
+                            const priceInput = document.getElementById(`priceInput-${itemId}`);
+                            const quantityInput = document.getElementById(`quantityInput-${itemId}`); // Assuming quantity is also an input field
+                            const paymentInput = document.getElementById(`paymentInput-${itemId}`);
 
-                        fetch(`functions/fetch_price.php?product_color=${product_color}&product_name=${product_name}&product_size=${product_size}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.price) {
-                                    priceInput.value = data.price;
-                                } else {
-                                    priceInput.value = 'Price Not Available';
-                                }
-                            })
-                            .catch(error => console.error('Error fetching price:', error));
-                    }
+                            fetch(`functions/fetch_price.php?product_color=${product_color}&product_name=${product_name}&product_size=${product_size}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.price) {
+                                        priceInput.value = data.price;
+
+                                        // Calculate total price (price * quantity)
+                                        const quantity = parseInt(quantityInput.value) || 1; // Default to 1 if quantity is not set
+                                        const totalPrice = data.price * quantity;
+
+                                        // If "Full Payment" is selected, set payment to the full price (totalPrice)
+                                        if (document.getElementById(`statusSelect-${itemId}`).value === "Completed") {
+                                            paymentInput.value = totalPrice; // Set payment to full amount
+                                        }
+                                    } else {
+                                        priceInput.value = 'Price Not Available';
+                                        paymentInput.value = '';
+                                    }
+                                })
+                                .catch(error => console.error('Error fetching price:', error));
+                        }
+
+                        // Handle the change in payment status (Full Payment or Partial Payment)
+                        function handlePaymentStatusChange(itemId) {
+                            const paymentInput = document.getElementById(`paymentInput-${itemId}`);
+                            const priceInput = document.getElementById(`priceInput-${itemId}`);
+                            const quantityInput = document.getElementById(`quantityInput-${itemId}`);
+                            const paymentStatus = document.getElementById(`statusSelect-${itemId}`).value;
+
+                            // Calculate the total price (price * quantity)
+                            const price = parseFloat(priceInput.value) || 0;
+                            const quantity = parseInt(quantityInput.value) || 1; // Default to 1 if quantity is not set
+                            const totalPrice = price * quantity;
+
+                            if (paymentStatus === "Completed") {
+                                // If Full Payment is selected, set payment to the total price (full payment)
+                                paymentInput.value = totalPrice;
+                                paymentInput.readOnly = true;  // Disable editing the payment field for full payment
+                            } else if (paymentStatus === "Ongoing") {
+                                // If Partial Payment is selected, allow the user to edit the payment
+                                paymentInput.readOnly = false;
+                                paymentInput.value = '';  // Clear payment input when partial payment is selected
+                            }
+                        }
+
+                        // You can call fetchPrice function when a user selects the product
+                        // Example: fetchPrice(0) when the product is selected for the first time
+
+
+                        // You can call fetchPrice function when a user selects the product
+                        // Example: fetchPrice(0) when the product is selected for the first time
+
 
                     // Add another order item dynamically
                     function addItem() {
@@ -529,8 +593,8 @@
                         newItem.classList.add('order-item');
                         newItem.innerHTML = `
                             <div class="row">
-                                <h5 class="col-12"> &nbsp Order Detail number: ${itemCount}</h5>
-                                <div class="col-md-6 mb-3">
+                                <h5 class="col-12"> &nbsp Item ${itemCount + 1} Detail:</h5>
+                                <div class="col-md-4 mb-3">
                                     <select class="form-control form-control-md" name="category_id[]" id="categorySelect-${itemCount}" onchange="fetchBrand(${itemCount})">
                                         <option selected hidden disabled>Select Category</option>
                                         <?php
@@ -547,41 +611,59 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <select class="form-control form-control-md" name="brand_id[]" id="brandSelect-${itemCount}" onchange="fetchProducts(${itemCount})">
                                         <option selected hidden disabled>Select Brand</option>
                                     </select>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <select class="form-control form-control-md" name="product_name[]" id="productSelect-${itemCount}" onchange="fetchSize(${itemCount})">
                                         <option selected hidden disabled>Select Product</option>
                                     </select>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <select class="form-control form-control-md" name="product_size[]" id="sizeSelect-${itemCount}" onchange="fetchColor(${itemCount})">
                                         <option selected hidden disabled>Select Size</option>
                                     </select>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <select class="form-control form-control-md" name="product_color[]" id="colorSelect-${itemCount}" onchange="fetchPrice(${itemCount})">
                                         <option selected hidden disabled>Select Color</option>
                                     </select>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
-                                    <input type="number" name="quantity[]" class="form-control form-control-md" placeholder="Quantity">
+                                <div class="col-md-4 mb-3">
+                                    <select class="form-control form-control-md" name="order_table_status[]" id="statusSelect-${itemCount}" onchange="handlePaymentStatusChange(${itemCount})">
+                                        <option selected hidden disabled>Payment Status</option>
+                                        <option value="Completed">Full Payment</option>
+                                        <option value="Ongoing">Partial Payment</option>
+                                    </select>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="quantityInput-${itemCount}"> Quantity </label>
+                                    <input type="number" class="form-control" name="quantity[]" id="quantityInput-${itemCount}" placeholder="Quantity" value="1" oninput="fetchPrice(${itemCount})">
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="priceInput-${itemCount}"> Price </label>
                                     <input type="text" class="form-control" name="price[]" id="priceInput-${itemCount}" placeholder="Product Price (₱)" readonly>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="paymentInput-${itemCount}"> Payment </label>
+                                    <input type="text" class="form-control" name="payment[]" id="paymentInput-${itemCount}" placeholder="Payment (₱)" oninput="validatePaymentInput(this)">
                                 </div>
                             </div>
                         `;
 
                         orderItemsDiv.appendChild(newItem);
                     }
+
                     </script>
                 </div>
 

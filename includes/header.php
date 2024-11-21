@@ -29,6 +29,8 @@ include 'functions/db_con.php';
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
 
 <!-- css -->
     <link rel="stylesheet" type="text/css" href="assets/css/main.css">

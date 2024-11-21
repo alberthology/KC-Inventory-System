@@ -37,7 +37,8 @@
 <table id="order-table" class="table table-bordered table-striped table-hover">
     <thead>
         <tr>
-            <th>Order ID</th>
+            <th>Order Number</th>
+            <th>Item ID</th>
             <th>Customer</th>
             <th>Product</th>
             <th>Unit Quantity & Price</th>
@@ -53,6 +54,7 @@
         c.order_item_id,
         c.order_id,
         p.product_name,
+        p.product_id,
         c.quantity,
         c.unit_price,
         c.total_price,
@@ -79,26 +81,23 @@
         // Check if any orders exist
         if (mysqli_num_rows($result) > 0) {
             // Iterate through each order and display in the table
-
             while ($row = mysqli_fetch_assoc($result)) {
                 // Convert the stored date and time to a readable format
                 $orderDate = new DateTime($row['order_date']);
                 $orderDateFormatted = $orderDate->format('g:i A, l, F j, Y'); // Format: MM dd, yyyy HH:mm pm
-                echo "<tr id='category-row-{$row['order_item_id']}'>
+                echo "<tr id='category-row-{$row['order_id']}'>
                         <td>{$row['order_id']}</td>
-                        <td>{$row['customer_name']}</td>  <!-- This should now work -->
+                        <td>{$row['product_id']}</td>
+                        <td>{$row['customer_name']}</td>
                         <td>{$row['product_name']}</td>
-                        <td>{$row['quantity']} items with ₱ {$row['unit_price']} unit price</td>
-                        <td>₱ {$row['total_price']}</td>
-                        <td style='text-align:center;'>
-                           {$orderDateFormatted}
-                        </td>
+                        <td>{$row['quantity']} items with ₱ " . number_format($row['unit_price'], 2) . " unit price</td>
+                        <td>₱ " . number_format($row['total_price'], 2) . "</td>
+                        <td style='text-align:center;'>{$orderDateFormatted}</td>
                     </tr>";
             }
         } else {
             echo "<tr><td colspan='6'>No orders found.</td></tr>";
-        }
-        ?>
+        }        ?>
     </tbody>
 </table>
 
@@ -117,54 +116,81 @@
 
                                                  <!-- /.card-header -->
                                                 <div class="card-body">
-                                                    <table id="ongoing-table" class="table table-bordered table-striped table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Order ID</th>
-                                                            <th>Customer</th>
-                                                            <th>Date Ordered</th>
-                                                            <th>Total Amount</th>
-                                                            <th>Status</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
+                                                    <table id="ongoing-table" class="table table-bordered table-striped table-hover"> 
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Customer</th>
+                                                                <th>Item Ordered ID</th>
+                                                                <th>Product</th>
+                                                                <th>Total Amount</th>
+                                                                <th>Payment</th>
+                                                                <th>Date Ordered</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
                                                         <tbody>
-                                                             <?php
+                                            <?php
+                                            $query = "
+                                                SELECT
+                                                    o.payment,
+                                                    o.order_item_id,
+                                                    o.product_id,
+                                                    o.quantity,
+                                                    o.unit_price,
+                                                    o.total_price,
+                                                    i.order_id,
+                                                    c.customer_name,
+                                                    c.contact_number,
+                                                    i.order_date,
+                                                    i.total_amount,
+                                                    i.status,
+                                                    p.product_name,
+                                                    p.product_name,
+                                                    p.product_name,
 
-                                                                // Query to fetch data from the order_table
-                                                                $query = "
-                                                                SELECT
-                                                                    o.order_id,
-                                                                    c.customer_name,
-                                                                    o.order_date,
-                                                                    o.total_amount,
-                                                                    o.status
-                                                                FROM order_table o
-                                                                LEFT JOIN customer_table c ON o.customer_id = c.customer_id
-                                                                WHERE status = ''";
-                                                                $result = mysqli_query($conn, $query);
+                                                FROM order_item_table o
+                                                LEFT JOIN order_table i ON o.order_id = i.order_id
+                                                LEFT JOIN product_table p ON o.product_id = p.product_id
+                                                LEFT JOIN customer_table c ON i.customer_id = c.customer_id
+                                                WHERE i.status = ''"; // Assumed status is 'ongoing'
 
-                                                                // Check if any categories exist
-                                                                if (mysqli_num_rows($result) > 0) {
-                                                                    // Iterate through each category and display in the table
-                                                                    while ($row = mysqli_fetch_assoc($result)) {
-                                                                        echo "<tr id='category-row-{$row['order_id']}'>
-                                                                                <td>{$row['order_id']}</td>
-                                                                                <td>{$row['customer_name']}</td>
-                                                                                <td>{$row['order_date']}</td>
-                                                                                <td>{$row['total_amount']}</td>
-                                                                                <td>{$row['status']}</td>
-                                                                                <td style='text-align:center;'>
-                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['order_id']})'>Remove</button>
-                                                                                </td>
-                                                                            </tr>";
-                                                                    }
-                                                                } else {
-                                                                    echo "<tr><td colspan='7'>No ongoing orders found.</td></tr>";
-                                                                }
-                                                                ?>
-                                                         </tbody>
-                                                     </table>
+                                            $result = mysqli_query($conn, $query);
+
+                                            // Check if any orders exist
+                                            if (mysqli_num_rows($result) > 0) {
+                                                // Iterate through each order and display in the table
+                                                while ($row = mysqli_fetch_assoc($result)) {
+                                                    // Format total_amount and payment with commas and 2 decimal places
+                                                    $formatted_total_amount = number_format($row['total_amount'], 2);
+                                                    $formatted_payment = number_format($row['payment'], 2);
+
+                                                    // Convert the stored date and time to a readable format
+                                                    $orderDate = new DateTime($row['order_date']);
+                                                    $orderDateFormatted = $orderDate->format('g:i A, l, F j, Y'); // Format: MM dd, yyyy HH:mm pm
+
+                                                    // Output the formatted data in the table
+                                                    echo "<tr id='order-row-{$row['order_item_id']}'>
+                                                            <td>{$row['customer_name']}</td>
+                                                            <td>{$row['order_item_id']}</td>
+                                                            <td>{$row['product_name']}</td>
+                                                            <td>₱ {$formatted_total_amount}</td>
+                                                            <td>₱ {$formatted_payment}</td>
+                                                            <td>{$orderDateFormatted}</td>
+                                                            <td style='text-align:center;'>
+                                                                <button class='btn btn-primary' onclick='openEditModal({$row['order_item_id']},\"{$formatted_payment}\")'>
+                                                                    Update Payment
+                                                                </button>
+                                                            </td>
+                                                          </tr>";
+                                                }
+                                            } else {
+                                                echo "<tr><td colspan='7'>No ongoing orders found.</td></tr>";
+                                            }
+                                            ?>
+
+                                                        </tbody>
+                                                    </table>
+
                                                  </div>
                                                  <!-- /.card-body -->
                                              </div>
@@ -172,6 +198,62 @@
                                          </div>
                                      </div>    
                                 </div>
+                <!-- Edit Stock Modal -->
+                        <div class="modal fade" id="edit-stocks">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title"><i class="fas fa-dolly"></i> &nbsp; Update Payment</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="edit_payment">Customer name:</label>
+                                                <p>ROOOY</p>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="edit_payment">Contact Number:</label>
+                                                <p>09676629818</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label for="edit_payment">Product Item:</label>
+                                                <p>ROOOY</p>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="edit_payment">Contact Number:</label>
+                                                <p>09676629818</p>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label for="edit_payment">Contact Number:</label>
+                                                <p>09676629818</p>
+                                            </div>
+                                        </div>
+
+
+                                        <form id="editStockForm" action="functions/edit_sql.php" method="post">
+                                        <input type="hidden" name="order_item_id" id="edit_order_item_id">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="edit_payment">Partial Payment:</label>
+                                                <input type="text" name="payment" id="edit_payment" class="form-control form-control-md" placeholder="Payment">
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer justify-content-between">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            <button type="submit" form="editStockForm" class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
 
                                 <div class="tab-pane" id="completed">
@@ -181,54 +263,76 @@
 
                                                  <!-- /.card-header -->
                                                 <div class="card-body">
-                                                    <table id="completed-table" class="table table-bordered table-striped table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Order ID</th>
-                                                            <th>Customer</th>
-                                                            <th>Date Ordered</th>
-                                                            <th>Total Amount</th>
-                                                            <th>Status</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
+                                                    <table id="ongoing-table" class="table table-bordered table-striped table-hover"> 
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Customer</th>
+                                                                <th>Item Ordered ID</th>
+                                                                <th>Product</th>
+                                                                <th>Total Amount</th>
+                                                                <th>Payment</th>
+                                                                <th>Date Ordered</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
                                                         <tbody>
-                                                             <?php
+                                                            <?php
+                                                // Query to fetch data from the order_table
+                                                $query = "
+                                                    SELECT
+                                                        o.payment,
+                                                        o.order_item_id,
+                                                        o.product_id,
+                                                        o.quantity,
+                                                        o.unit_price,
+                                                        o.total_price,
+                                                        i.order_id,
+                                                        c.customer_name,
+                                                        i.order_date,
+                                                        i.total_amount,
+                                                        i.status,
+                                                        p.product_name
+                                                    FROM order_item_table o
+                                                    LEFT JOIN order_table i ON o.order_id = i.order_id
+                                                    LEFT JOIN product_table p ON o.product_id = p.product_id
+                                                    LEFT JOIN customer_table c ON i.customer_id = c.customer_id
+                                                    WHERE i.status = 'Completed'"; // Assumed status is 'ongoing'
 
-                                                                // Query to fetch data from the order_table
-                                                                $query = "
-                                                                SELECT
-                                                                    o.order_id,
-                                                                    c.customer_name,
-                                                                    o.order_date,
-                                                                    o.total_amount,
-                                                                    o.status
-                                                                FROM order_table o
-                                                                LEFT JOIN customer_table c ON o.customer_id = c.customer_id
-                                                                WHERE status = 'Completed'";
-                                                                $result = mysqli_query($conn, $query);
+                                                $result = mysqli_query($conn, $query);
 
-                                                                // Check if any categories exist
-                                                                if (mysqli_num_rows($result) > 0) {
-                                                                    // Iterate through each category and display in the table
-                                                                    while ($row = mysqli_fetch_assoc($result)) {
-                                                                        echo "<tr id='category-row-{$row['order_id']}'>
-                                                                                <td>{$row['order_id']}</td>
-                                                                                <td>{$row['customer_name']}</td>
-                                                                                <td>{$row['order_date']}</td>
-                                                                                <td>{$row['total_amount']}</td>
-                                                                                <td>{$row['status']}</td>
-                                                                                <td style='text-align:center;'>
-                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['order_id']})'>Remove</button>
-                                                                                </td>
-                                                                            </tr>";
-                                                                    }
-                                                                } else {
-                                                                    echo "<tr><td colspan='7'>No orders found.</td></tr>";
-                                                                }
-                                                                ?>
-                                                         </tbody>
-                                                     </table>
+                                                // Check if any orders exist
+                                                if (mysqli_num_rows($result) > 0) {
+                                                    // Iterate through each order and display in the table
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                        // Format total_amount and payment with commas and 2 decimal places
+                                                        $formatted_total_amount = number_format($row['total_amount'], 2);
+                                                        $formatted_payment = number_format($row['payment'], 2);
+
+                                                        // Convert the stored date and time to a readable format
+                                                        $orderDate = new DateTime($row['order_date']);
+                                                        $orderDateFormatted = $orderDate->format('g:i A, l, F j, Y'); // Format: MM dd, yyyy HH:mm pm
+
+                                                        // Output the formatted data in the table
+                                                        echo "<tr id='order-row-{$row['order_item_id']}'>
+                                                                <td>{$row['customer_name']}</td>
+                                                                <td>{$row['order_item_id']}</td>
+                                                                <td>{$row['product_name']}</td>
+                                                                <td>₱ {$formatted_total_amount}</td>
+                                                                <td>₱ {$formatted_payment}</td>
+                                                                <td>{$orderDateFormatted}</td>
+                                                                <td style='text-align:center;'>
+                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['order_id']})'>Remove</button>
+                                                                </td>
+                                                              </tr>";
+                                                    }
+                                                } else {
+                                                    echo "<tr><td colspan='7'>No ongoing orders found.</td></tr>";
+                                                }
+                                                ?>
+
+                                                        </tbody>
+                                                    </table>
+
                                                  </div>
                                                  <!-- /.card-body -->
                                              </div>
@@ -238,51 +342,8 @@
                                 </div>
                             </div>
 
-                        <!-- Edit Stock Modal -->
-                        <div class="modal fade" id="edit-stocks">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h4 class="modal-title"><i class="fas fa-dolly"></i> &nbsp; Edit Product Brand</h4>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form id="editStockForm" action="functions/edit_sql.php" method="post">
-                                            <!-- Hidden field to store the ID of the record to edit -->
-                                            <input type="hidden" name="brand_id" id="edit_brand_id">
+                        
 
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="edit_brand_name">Brand Name</label>
-                                                    <input type="text" name="brand" id="edit_brand_name" class="form-control form-control-md" placeholder="Brand Name">
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <label for="edit_category_id">Category</label>
-                                                    <select class="form-control form-control-md" name="category_id" id="edit_category_id">
-                                                        <option selected hidden disabled>Select Category</option>
-                                                        <!-- Categories will be populated here by JavaScript -->
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <label for="edit_origin_country">Origin Country</label>
-                                                    <input type="text" name="origin_country" id="edit_origin_country" class="form-control form-control-md" placeholder="Originated Country">
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <label for="edit_description">Description</label>
-                                                    <input type="text" name="description" id="edit_description" class="form-control" placeholder="Brand Description">
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="modal-footer justify-content-between">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                        <button type="submit" form="editStockForm" class="btn btn-primary">Save Changes</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 <!-- Place Order modal form -->
 <div class="modal fade" id="add-order">
     <div class="modal-dialog modal-lg">
@@ -767,19 +828,19 @@ $(document).ready(function() {
 
 
 // Function to open the edit modal and populate it with data
-function openEditModal(id, brand, category_id, origin_country, description) {
+function openEditModal(order_item_id, payment) {
     // Set the values in the modal fields
-    $('#edit_brand_id').val(id);
-    $('#edit_brand_name').val(brand);
-    $('#edit_origin_country').val(origin_country);
-    $('#edit_description').val(description);
-
-    // Now, load the categories into the dropdown and select the current category
-    loadCategories(category_id);
+    $('#edit_order_item_id').val(order_item_id);
+    $('#edit_payment').val(payment);
+    $('#edit_order_item_id').val(order_item_id);
+    $('#edit_payment').val(payment);
+    $('#edit_order_item_id').val(order_item_id);
+    $('#edit_payment').val(payment);
 
     // Show the modal
     $('#edit-stocks').modal('show');
 }
+
 
 // Function to load categories dynamically via AJAX
 function loadCategories(selectedCategoryId) {

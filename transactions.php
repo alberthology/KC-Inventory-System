@@ -134,24 +134,30 @@
                                                 SELECT
                                                     o.payment,
                                                     o.order_item_id,
-                                                    o.product_id,
                                                     o.quantity,
                                                     o.unit_price,
                                                     o.total_price,
                                                     i.order_id,
-                                                    c.customer_name,
-                                                    c.contact_number,
                                                     i.order_date,
                                                     i.total_amount,
                                                     i.status,
+                                                    p.product_id,
                                                     p.product_name,
-                                                    p.product_name,
-                                                    p.product_name,
-
+                                                    p.quantity_in_stock,
+                                                    p.price,
+                                                    p.product_size,
+                                                    p.product_color,
+                                                    c.customer_id,
+                                                    c.customer_name,
+                                                    c.contact_number,
+                                                    v.category_name,
+                                                    b.brand_name
                                                 FROM order_item_table o
                                                 LEFT JOIN order_table i ON o.order_id = i.order_id
                                                 LEFT JOIN product_table p ON o.product_id = p.product_id
                                                 LEFT JOIN customer_table c ON i.customer_id = c.customer_id
+                                                LEFT JOIN category_table v ON p.category_id = v.category_id
+                                                LEFT JOIN brand_table b ON p.brand_id = b.brand_id
                                                 WHERE i.status = ''"; // Assumed status is 'ongoing'
 
                                             $result = mysqli_query($conn, $query);
@@ -177,14 +183,14 @@
                                                             <td>₱ {$formatted_payment}</td>
                                                             <td>{$orderDateFormatted}</td>
                                                             <td style='text-align:center;'>
-                                                                <button class='btn btn-primary' onclick='openEditModal({$row['order_item_id']},\"{$formatted_payment}\")'>
+                                                                <button class='btn btn-primary' onclick='openEditModal({$row['order_item_id']},\"{$row['customer_name']}\",\"{$row['contact_number']}\",\"{$row['category_name']}\",\"{$row['brand_name']}\",\"{$row['product_name']}\",\"{$row['product_size']}\",\"{$row['product_color']}\",\"{$row['status']}\",\"{$row['quantity']}\",\"{$row['price']}\",\"{$formatted_total_amount}\",\"{$formatted_payment}\")'>
                                                                     Update Payment
                                                                 </button>
                                                             </td>
                                                           </tr>";
                                                 }
                                             } else {
-                                                echo "<tr><td colspan='7'>No ongoing orders found.</td></tr>";
+                                                echo "<tr><td colspan='7'>No partially paid orders found.</td></tr>";
                                             }
                                             ?>
 
@@ -326,7 +332,7 @@
                                                               </tr>";
                                                     }
                                                 } else {
-                                                    echo "<tr><td colspan='7'>No ongoing orders found.</td></tr>";
+                                                    echo "<tr><td colspan='7'>No completed orders found.</td></tr>";
                                                 }
                                                 ?>
 

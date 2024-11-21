@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 13, 2024 at 09:03 AM
+-- Generation Time: Nov 21, 2024 at 09:10 AM
 -- Server version: 8.3.0
 -- PHP Version: 8.3.6
 
@@ -106,14 +106,21 @@ CREATE TABLE IF NOT EXISTS `customer_table` (
   `email` varchar(100) DEFAULT NULL,
   `address` text,
   PRIMARY KEY (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `customer_table`
 --
 
 INSERT INTO `customer_table` (`customer_id`, `customer_name`, `contact_number`, `email`, `address`) VALUES
-(1, 'John Doe', '09676629818', 'jdoe@gmail.com', 'Philippines');
+(20, 'Roy', '12346578912', NULL, NULL),
+(21, 'Chan', '12345678901', NULL, NULL),
+(22, 'Jd', '12345678902', NULL, NULL),
+(23, 'Jd', '12345678902', NULL, NULL),
+(24, 'Yawa', '12345678i0', NULL, NULL),
+(25, 'Joe', '2345678909', NULL, NULL),
+(26, 'Janjan', '12345678909', NULL, NULL),
+(27, 'Loyloy', '12345678909', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -149,21 +156,27 @@ CREATE TABLE IF NOT EXISTS `order_item_table` (
   `quantity` int NOT NULL,
   `unit_price` decimal(10,2) NOT NULL,
   `total_price` decimal(10,2) NOT NULL,
+  `payment` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`order_item_id`),
   KEY `order_id` (`order_id`),
   KEY `product_id` (`product_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `order_item_table`
 --
 
-INSERT INTO `order_item_table` (`order_item_id`, `order_id`, `product_id`, `quantity`, `unit_price`, `total_price`) VALUES
-(3, 5, 3, 2, 15.00, 0.00),
-(4, 5, 4, 1, 20.00, 0.00),
-(5, 5, 6, 3, 10.00, 0.00),
-(7, 7, 3, 2, 50.00, 100.00),
-(8, 7, 6, 1, 100.00, 100.00);
+INSERT INTO `order_item_table` (`order_item_id`, `order_id`, `product_id`, `quantity`, `unit_price`, `total_price`, `payment`) VALUES
+(23, 20, 7, 2, 59.99, 119.98, 119.98),
+(24, 21, 6, 1, 899.99, 899.99, 500.00),
+(25, 21, 3, 2, 129.99, 259.98, 259.98),
+(26, 22, 8, 1, 49.99, 49.99, 30.00),
+(27, 23, 6, 1, 899.99, 899.99, 200.00),
+(28, 23, 8, 1, 49.99, 49.99, 20.00),
+(29, 24, 6, 1, 899.99, 899.99, 200.00),
+(30, 25, 21, 1, 20000.00, 20000.00, 10000.00),
+(31, 25, 7, 2, 59.99, 119.98, 119.98),
+(32, 26, 24, 1, 200.00, 200.00, 200.00);
 
 -- --------------------------------------------------------
 
@@ -177,22 +190,23 @@ CREATE TABLE IF NOT EXISTS `order_table` (
   `customer_id` int NOT NULL,
   `order_date` datetime DEFAULT CURRENT_TIMESTAMP,
   `total_amount` decimal(10,2) DEFAULT NULL,
-  `status` enum('completed','pending','cancelled') DEFAULT NULL,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   KEY `customer_id` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `order_table`
 --
 
 INSERT INTO `order_table` (`order_id`, `customer_id`, `order_date`, `total_amount`, `status`) VALUES
-(2, 1, '2024-11-13 14:33:30', NULL, NULL),
-(3, 1, '2024-11-13 14:39:14', NULL, NULL),
-(4, 1, '2024-11-13 14:39:35', NULL, NULL),
-(5, 1, '2024-11-13 14:40:41', 80.00, NULL),
-(6, 1, '2024-11-13 00:00:00', 200.00, NULL),
-(7, 1, '2024-11-13 00:00:00', 200.00, NULL);
+(20, 20, '2024-11-19 19:12:48', 119.98, 'completed'),
+(21, 21, '2024-11-19 19:13:39', 1159.97, ''),
+(22, 23, '2024-11-19 19:51:55', 49.99, ''),
+(23, 24, '2024-11-19 19:52:55', 949.98, ''),
+(24, 25, '2024-11-21 09:36:10', 899.99, ''),
+(25, 26, '2024-11-21 09:50:44', 20119.98, ''),
+(26, 27, '2024-11-21 12:05:40', 200.00, 'Completed');
 
 -- --------------------------------------------------------
 
@@ -204,6 +218,8 @@ DROP TABLE IF EXISTS `product_table`;
 CREATE TABLE IF NOT EXISTS `product_table` (
   `product_id` int NOT NULL AUTO_INCREMENT,
   `product_name` varchar(150) NOT NULL,
+  `product_size` varchar(50) DEFAULT NULL,
+  `product_color` varchar(100) DEFAULT NULL,
   `category_id` int DEFAULT NULL,
   `description` text,
   `quantity_in_stock` int DEFAULT '0',
@@ -214,26 +230,27 @@ CREATE TABLE IF NOT EXISTS `product_table` (
   KEY `category_id` (`category_id`),
   KEY `supplier_id` (`supplier_id`),
   KEY `fk_product_brand` (`brand_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `product_table`
 --
 
-INSERT INTO `product_table` (`product_id`, `product_name`, `category_id`, `description`, `quantity_in_stock`, `price`, `supplier_id`, `brand_id`) VALUES
-(3, 'Nike Air Max 270', 15, 'A stylish, comfortable running shoe with air cushioning.', 50, 129.99, NULL, 1),
-(4, 'Adidas Ultraboost', 15, 'Premium running shoe with Boost technology for comfort.', 30, 179.99, NULL, 2),
-(6, 'Samsung Galaxy S24', 4, 'Powerful smartphone with AMOLED display and 5G support.', 75, 899.99, NULL, 4),
-(7, 'Levi\'s 501 Jeans', 3, 'Classic straight-leg jeans made from premium denim.', 200, 59.99, NULL, 5),
-(8, 'Wrangler Bootcut', 3, 'Bootcut jeans, perfect for casual and work settings.', 150, 49.99, NULL, 6),
-(9, 'Canon EOS 90D', 4, 'High-performance DSLR camera with 32.5 MP sensor.', 20, 1199.99, NULL, 7),
-(10, 'Nikon D7500', 4, 'DSLR camera with 4K video recording and fast autofocus.', 25, 899.99, NULL, 8),
-(11, 'L\'Oréal Revitalift', 10, 'Anti-aging cream that smoothes and firms the skin.', 100, 29.99, NULL, 9),
-(12, 'Estée Lauder Advanced Night Repair', 10, 'Overnight serum that reduces the look of wrinkles.', 80, 89.99, NULL, 10),
-(13, 'Bosch Drill Set', 16, 'Compact power drill with multiple bits for various tasks.', 40, 99.99, NULL, 11),
-(14, 'DeWalt Cordless Drill', 16, 'Durable cordless drill with high torque for heavy-duty tasks.', 60, 149.99, NULL, 12),
-(20, 'iPhone 11', 4, 'Sample data', 6, 17000.00, NULL, 3),
-(21, 'iPhone 15', 4, 'Sample data 2', 6, 20000.00, NULL, 3);
+INSERT INTO `product_table` (`product_id`, `product_name`, `product_size`, `product_color`, `category_id`, `description`, `quantity_in_stock`, `price`, `supplier_id`, `brand_id`) VALUES
+(3, 'Air Max 270', 'Medium', 'White', 15, 'A stylish, comfortable running shoe with air cushioning.', 50, 129.99, NULL, 1),
+(4, 'Ultraboost', 'Large', 'Red', 15, 'Premium running shoe with Boost technology for comfort.', 30, 179.99, NULL, 2),
+(6, 'Galaxy S24', 'Default', 'Black', 4, 'Powerful smartphone with AMOLED display and 5G support.', 75, 899.99, NULL, 4),
+(7, '501 Jeans', 'Medium', 'Denim', 3, 'Classic straight-leg jeans made from premium denim.', 200, 59.99, NULL, 5),
+(8, 'Wrangler Bootcut', 'Small', 'Blue', 3, 'Bootcut jeans, perfect for casual and work settings.', 150, 49.99, NULL, 6),
+(9, 'Canon EOS 90D', 'Default', 'Black', 4, 'High-performance DSLR camera with 32.5 MP sensor.', 20, 1199.99, NULL, 7),
+(10, 'Nikon D7500', 'Default', 'Black', 4, 'DSLR camera with 4K video recording and fast autofocus.', 25, 899.99, NULL, 8),
+(11, 'L\'Oréal Revitalift', 'Default', 'Default', 10, 'Anti-aging cream that smoothes and firms the skin.', 100, 29.99, NULL, 9),
+(12, 'Estée Lauder Advanced Night Repair', 'Default', 'Default', 10, 'Overnight serum that reduces the look of wrinkles.', 80, 89.99, NULL, 10),
+(13, 'Bosch Drill Set', 'Default', 'Black', 16, 'Compact power drill with multiple bits for various tasks.', 40, 99.99, NULL, 11),
+(14, 'DeWalt Cordless Drill', 'Default', 'Yellow', 16, 'Durable cordless drill with high torque for heavy-duty tasks.', 60, 149.99, NULL, 12),
+(20, 'iPhone 11', 'Default', 'White', 4, 'Sample data', 6, 17000.00, NULL, 3),
+(21, 'iPhone 15', 'Default', 'White', 4, 'Sample data 2', 6, 20000.00, NULL, 3),
+(24, 'Air Max 270', 'Small', 'Black', 3, NULL, 20, 200.00, NULL, 1);
 
 -- --------------------------------------------------------
 

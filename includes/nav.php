@@ -46,8 +46,8 @@
                 <a href="profile.php" class="dropdown-item">
                     <i class="fas fa-user-circle mr-2"></i> Profile
                 </a>
-                <a href="stocks-options.php" class="dropdown-item">
-                    <i class="fas fa-cog mr-2"></i> Stocks Options
+                <a href="archive.php" class="dropdown-item">
+                    <i class="fas fa-folder mr-2"></i> Archive Logs
                 </a>
                 <div class="dropdown-divider"></div>
                 <a href="logout.php" class="dropdown-item">

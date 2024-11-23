@@ -1,3 +1,6 @@
+C0#B0#P#-customer#order# (C01B02P4-012021)
+
+
 1. Categories Table (category_table)
 Purpose: To categorize items for easier tracking (e.g., electronics, furniture, clothing, etc.).
 

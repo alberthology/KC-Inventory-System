@@ -21,10 +21,13 @@ include 'functions/db_con.php';
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
 
 <!-- Select2 CSS -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <!-- jQuery (required for Select2) -->
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -52,6 +55,28 @@ include 'functions/db_con.php';
             width: 250px;
             /* Set a fixed width */
         }
+.comment-box {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+.control-number {
+            font-weight: bold;
+            margin-top: 5px;
+            margin-bottom: 25px;
+        }
+.suggestion {
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+.date{
+                font-size: 14px;
+                color:#808080;
+
+}
+
     </style>
 </head>
 

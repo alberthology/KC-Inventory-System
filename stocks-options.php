@@ -197,6 +197,7 @@
                                     <div class="modal-body">
                                         <form id="editStockForm" action="functions/edit_sql.php" method="post">
                                             <!-- Hidden field to store the ID of the record to edit -->
+                                        <input type="hidden" name="form_type" value="update_brand">
                                             <input type="hidden" name="brand_id" id="edit_brand_id">
 
                                             <div class="row">

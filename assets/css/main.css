@@ -10,10 +10,6 @@
     overflow-y: auto; /* Add scroll to sidebar if needed */
 }
 
-.sidebar-dark-teal {
-/*    background-color: #008080 !important;*/
-}
-
 /* Ensure the content area doesn't get hidden behind the sidebar */
 .content-wrapper {
     margin-left: 250px; /* Adjust this value based on the width of your sidebar */
@@ -23,6 +19,7 @@ body {
     padding-left: 0 !important; /* Remove default body padding */
     overflow-x: hidden; /* Disable horizontal overflow (optional) */
 }
+
 
 .nav-sidebar {
     display: flex;

@@ -340,7 +340,7 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                                             <div class="col-md-4 mb-3">
                                                 <label for="edit_status">Payment Status:</label>
                                                 <br>
-                                                <span class="badge bg-warning text-dark" id="edit_status"></span>
+                                                <span class="badge bg-warning text-dark" id="">Partially Paid</span>
                                                 
                                             </div>
                                         </div>

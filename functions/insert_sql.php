@@ -61,6 +61,7 @@ if (isset($_POST['submit-brand'])) {
 }
 
 
+// Order processing logic
 if (isset($_POST['submit-order'])) {
     // Step 1: Insert into customer_table
     $customer_name = mysqli_real_escape_string($conn, $_POST['customer_name']);
@@ -71,7 +72,7 @@ if (isset($_POST['submit-order'])) {
     // Insert the customer and retrieve the customer_id
     $customer_id = insertRecord(
         'customer_table',
-        '`customer_name`, `contact_number`',
+        'customer_name, contact_number',
         "'$customer_name', '$contact_number'",
         "Customer added successfully!",
         "Error adding customer! Please try again."
@@ -80,7 +81,6 @@ if (isset($_POST['submit-order'])) {
     if ($customer_id) {
         // Step 2: Insert into order_table with customer_id and payment status
         $order_date = date('Y-m-d H:i:s'); // Store the current date and time
-        // Ensure to access the first value from the array
         $payment_status = mysqli_real_escape_string($conn, $_POST['order_table_status'][0]); // Get the payment status from the form
 
         // Get arrays for product_name, product_color, product_size, quantity, and price
@@ -100,7 +100,7 @@ if (isset($_POST['submit-order'])) {
         // Insert the order and retrieve the order_id
         $order_id = insertRecord(
             'order_table',
-            '`customer_id`, `order_date`, `total_amount`, `status`',
+            'customer_id, order_date, total_amount, status',
             "'$customer_id', '$order_date', '$total_amount', '$payment_status'",
             "Order placed successfully!",
             "Error placing order! Please try again."
@@ -109,34 +109,58 @@ if (isset($_POST['submit-order'])) {
         if ($order_id) {
             // Step 3: Insert each product into order_item_table using the order_id and payment
             foreach ($product_names as $index => $product_name) {
-                // Fetch product_id using product_name, product_color, product_size
+                // Fetch product details
                 $product_color = mysqli_real_escape_string($conn, $product_colors[$index]);
                 $product_size = mysqli_real_escape_string($conn, $product_sizes[$index]);
                 $quantity = mysqli_real_escape_string($conn, $quantities[$index]);
                 $price = mysqli_real_escape_string($conn, $prices[$index]);
                 $total_price = $quantity * $price;
-                $payment = mysqli_real_escape_string($conn, $payments[$index]); // Get payment for each item
+                $payment = mysqli_real_escape_string($conn, $payments[$index]);
 
-                // Query to get the product_id
-                $sql = "SELECT product_id FROM product_table WHERE product_name = '$product_name' AND product_color = '$product_color' AND product_size = '$product_size' LIMIT 1";
+                // Query to get the product_id and quantity_in_stock
+                $sql = "SELECT product_id, quantity_in_stock FROM product_table WHERE product_name = '$product_name' AND product_color = '$product_color' AND product_size = '$product_size' LIMIT 1";
                 $result = mysqli_query($conn, $sql);
 
                 if ($result && mysqli_num_rows($result) > 0) {
                     $product = mysqli_fetch_assoc($result);
                     $product_id = $product['product_id'];
+                    $stock_quantity = $product['quantity_in_stock'];
+
+                    // Check if there is enough stock
+                    if ($stock_quantity < $quantity) {
+                        // If there is not enough stock, show error message and exit
+                        $_SESSION['message'] = "Error: Insufficient stock for product $product_name. Available stock: $stock_quantity.";
+                        $_SESSION['message_type'] = "error";
+                        header("Location: ../order_page.php"); // Redirect to the order page to show the error
+                        exit();
+                    }
 
                     // Insert the order item into the database
                     $item_values = "'$order_id', '$product_id', '$quantity', '$price', '$total_price', '$payment'";
                     insertRecord(
                         'order_item_table',
-                        '`order_id`, `product_id`, `quantity`, `unit_price`, `total_price`, `payment`',
+                        'order_id, product_id, quantity, unit_price, total_price, payment',
                         $item_values,
                         "Item added successfully!",
                         "Error adding item! Please try again."
                     );
+
+                    // Update the product stock after the order is placed
+                    $new_stock_quantity = $stock_quantity - $quantity;
+                    $update_sql = "UPDATE product_table SET quantity_in_stock = '$new_stock_quantity' WHERE product_id = '$product_id'";
+                    if ($conn->query($update_sql) === FALSE) {
+                        $_SESSION['message'] = "Error updating stock for product $product_name.";
+                        $_SESSION['message_type'] = "error";
+                        header("Location: ../order_page.php");
+                        exit();
+                    }
+
                 } else {
                     // Handle case where product not found
-                    die("Error: Product not found in the product table.");
+                    $_SESSION['message'] = "Error: Product not found in the product table.";
+                    $_SESSION['message_type'] = "error";
+                    header("Location: ../order_page.php");
+                    exit();
                 }
             }
 

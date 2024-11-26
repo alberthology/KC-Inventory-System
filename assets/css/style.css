@@ -33,6 +33,15 @@ body {
 }
 
 
+/* Add this to your stylesheet */
+#brand-table th, #brand-table td {
+    width: auto;
+}
+#product-table th, #product-table td {
+    width: auto;
+}
+
+
 @media (min-width: 1024px) {
     body {
         overflow-y: hidden;

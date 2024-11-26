@@ -176,13 +176,14 @@ $result = mysqli_query($conn, $query);
 if (mysqli_num_rows($result) > 0) {
     // Iterate through each Product and display in the table
     while ($row = mysqli_fetch_assoc($result)) {
+        $formatted_price = number_format($row['price'], 2);
         echo "<tr id='product-row-{$row['product_id']}'>
                 <td>{$row['product_id']}</td>
                 <td>{$row['product_name']}</td>
                 <td>{$row['category_name']}</td> <!-- Show category name -->
                 <td>{$row['brand_name']}</td> <!-- Show brand name -->
                 <td>{$row['quantity_in_stock']}</td>
-                <td>{$row['price']}</td>
+                <td>{$formatted_price}</td>
                 <td style='text-align:center;'>
                     <button class='btn btn-danger btn-sm' onclick='removeProduct({$row['product_id']})'>Remove</button>
                 </td>
@@ -374,71 +375,89 @@ if (mysqli_num_rows($result) > 0) {
                                             <form action="functions/insert_sql.php" method="post">
                                                 <div class="row">
                                                     <div class="col-md-12">
-                                                        <input type="text" name="Product" class="form-control form-control-md" placeholder="Product Name">
+                                                        <input type="text" name="product" class="form-control form-control-md" placeholder="Product Name">
                                                     </div>
 
                                                     <div class="col-md-12">
-                                                        <select class="form-control form-control-md" name="category_id">
-                                                            <option selected hidden disabled>Select Category</option>
-        <?php           // Query to fetch data from the category_table
-                $query = "SELECT * FROM category_table";
-                $result = mysqli_query($conn, $query);
+    <select class="form-control form-control-md" name="category_id" id="category_id">
+        <option selected hidden disabled>Select Category</option>
+        <?php
+        // Query to fetch data from the category_table
+        $query = "SELECT * FROM category_table";
+        $result = mysqli_query($conn, $query);
 
-                // Check if any categories exist
-                if (mysqli_num_rows($result) > 0) {
-                    // Iterate through each category and display in the table
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
-                    }
+        // Check if any categories exist
+        if (mysqli_num_rows($result) > 0) {
+            // Iterate through each category and display in the table
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo "<option value='" . $row['category_id'] . "'>" . $row['category_name'] . "</option>";
+            }
+        } else {
+            echo "<option disabled>No Category Available</option>";
+        }
+        ?>
+    </select>
+</div>
+
+<div class="col-md-12">
+    <select class="form-control form-control-md" name="brand_id" id="brand_id">
+        <option selected hidden disabled>Select Brand</option>
+        <!-- Brands will be populated based on the category selected -->
+    </select>
+</div>
+
+<script type="text/javascript">
+    
+    document.getElementById('category_id').addEventListener('change', function () {
+    var categoryId = this.value;
+
+    // Make sure a category is selected before making the request
+    if (categoryId) {
+        // Create an AJAX request
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'functions/get_brands.php?category_id=' + categoryId, true);
+        xhr.onload = function () {
+            if (xhr.status == 200) {
+                var brandSelect = document.getElementById('brand_id');
+                var brands = JSON.parse(xhr.responseText);
+
+                // Clear the existing options
+                brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>';
+
+                // Populate the brand options
+                if (brands.length > 0) {
+                    brands.forEach(function (brand) {
+                        var option = document.createElement('option');
+                        option.value = brand.brand_id;
+                        option.textContent = brand.brand_name;
+                        brandSelect.appendChild(option);
+                    });
                 } else {
-                    echo "<option disabled>No Category Available</option>";
+                    brandSelect.innerHTML = '<option disabled>No Brand Available</option>';
                 }
-                ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <select class="form-control form-control-md" name="brand_id">
-                                                            <option selected hidden disabled>Select Brand</option>
-        <?php           // Query to fetch data from the brand_table
-                $query = "SELECT * FROM brand_table";
-                $result = mysqli_query($conn, $query);
+            }
+        };
+        xhr.send();
+    } else {
+        // If no category is selected, clear the brand dropdown
+        document.getElementById('brand_id').innerHTML = '<option selected hidden disabled>Select Brand</option>';
+    }
+});
 
-                // Check if any categories exist
-                if (mysqli_num_rows($result) > 0) {
-                    // Iterate through each brand and display in the table
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<option value='". $row['brand_id'] ."'>". $row['brand_name']."</option>";
-                    }
-                } else {
-                    echo "<option disabled>No Brand Available</option>";
-                }
-                ?>
-                                                        </select>
+</script>
+                                                    <div class="col-md-6">
+                                                        <input type="text" name="size" class="form-control form-control-md" placeholder="Input Size">
+                                                        
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <input type="text" name="color" class="form-control form-control-md" placeholder="Input Color">
+                                                        
+                                                    </div>
+                                                    <div class="col-md-12 mt-3">
+                                                        <input type="number" name="quantity" class="form-control form-control-md" placeholder="Stock Quantity" min="1">
                                                     </div>
                                                     <div class="col-md-12">
-                                                        <select class="form-control form-control-md" name="supplier_id">
-                                                            <option selected hidden disabled>Select Supplier</option>
-        <?php           // Query to fetch data from the supplier_table
-                $query = "SELECT * FROM supplier_table";
-                $result = mysqli_query($conn, $query);
-
-                // Check if any categories exist
-                if (mysqli_num_rows($result) > 0) {
-                    // Iterate through each supplier and display in the table
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<option value='". $row['supplier_id'] ."'>". $row['supplier_name']."</option>";
-                    }
-                } else {
-                    echo "<option disabled>No supplier Available</option>";
-                }
-                ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="number" name="Quantity" class="form-control form-control-md" placeholder="Stock Quantity">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="number" name="Price" class="form-control form-control-md" placeholder="Product Price">
+                                                        <input type="text" name="price" id="price" class="form-control form-control-md" placeholder="Product Price">
                                                     </div>
 
                                                     <div class="col-md-12">
@@ -520,53 +539,112 @@ if (mysqli_num_rows($result) > 0) {
     ?>
 
  <script>
-     $(document).ready(function() {
-         // Initialize shoes-table by default
-         $('#category-table').DataTable({
-             "paging": true,
-             "lengthChange": true,
-             "searching": true,
-             "ordering": true,
-             "info": true,
-             "autoWidth": true,
-             "responsive": true,
-             "pageLength": 10 // Display 10 items per page
-         });
 
-         // Reinitialize bags-table and clothes-table when their tabs are shown
-         $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-             var target = $(e.target).attr("href"); // Get the target tab
+$(document).ready(function() {
+    var brandTable;
+    var productTable;
 
-             if (target === "#brand") {
-                 if (!$.fn.DataTable.isDataTable('#brand-table')) {
-                     $('#brand-table').DataTable({
-                         "paging": true,
-                         "lengthChange": true,
-                         "searching": true,
-                         "ordering": true,
-                         "info": true,
-                         "autoWidth": true,
-                         "responsive": true,
-                         "pageLength": 10 // Display 10 items per page
-                     });
-                 }
-             }
-             if (target === "#product") {
-                 if (!$.fn.DataTable.isDataTable('#product-table')) {
-                     $('#product-table').DataTable({
-                         "paging": true,
-                         "lengthChange": true,
-                         "searching": true,
-                         "ordering": true,
-                         "info": true,
-                         "autoWidth": true,
-                         "responsive": true,
-                         "pageLength": 10 // Display 10 items per page
-                     });
-                 }
-             }
-         });
-     });
+    // Initialize the category table by default
+    var categoryTable = $('#category-table').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": true,
+        "responsive": true,
+        "pageLength": 10 // Display 10 items per page
+    });
+
+$(document).ready(function() {
+    // Make the tables visible before initializing DataTables
+    $('#brand-table').css('display', 'table');
+    $('#product-table').css('display', 'table');
+
+    // Initialize the DataTable for the brand table
+    var brandTable = $('#brand-table').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": true,
+        "responsive": true,
+        "pageLength": 10 // Display 10 items per page
+    });
+
+    // Initialize the DataTable for the product table
+    var productTable = $('#product-table').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": true,
+        "responsive": true,
+        "pageLength": 10 // Display 10 items per page
+    });
+});
+
+
+    // Initialize DataTable for brand table when the tab is shown
+/*    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+        var target = $(e.target).attr("href"); // Get the target tab
+
+        if (target === "#brand" && !$.fn.DataTable.isDataTable('#brand-table')) {
+            if (brandTable) {
+                brandTable.destroy(); // Destroy the old instance if it exists
+            }
+            brandTable = $('#brand-table').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true,
+                "responsive": true,
+                "pageLength": 10
+            });
+        }
+
+        if (target === "#product" && !$.fn.DataTable.isDataTable('#product-table')) {
+            if (productTable) {
+                productTable.destroy(); // Destroy the old instance if it exists
+            }
+            productTable = $('#product-table').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true,
+                "responsive": true,
+                "pageLength": 10
+            });
+        }
+    });*/
+});
+
+
+
+    document.getElementById('price').addEventListener('input', function(event) {
+        // Get the input value
+        let value = event.target.value;
+        
+        // Remove any non-numeric characters (except for decimal points)
+        value = value.replace(/[^0-9.]/g, '');
+
+        // Split the number into integer and decimal parts (if any)
+        let parts = value.split('.');
+
+        // Format the integer part with commas
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // Join the parts back together, ensuring the decimal part is included if there was one
+        event.target.value = parts.join('.');
+    });
+
+
 
 
 // Function to open the edit modal and populate it with data

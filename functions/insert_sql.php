@@ -59,7 +59,35 @@ if (isset($_POST['submit-brand'])) {
     header("Location: ../stocks-options.php");
     exit();
 }
+if (isset($_POST['submit-product'])) {
+    $product = $_POST['product'];
+    $category_id = $_POST['category_id'];
+    $brand_id = $_POST['brand_id'];
+    $description = $_POST['description'];
+    $size = $_POST['size'];
+    $color = $_POST['color'];
+    $quantity = $_POST['quantity'];
+    $price = $_POST['price'];
 
+    // Remove commas from price input (e.g., "1,000" becomes "1000")
+    $price = str_replace(',', '', $price);
+
+    // Optionally, validate price is numeric and convert it to a float if needed
+    $price = floatval($price); // Ensures it's treated as a float number
+
+    // Insert record into the database
+    insertRecord(
+        'product_table',
+        '`product_name`, `product_size`, `product_color`, `category_id`, `description`, `quantity_in_stock`, `price`, `brand_id`',
+        "'$product', '$size', '$color', '$category_id', '$description', '$quantity', '$price', '$brand_id'",
+        "Product added successfully!",
+        "Error adding product! Please try again."
+    );
+
+    // Redirect to stocks-options.php
+    header("Location: ../stocks-options.php");
+    exit();
+}
 
 // Order processing logic
 if (isset($_POST['submit-order'])) {

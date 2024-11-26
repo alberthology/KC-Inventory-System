@@ -4,90 +4,137 @@ include 'db_con.php';
 
 
 // Function to handle the insert and set session messages
+/*function insertRecord($table, $columns, $values, $successMessage, $errorMessage) {
+    global $conn;
+
+   
+    $sql = "INSERT INTO $table ($columns) VALUES ($values)";
+
+    
+    if ($conn->query($sql) === TRUE) {
+        $_SESSION['message'] = $successMessage;
+        $_SESSION['message_type'] = "success"; 
+        return $conn->insert_id; 
+    } else {
+        $_SESSION['message'] = $errorMessage . $conn->error;
+        $_SESSION['message_type'] = "error"; 
+        return false;
+    }
+}*/
+
+
 function insertRecord($table, $columns, $values, $successMessage, $errorMessage) {
     global $conn;
 
-    // Build the SQL insert query
-    $sql = "INSERT INTO $table ($columns) VALUES ($values)";
+    // Split columns and values into arrays
+    $columnArray = explode(',', $columns);
+    $placeholders = rtrim(str_repeat('?, ', count($values)), ', ');
 
-    // Execute the query and set session message based on the result
-    if ($conn->query($sql) === TRUE) {
-        $_SESSION['message'] = $successMessage;
-        $_SESSION['message_type'] = "success"; // success type
-        return $conn->insert_id; // Return the auto-generated ID (for order_id or customer_id)
+    // Build the SQL insert query with placeholders
+    $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
+
+    // Prepare the SQL query
+    if ($stmt = $conn->prepare($sql)) {
+        // Determine the types of the parameters (for bind_param)
+        $types = '';
+        foreach ($values as $value) {
+            if (is_numeric($value)) {
+                $types .= 'i'; // Integer
+            } else {
+                $types .= 's'; // String
+            }
+        }
+
+        // Bind parameters dynamically
+        $stmt->bind_param($types, ...$values);
+
+        // Execute the query
+        if ($stmt->execute()) {
+            $_SESSION['message'] = $successMessage;
+            $_SESSION['message_type'] = "success";
+            return $conn->insert_id;  // Return the auto-generated ID
+        } else {
+            $_SESSION['message'] = $errorMessage . $stmt->error;
+            $_SESSION['message_type'] = "error";
+            return false;
+        }
+
+        // Close the statement
+        $stmt->close();
     } else {
-        $_SESSION['message'] = $errorMessage . $conn->error;
-        $_SESSION['message_type'] = "error"; // error type
+        $_SESSION['message'] = "Error preparing query: " . $conn->error;
+        $_SESSION['message_type'] = "error";
         return false;
     }
 }
 
+
+
+
 if (isset($_POST['submit-category'])) {
     $category = $_POST['category'];
-    $description = $_POST['description'];
+    // $description = $_POST['description'];
 
-    // Call insert function for category
-    insertRecord(
-        'category_table',
-        '`category_name`, `description`',
-        "'$category', '$description'",
-        "Category added successfully!",
-        "Error adding category! Please try again. "
-    );
-
-    // Redirect to stocks-options.php
-    header("Location: ../stocks-options.php");
-    exit();
-}
-
-if (isset($_POST['submit-brand'])) {
     $brand = $_POST['brand'];
     $origin_country = $_POST['origin_country'];
-    $category_id = $_POST['category_id'];
     $description = $_POST['description'];
 
-    // Call insert function for brand
-    insertRecord(
-        'brand_table',
-        '`brand_name`, `category_id`,`description`, `country_of_origin`',
-        "'$brand','$category_id', '$description', '$origin_country'",
-        "Brand added successfully!",
-        "Error adding brand! Please try again. "
-    );
+    // Check if category already exists
+    $query = "SELECT category_id FROM category_table WHERE category_name = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('s', $category);  // Bind $category as a string
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    // Redirect to stocks-options.php
-    header("Location: ../stocks-options.php");
-    exit();
+    if ($result->num_rows > 0) {
+        // Category exists, get the category_id
+        $row = $result->fetch_assoc();
+        $category_id = $row['category_id'];
+
+        // Insert the brand with the existing category_id
+        $brand_inserted = insertRecord(
+            'brand_table',
+            'brand_name, category_id, description, country_of_origin',
+            [$brand, $category_id, $description, $origin_country],  // Pass values as array for prepared statements
+            "Brand added successfully!",
+            "Error adding brand! Please try again."
+        );
+
+        if ($brand_inserted) {
+            // Redirect to stocks-options.php
+            header("Location: ../stocks-options.php");
+            exit();
+        }
+    } else {
+        // Category doesn't exist, insert it first
+        $category_id = insertRecord(
+            'category_table',
+            'category_name', // Column names (no need for backticks)
+            [$category],  // Pass values as array for prepared statements
+            "Category added successfully!",
+            "Error adding category! Please try again."
+        );
+
+        if ($category_id) {
+            // Insert the brand with the new category_id
+            $brand_inserted = insertRecord(
+                'brand_table',
+                'brand_name, category_id, description, country_of_origin',
+                [$brand, $category_id, $description, $origin_country],  // Pass values as array
+                "Brand added successfully!",
+                "Error adding brand! Please try again."
+            );
+
+            if ($brand_inserted) {
+                // Redirect to stocks-options.php
+                header("Location: ../stocks-options.php");
+                exit();
+            }
+        }
+    }
 }
-if (isset($_POST['submit-product'])) {
-    $product = $_POST['product'];
-    $category_id = $_POST['category_id'];
-    $brand_id = $_POST['brand_id'];
-    $description = $_POST['description'];
-    $size = $_POST['size'];
-    $color = $_POST['color'];
-    $quantity = $_POST['quantity'];
-    $price = $_POST['price'];
 
-    // Remove commas from price input (e.g., "1,000" becomes "1000")
-    $price = str_replace(',', '', $price);
 
-    // Optionally, validate price is numeric and convert it to a float if needed
-    $price = floatval($price); // Ensures it's treated as a float number
-
-    // Insert record into the database
-    insertRecord(
-        'product_table',
-        '`product_name`, `product_size`, `product_color`, `category_id`, `description`, `quantity_in_stock`, `price`, `brand_id`',
-        "'$product', '$size', '$color', '$category_id', '$description', '$quantity', '$price', '$brand_id'",
-        "Product added successfully!",
-        "Error adding product! Please try again."
-    );
-
-    // Redirect to stocks-options.php
-    header("Location: ../stocks-options.php");
-    exit();
-}
 
 // Order processing logic
 if (isset($_POST['submit-order'])) {
@@ -200,7 +247,53 @@ if (isset($_POST['submit-order'])) {
 }
 
 
+if (isset($_POST['submit-product'])) {
+    $product = $_POST['product'];
+    $category_id = $_POST['category_id'];
+    $brand_id = $_POST['brand_id'];
+    $description = $_POST['description'];
+    $size = $_POST['size'];
+    $color = $_POST['color'];
+    $quantity = $_POST['quantity'];
+    $price = $_POST['price'];
 
+    // Remove commas from price input (e.g., "1,000" becomes "1000")
+    $price = str_replace(',', '', $price);
+
+    // Optionally, validate price is numeric and convert it to a float if needed
+    $price = floatval($price); // Ensures it's treated as a float number
+
+    // Insert record into the database
+    insertRecord(
+        'product_table',
+        '`product_name`, `product_size`, `product_color`, `category_id`, `description`, `quantity_in_stock`, `price`, `brand_id`',
+        "'$product', '$size', '$color', '$category_id', '$description', '$quantity', '$price', '$brand_id'",
+        "Product added successfully!",
+        "Error adding product! Please try again."
+    );
+
+    // Redirect to stocks-options.php
+    header("Location: ../stocks-options.php");
+    exit();
+}
+/*if (isset($_POST['submit-brand'])) {
+    $brand = $_POST['brand'];
+    $origin_country = $_POST['origin_country'];
+    $category_id = $_POST['category_id'];
+    $description = $_POST['description'];
+
+    insertRecord(
+        'brand_table',
+        '`brand_name`, `category_id`,`description`, `country_of_origin`',
+        "'$brand','$category_id', '$description', '$origin_country'",
+        "Brand added successfully!",
+        "Error adding brand! Please try again. "
+    );
+
+
+    header("Location: ../stocks-options.php");
+    exit();
+}*/
 
 $conn->close();
 ?>

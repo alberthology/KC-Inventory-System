@@ -17,7 +17,7 @@
                          <div class="card-header p-3">
                              <ul class="nav nav-pills">
                                  <li class="nav-item"><a class="nav-link active" href="#category" data-toggle="tab"><b>CATEGORY</b></a></li>
-                                 <li class="nav-item"><a class="nav-link" href="#brand" data-toggle="tab"><b>BRAND</b></a></li>
+                                 <!-- <li class="nav-item"><a class="nav-link" href="#brand" data-toggle="tab"><b>BRAND</b></a></li> -->
                                  <li class="nav-item"><a class="nav-link" href="#product" data-toggle="tab"><b>PRODUCT</b></a></li>
                              </ul>
                          </div>
@@ -29,7 +29,7 @@
                                              <div class="card-header">
                                                  <div class="row">
                                                      <div class="col-auto">
-                                                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-category"><i class="fas fa-plus"></i>  &nbsp Category</button>
+                                                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-category"><i class="fas fa-plus"></i>  &nbsp Product Brand</button>
                                                      </div>
                                                  </div>
                                                  <!-- /.card-header -->
@@ -37,7 +37,8 @@
                                                      <table id="category-table" class="table table-bordered table-striped table-hover">
                                                          <thead>
                                                              <tr>
-                                                                 <th>Category Name</th>
+                                                                 <th>Brand</th>
+                                                                 <th>Category</th>
                                                                  <th>Action</th>
                                                              </tr>
                                                          </thead>
@@ -45,19 +46,33 @@
                                                              <?php
 
                                                                 // Query to fetch data from the category_table
-                                                                $query = "SELECT category_id, category_name FROM category_table";
+                                                                $query = "SELECT
+                                                                c.category_id, 
+                                                                c.category_name, 
+                                                                b.brand_id, 
+                                                                b.brand_name, 
+                                                                b.description, 
+                                                                b.country_of_origin
+                                                                FROM category_table c
+                                                                INNER JOIN  brand_table b ON b.category_id = c.category_id ";
                                                                 $result = mysqli_query($conn, $query);
 
                                                                 // Check if any categories exist
                                                                 if (mysqli_num_rows($result) > 0) {
                                                                     // Iterate through each category and display in the table
                                                                     while ($row = mysqli_fetch_assoc($result)) {
-                                                                        echo "<tr id='category-row-{$row['category_id']}'>
-                                                                                <td>{$row['category_name']}</td>
-                                                                                <td style='text-align:center;'>
-                                                                                    <button class='btn btn-danger btn-sm' onclick='removeCategory({$row['category_id']})'>Remove</button>
-                                                                                </td>
-                                                                            </tr>";
+            echo "<tr id='brand-row-{$row['brand_id']}'>
+                    <td>{$row['brand_name']}</td>
+                    <td>{$row['category_name']}</td>
+                    <td style='text-align:center;'>
+                        <button class='btn btn-primary' onclick='openEditModal_brand({$row['brand_id']}, \"{$row['brand_name']}\", \"{$row['category_id']}\" , \"{$row['country_of_origin']}\", \"{$row['description']}\")'>
+                            <i class='fas fa-edit'></i>
+                        </button> &nbsp 
+                        <button class='btn btn-danger' onclick='removeBrand({$row['brand_id']})'>
+                            <i class='fas fa-trash'></i>
+                        </button>
+                    </td>
+                </tr>";
                                                                     }
                                                                 } else {
                                                                     echo "<tr><td colspan='2'>No categories found.</td></tr>";
@@ -73,7 +88,7 @@
                                      </div>
                                  </div>
 
-                                 <div class="tab-pane" id="brand">
+<!--                                  <div class="tab-pane" id="brand">
                                      <div class="col-12">
                                          <div class="card">
                                              <div class="card-header">
@@ -82,24 +97,21 @@
                                                          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-stocks"><i class="fas fa-plus"></i> &nbsp Brand</button>
                                                      </div>
                                                  </div>
-                                                 <!-- /.card-header -->
                                                  <div class="card-body">
-                                                     <table id="brand-table" class="table table-bordered table-striped">
+                                                     <table id="brand-table" class="table table-bordered table-striped" style="width:100%;">
                                                          <thead>
                                                              <tr>
                                                                  <th>Brand Name</th>
                                                                  <th>Action</th>
                                                              </tr>
                                                          </thead>
-                                                        <tbody>
+                                                        <tbody> -->
 <?php
-    // Query to fetch data from the brand_table
-    $query = "SELECT * FROM brand_table";
+/*    $query = "SELECT * FROM brand_table";
     $result = mysqli_query($conn, $query);
 
-    // Check if any brands exist
+
     if (mysqli_num_rows($result) > 0) {
-        // Iterate through each brand and display in the table
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<tr id='brand-row-{$row['brand_id']}'>
                     <td>{$row['brand_name']}</td>
@@ -111,22 +123,28 @@
                             <i class='fas fa-trash'></i>
                         </button>
                     </td>
-                </tr>";
-        }
-    } else {
-        echo "<tr><td colspan='2'>No brands found.</td></tr>";
-    }
-?>
-                                                        </tbody>
+                </tr>
+                                                         </tbody>
 
                                                      </table>
                                                  </div>
-                                                 <!-- /.card-body -->
                                              </div>
-                                             <!-- /.card -->
                                          </div>
                                      </div>
-                                 </div>
+                                 </div>";
+        }
+    } else {
+        echo "<tr><td colspan='2'>No brands found.</td></tr>
+                                                 </tbody>
+
+                                                     </table>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>";
+    }*/
+?>
 
                                  <div class="tab-pane" id="product">
                                      <div class="col-12">
@@ -139,7 +157,9 @@
                                                 </div>
                                                  <!-- /.card-header -->
                                                 <div class="card-body">
-                                                    <table id="product-table" class="table table-bordered table-striped table-hover">
+
+
+                                                    <table id="product-table" class="table table-bordered table-striped table-hover" style="width:100.1%;">
                                                         <thead>
                                                             <tr>
                                                                 <th>Product Code</th>
@@ -159,7 +179,12 @@ $query = "
     SELECT 
         p.product_id, 
         p.product_name, 
+        p.description, 
+        p.product_size, 
+        p.product_color, 
+        c.category_id, 
         c.category_name, 
+        b.brand_id, 
         b.brand_name, 
         p.quantity_in_stock, 
         p.price, 
@@ -185,7 +210,12 @@ if (mysqli_num_rows($result) > 0) {
                 <td>{$row['quantity_in_stock']}</td>
                 <td>{$formatted_price}</td>
                 <td style='text-align:center;'>
-                    <button class='btn btn-danger btn-sm' onclick='removeProduct({$row['product_id']})'>Remove</button>
+                <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['product_id']}, \"{$row['product_name']}\", \"{$row['brand_name']}\", \"{$row['brand_id']}\", \"{$row['category_id']}\" , \"{$row['category_name']}\", \"{$row['quantity_in_stock']}\", \"{$row['price']}\", \"{$row['product_size']}\", \"{$row['product_color']}\", \"{$row['description']}\")'>
+                            <i class='fas fa-edit'></i>
+                        </button> &nbsp
+                    <button class='btn btn-danger btn-sm' onclick='removeProduct({$row['product_id']})'>
+                    <i class='fas fa-trash'></i>
+                    </button>
                 </td>
               </tr>";
     }
@@ -206,63 +236,7 @@ if (mysqli_num_rows($result) > 0) {
                                  </div>
                              </div>
 
-                             <!-- add brand modal -->
-                            <div class="modal fade" id="add-stocks">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <form id="stockForm" action="functions/insert_sql.php" method="post">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"><i class="fas fa-dolly"></i> &nbsp Add Product Brands</h4>
-
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="brand" class="form-control form-control-md" placeholder="Brand Name">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <select class="form-control form-control-md" name="category_id">
-                                                            <option selected hidden disabled>Select Category</option>
-        <?php           // Query to fetch data from the category_table
-                $query = "SELECT * FROM category_table";
-                $result = mysqli_query($conn, $query);
-
-                // Check if any categories exist
-                if (mysqli_num_rows($result) > 0) {
-                    // Iterate through each category and display in the table
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
-                    }
-                } else {
-                    echo "<option disabled>No Category Available</option>";
-                }
-                ?>
-                                                        </select>
-                                                    </div>
-                                                   <div class="col-md-12">
-                                                        <input type="text" name="origin_country" class="form-control form-control-md" placeholder="Originated Country">
-                                                    </div>
-                                                    <div class="col-md-12">
-
-                                                        <input type="text" name="description" class="description" placeholder="Brand Description">
-                                                    </div>
-                                                </div>
-                                        </div>
-                                        <div class="modal-footer justify-content-between">
-                                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                             <button type="submit" name="submit-brand" class="btn btn-primary" style="float: right;">Add</button>
-                                        </div>
-                                        </form>
-                                    </div>
-                                     <!-- /.modal-content -->
-                                </div>
-                                 <!-- /.modal-dialog -->
-                            </div>
-
-                        <!-- Edit Stock Modal -->
+                        <!-- Edit brand Modal -->
                         <div class="modal fade" id="edit-brand">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
@@ -326,7 +300,7 @@ if (mysqli_num_rows($result) > 0) {
                                 <div class="modal-dialog modal-md">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h4 class="modal-title"><i class="fas fa-tags"></i> Add Product Category</h4>
+                                            <h4 class="modal-title"><i class="fas fa-tags"></i> Add Product Brand & Category</h4>
 
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
@@ -336,11 +310,17 @@ if (mysqli_num_rows($result) > 0) {
                                             <form action="functions/insert_sql.php" method="post">
                                                 <div class="row">
                                                     <div class="col-md-12">
-                                                        <input type="text" name="category" class="form-control form-control-md" placeholder="Category Name">
+                                                        <input type="text" name="category" class="form-control form-control-md" placeholder="Category">
                                                     </div>
                                                     <div class="col-md-12">
+                                                        <input type="text" name="brand" class="form-control form-control-md" placeholder="Brand">
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <input type="text" name="origin_country" class="form-control form-control-md" placeholder="Originated Country (Optional)">
+                                                    </div>
+                                                    <div class="col-md-12 mb-5">
 
-                                                        <input type="text" name="description" class="description" placeholder="Category Description">
+                                                        <input type="text" name="description" class="description" placeholder="Brand Description (Optional)">
                                                     </div>
                                                  </div>
                                                  <hr>
@@ -480,45 +460,81 @@ if (mysqli_num_rows($result) > 0) {
                                  </div>
                                  <!-- /.modal-dialog -->
                              </div>
-                            <!-- Edit Stock Modal -->
-                            <div class="modal fade" id="edit-stocks">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"><i class="fas fa-dolly"></i> &nbsp; Edit Product</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form id="editStockForm" action="functions/edit_sql.php" method="post">
 
-                                                <!-- Hidden field to store the ID of the record to edit -->
-                                                <input type="hidden" name="product_id" id="edit_product_id">
 
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <label for="edit_brand_name">Product Name</label>
-                                                        <input type="text" name="brand" id="edit_brand_name" class="form-control form-control-md" placeholder="Brand Name">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <label for="edit_origin_country">Origin Country</label>
-                                                        <input type="text" name="origin_country" id="edit_origin_country" class="form-control form-control-md" placeholder="Originated Country">
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <label for="edit_description">Description</label>
-                                                        <input type="text" name="description" id="edit_description" class="form-control" placeholder="Brand Description">
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer justify-content-between">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                            <button type="submit" form="editStockForm" class="btn btn-primary">Save Changes</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
+<!-- Edit Stock Modal -->
+<div class="modal fade" id="edit-stocks">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fas fa-dolly"></i> &nbsp; Edit Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editStockForm" action="functions/edit_sql.php" method="post">
+                    <!-- Hidden field to store the ID of the record to edit -->
+                    <input type="hidden" name="product_id" id="edit_product_id">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="edit_product_name">Product:</label>
+                            <input type="text" name="product" id="edit_product_name" class="form-control form-control-md" placeholder="Product Name">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="edit_category_id">Category:</label>
+                            <select class="form-control form-control-md" name="category_id" id="edit_category_id">
+                                <option selected hidden disabled>Select Category</option>
+                                <!-- Categories will be populated here by JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="edit_brand_id">Brand:</label>
+                            <select class="form-control form-control-md" name="brand_id" id="edit_brand_id">
+                                <option selected hidden disabled>Select Brand</option>
+                                <!-- Brands will be populated based on the category selected -->
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_product_size">Size:</label>
+                            <input type="text" name="size" class="form-control form-control-md" id="edit_product_size"  placeholder="Input Size">
+                        </div>
+
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_product_color">Color:</label>
+                            <input type="text" name="color" class="form-control form-control-md" id="edit_product_color" placeholder="Input Color">
+                        </div>
+
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_quantity_in_stock">Quantity in Stock:</label>
+                            <input type="number" name="quantity" class="form-control form-control-md" id="edit_quantity_in_stock" placeholder="Stock Quantity" min="1">
+                        </div>
+
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_price">Price:</label>
+                            <input type="text" name="price" id="edit_price" class="form-control form-control-md" placeholder="Product Price">
+                        </div>
+
+                        <div class="col-md-12 mt-3">
+                            <label for="edit_description">Product Description:</label>
+                            <input type="text" name="description" class="description" id="edit_description" placeholder="Product Description (optional)">
+                        </div>
+                    </div>
+                    <hr>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between" style="margin-top: 5%;">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" form="editStockForm" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
                          </div>
                      </div>
@@ -664,20 +680,101 @@ function openEditModal_brand(id, brand, category_id, origin_country, description
 
 
 
-// Function to load categories dynamically via AJAX
+
+// Function to load categories into the select dropdown
 function loadCategories(selectedCategoryId) {
+    var categorySelect = document.getElementById('edit_category_id');
+    
+    // Clear existing categories
+    categorySelect.innerHTML = '<option selected hidden disabled>Select Category</option>';
+    
+    // Make an AJAX request to fetch categories
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'functions/get_categories.php', true);
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+            var categories = JSON.parse(xhr.responseText);
+            
+            categories.forEach(function(category) {
+                var option = document.createElement('option');
+                option.value = category.category_id;
+                option.textContent = category.category_name;
+                categorySelect.appendChild(option);
+            });
+
+            // Select the category if passed
+            if (selectedCategoryId) {
+                categorySelect.value = selectedCategoryId;
+            }
+        }
+    };
+    xhr.send();
+}
+
+// Function to load brands based on selected category
+function loadBrands(selectedBrandId, categoryId) {
+    var brandSelect = document.getElementById('edit_brand_id');
+    brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>'; // Reset brand options
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'functions/get_brands.php?category_id=' + categoryId, true);
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+            var brands = JSON.parse(xhr.responseText);
+
+            brands.forEach(function(brand) {
+                var option = document.createElement('option');
+                option.value = brand.brand_id;
+                option.textContent = brand.brand_name;
+                brandSelect.appendChild(option);
+            });
+
+            // Set the brand value if available
+            if (selectedBrandId) {
+                brandSelect.value = selectedBrandId;
+            }
+        }
+    };
+    xhr.send();
+}
+
+// Open the modal with pre-filled data
+function openEditModal(product_id, product_name, brand_name, brand_id, category_id, category_name, quantity_in_stock, price, product_size, product_color, description) {
+    // Set the values in the modal fields
+    $('#edit_product_id').val(product_id);
+    $('#edit_product_name').val(product_name);
+    $('#edit_quantity_in_stock').val(quantity_in_stock);
+    $('#edit_price').val(price);
+    $('#edit_product_size').val(product_size);
+    $('#edit_product_color').val(product_color);
+    $('#edit_description').val(description);
+
+    // Load the categories and brands
+    loadCategories(category_id);
+    loadBrands(brand_id, category_id);
+
+    // Show the modal
+    $('#edit-stocks').modal('show');
+}
+
+
+
+
+
+// Function to load categories dynamically via AJAX
+/*function loadCategories(selectedCategoryId) {
     $.ajax({
-        url: 'functions/get_categories.php',  // Adjust the path to where your PHP script is
+        url: 'functions/get_categories.php',  
         method: 'GET',
         dataType: 'json',
         success: function(data) {
             var selectElement = $('#edit_category_id');
-            selectElement.empty();  // Clear existing options
+            selectElement.empty();  
 
-            // Add the default "Select Category" option
+            
             selectElement.append('<option selected hidden disabled>Select Category</option>');
 
-            // Add the options for each category
+           
             data.forEach(function(category) {
                 var selected = (category.category_id == selectedCategoryId) ? 'selected' : '';
                 selectElement.append('<option value="' + category.category_id + '" ' + selected + '>' + category.category_name + '</option>');
@@ -687,7 +784,7 @@ function loadCategories(selectedCategoryId) {
             alert('Failed to load categories.');
         }
     });
-}
+}*/
 
      function removeCategory(category_id) {
          Swal.fire({
@@ -697,7 +794,7 @@ function loadCategories(selectedCategoryId) {
              showCancelButton: true,
              confirmButtonColor: '#3085d6',
              cancelButtonColor: '#d33',
-             confirmButtonText: 'Yes, delete it!',
+             confirmButtonText: 'Confirm',
              width: '30%',  // Adjust the width here
 
          }).then((result) => {
@@ -757,7 +854,7 @@ function loadCategories(selectedCategoryId) {
              showCancelButton: true,
              confirmButtonColor: '#3085d6',
              cancelButtonColor: '#d33',
-             confirmButtonText: 'Yes, delete it!',
+             confirmButtonText: 'Confirm',
              width: '30%',  // Adjust the width here
 
          }).then((result) => {
@@ -810,17 +907,6 @@ function loadCategories(selectedCategoryId) {
      }
 
 
-    // Function to open the edit modal and populate it with data
-function openEditModal(id, brand, origin_country, description) {
-    // Set the values in the modal fields
-    $('#edit_brand_id').val(id);
-    $('#edit_brand_name').val(brand);
-    $('#edit_origin_country').val(origin_country);
-    $('#edit_description').val(description);
-
-    // Show the modal
-    $('#edit-stocks').modal('show');
-}
 function removeProduct(product_id) {
     Swal.fire({
         title: 'Are you sure?',
@@ -829,7 +915,7 @@ function removeProduct(product_id) {
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
+        confirmButtonText: 'Confirm',
         width: '30%',  // Adjust the width here
     }).then((result) => {
         if (result.isConfirmed) {

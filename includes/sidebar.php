@@ -41,7 +41,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <li class="nav-item">
                             <a href="products.php" class="nav-link <?php echo ($current_page == 'products.php') ? 'active' : ''; ?>">
                                 <i class="fas fa-cube nav-icon"></i>
-                                <p>Product Management</p>
+                                <p>Inventory Logs</p>
                             </a>
                         </li>
 

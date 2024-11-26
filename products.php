@@ -15,7 +15,7 @@
                  <div class="col-md-12 mt-2">
                      <div class="card">
                          <div class="card-header p-3">
-                             <h3>List of Products</h3>
+                             <h3>Inventory Log</h3>
                          </div>
                          <div class="card-body">
                              <div class="tab-content">
@@ -24,64 +24,20 @@
                                          <div class="card">
                                              <div class="card-header">
                                                  <div class="row">
-                                                     <div class="col-auto">
+                                                     <!-- <div class="col-auto">
                                                          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-product"><i class="fas fa-plus"></i>  &nbsp Product</button>
-                                                    </div>
+                                                    </div> -->
                                                 </div>
                                                  <!-- /.card-header -->
                                                 <div class="card-body">
                                                     <table id="product-table" class="table table-bordered table-striped table-hover">
                                                         <thead>
                                                             <tr>
-                                                                <th>Product Code</th>
-                                                                <th>Product Name</th>
-                                                                <th>Category</th>
-                                                                <th>Brand</th>
-                                                                <th>Quantity</th>
-                                                                <th>Price</th>
-                                                                <th>Action</th>
+
                                                             </tr>
                                                         </thead>
                                                         <tbody>
 <?php
-
-// SQL query to join product_table with category_table, brand_table, and supplier_table
-$query = "
-    SELECT 
-        p.product_id, 
-        p.product_name, 
-        c.category_name, 
-        b.brand_name, 
-        p.quantity_in_stock, 
-        p.price, 
-        s.supplier_name
-    FROM product_table p
-    LEFT JOIN category_table c ON p.category_id = c.category_id
-    LEFT JOIN brand_table b ON p.brand_id = b.brand_id
-    LEFT JOIN supplier_table s ON p.supplier_id = s.supplier_id
-";
-
-$result = mysqli_query($conn, $query);
-
-// Check if any products exist
-if (mysqli_num_rows($result) > 0) {
-    // Iterate through each Product and display in the table
-    while ($row = mysqli_fetch_assoc($result)) {
-        echo "<tr id='product-row-{$row['product_id']}'>
-                <td>{$row['product_id']}</td>
-                <td>{$row['product_name']}</td>
-                <td>{$row['category_name']}</td> <!-- Show category name -->
-                <td>{$row['brand_name']}</td> <!-- Show brand name -->
-                <td>{$row['quantity_in_stock']}</td>
-                <td>{$row['price']}</td>
-                <td style='text-align:center;'>
-                    <button class='btn btn-danger btn-sm' onclick='removeProduct({$row['product_id']})'>Remove</button>
-                </td>
-              </tr>";
-    }
-} else {
-    echo "<tr><td colspan='7'>No Products found.</td></tr>";
-}
 
 ?>
 

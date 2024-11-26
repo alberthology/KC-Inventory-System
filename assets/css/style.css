@@ -35,10 +35,10 @@ body {
 
 /* Add this to your stylesheet */
 #brand-table th, #brand-table td {
-    width: auto;
+    width: 100%;
 }
 #product-table th, #product-table td {
-    width: auto;
+    width: 100%;
 }
 
 

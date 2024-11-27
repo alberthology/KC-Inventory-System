@@ -177,22 +177,12 @@
 // SQL query to join product_table with category_table, brand_table, and supplier_table
 $query = "
     SELECT 
-        p.product_id, 
-        p.product_name, 
-        p.description, 
-        p.product_size, 
-        p.product_color, 
-        c.category_id, 
-        c.category_name, 
-        b.brand_id, 
-        b.brand_name, 
-        p.quantity_in_stock, 
-        p.price, 
-        s.supplier_name
+p.product_id, p.product_name, p.category_id, p.brand_id, p.quantity_in_stock, p.price, 
+           p.product_size, p.product_color, p.description, 
+           c.category_name, b.brand_name
     FROM product_table p
     LEFT JOIN category_table c ON p.category_id = c.category_id
     LEFT JOIN brand_table b ON p.brand_id = b.brand_id
-    LEFT JOIN supplier_table s ON p.supplier_id = s.supplier_id
 ";
 
 $result = mysqli_query($conn, $query);
@@ -203,21 +193,35 @@ if (mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
         $formatted_price = number_format($row['price'], 2);
         echo "<tr id='product-row-{$row['product_id']}'>
-                <td>{$row['product_id']}</td>
-                <td>{$row['product_name']}</td>
-                <td>{$row['category_name']}</td> <!-- Show category name -->
-                <td>{$row['brand_name']}</td> <!-- Show brand name -->
-                <td>{$row['quantity_in_stock']}</td>
-                <td>{$formatted_price}</td>
-                <td style='text-align:center;'>
-                <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['product_id']}, \"{$row['product_name']}\", \"{$row['brand_name']}\", \"{$row['brand_id']}\", \"{$row['category_id']}\" , \"{$row['category_name']}\", \"{$row['quantity_in_stock']}\", \"{$row['price']}\", \"{$row['product_size']}\", \"{$row['product_color']}\", \"{$row['description']}\")'>
-                            <i class='fas fa-edit'></i>
-                        </button> &nbsp
-                    <button class='btn btn-danger btn-sm' onclick='removeProduct({$row['product_id']})'>
-                    <i class='fas fa-trash'></i>
-                    </button>
-                </td>
-              </tr>";
+    <td>{$row['product_id']}</td>
+    <td>{$row['product_name']}</td>
+    <td>{$row['category_name']}</td> <!-- Show category name -->
+    <td>{$row['brand_name']}</td> <!-- Show brand name -->
+    <td>{$row['quantity_in_stock']}</td>
+    <td>{$formatted_price}</td>
+    <td style='text-align:center;'>
+        <button class='btn btn-primary btn-sm' onclick='openEditModal(
+            {$row['product_id']}, 
+            \"{$row['product_name']}\", 
+            \"{$row['brand_name']}\", 
+            \"{$row['brand_id']}\", 
+            \"{$row['category_id']}\", 
+            \"{$row['category_name']}\", 
+            \"{$row['quantity_in_stock']}\", 
+            \"{$row['price']}\", 
+            \"{$row['product_size']}\", 
+            \"{$row['product_color']}\", 
+            \"{$row['description']}\"
+        )'>
+            <i class='fas fa-edit'></i>
+        </button>
+        &nbsp
+        <button class='btn btn-danger btn-sm' onclick='removeProduct({$row['product_id']})'>
+            <i class='fas fa-trash'></i>
+        </button>
+    </td>
+</tr>";
+
     }
 } else {
     echo "<tr><td colspan='7'>No Products found.</td></tr>";
@@ -235,6 +239,7 @@ if (mysqli_num_rows($result) > 0) {
                                      </div>
                                  </div>
                              </div>
+
 
                         <!-- Edit brand Modal -->
                         <div class="modal fade" id="edit-brand">
@@ -474,59 +479,95 @@ if (mysqli_num_rows($result) > 0) {
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editStockForm" action="functions/edit_sql.php" method="post">
+                <!-- <form id="editStockForm" action="functions/edit_sql.php" method="post"> -->
                     <!-- Hidden field to store the ID of the record to edit -->
                     <input type="hidden" name="product_id" id="edit_product_id">
 
                     <div class="row">
+                        <!-- Product Name -->
                         <div class="col-md-12">
-                            <label for="edit_product_name">Product:</label>
+                            <label for="edit_product_name">Product Name:</label>
                             <input type="text" name="product" id="edit_product_name" class="form-control form-control-md" placeholder="Product Name">
                         </div>
 
-                        <div class="col-md-6">
-                            <label for="edit_category_id">Category:</label>
-                            <select class="form-control form-control-md" name="category_id" id="edit_category_id">
-                                <option selected hidden disabled>Select Category</option>
-                                <!-- Categories will be populated here by JavaScript -->
-                            </select>
-                        </div>
 
-                        <div class="col-md-6">
-                            <label for="edit_brand_id">Brand:</label>
-                            <select class="form-control form-control-md" name="brand_id" id="edit_brand_id">
-                                <option selected hidden disabled>Select Brand</option>
-                                <!-- Brands will be populated based on the category selected -->
-                            </select>
-                        </div>
 
+                        <!-- Product Size -->
                         <div class="col-md-6 mt-3">
-                            <label for="edit_product_size">Size:</label>
-                            <input type="text" name="size" class="form-control form-control-md" id="edit_product_size"  placeholder="Input Size">
+                            <label for="edit_size">Size:</label>
+                            <input type="text" name="size" class="form-control form-control-md" id="edit_size" placeholder="Product Size">
                         </div>
 
+                        <!-- Product Color -->
                         <div class="col-md-6 mt-3">
-                            <label for="edit_product_color">Color:</label>
-                            <input type="text" name="color" class="form-control form-control-md" id="edit_product_color" placeholder="Input Color">
+                            <label for="edit_color">Color:</label>
+                            <input type="text" name="color" class="form-control form-control-md" id="edit_color" placeholder="Product Color">
                         </div>
 
+                        <!-- Quantity in Stock -->
                         <div class="col-md-6 mt-3">
-                            <label for="edit_quantity_in_stock">Quantity in Stock:</label>
-                            <input type="number" name="quantity" class="form-control form-control-md" id="edit_quantity_in_stock" placeholder="Stock Quantity" min="1">
+                            <label for="edit_quantity">Quantity in Stock:</label>
+                            <input type="number" name="quantity" class="form-control form-control-md" id="edit_quantity" placeholder="Stock Quantity" min="1">
                         </div>
 
+                        <!-- Price -->
                         <div class="col-md-6 mt-3">
                             <label for="edit_price">Price:</label>
                             <input type="text" name="price" id="edit_price" class="form-control form-control-md" placeholder="Product Price">
                         </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6 mt-3">
 
+                            <div class="col-md-12 mt-2">
+                            <input type="number" name="product" id="edit_category" class="form-control form-control-md" placeholder="Category ID">
+                            <button class="btn btn-primary" onclick="fetchCategoryAndBrand()">View More Details</button>
+                        </div>
+
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <!-- Category Dropdown -->
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_category">Category:</label>
+                            <select class="form-control form-control-md" name="category_id" id="edit_category_dropdown">
+                                
+                                <!-- Categories will be populated based on selection -->
+                                <?php
+/*                $query = "SELECT * FROM category_table";
+                $result = mysqli_query($conn, $query);
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
+                    }
+                } else {
+                    echo "<option disabled>No Categories Available</option>";
+                }*/
+                ?>
+                            </select>
+                        </div>
+
+
+                        <!-- Brand Dropdown -->
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_brand">Brand:</label>
+                            <select class="form-control form-control-md" name="brand_id" id="edit_brand">
+                                <option selected hidden disabled>Select Brand</option>
+                                <!-- Brands will be populated dynamically -->
+                            </select>
+                        </div>
+
+                        <!-- Product Description -->
                         <div class="col-md-12 mt-3">
                             <label for="edit_description">Product Description:</label>
                             <input type="text" name="description" class="description" id="edit_description" placeholder="Product Description (optional)">
                         </div>
                     </div>
                     <hr>
-                </form>
+
+                <!-- </form> -->
             </div>
             <div class="modal-footer justify-content-between" style="margin-top: 5%;">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -535,6 +576,7 @@ if (mysqli_num_rows($result) > 0) {
         </div>
     </div>
 </div>
+
 
                          </div>
                      </div>
@@ -663,6 +705,169 @@ $(document).ready(function() {
 
 
 
+function fetchCategoryAndBrand() {
+    const categoryId = document.getElementById("edit_category").value;
+    const categorySelect = document.getElementById("edit_category_dropdown"); // Corrected ID
+    const brandSelect = document.getElementById("edit_brand");
+
+    console.log("Fetching categories and brands for category ID:", categoryId);
+
+    // Clear previous options in the category select dropdown
+    console.log("Clearing previous category options...");
+    // categorySelect.innerHTML = '<option selected hidden disabled>Select Category</option>';
+
+    // Clear previous brand options
+    console.log("Clearing previous brand options...");
+    // brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>';
+
+    // Fetch data from the server
+    console.log("Sending request to fetch data...");
+    fetch(`functions/fetch_categories.php?category_id=${categoryId}`)
+        .then(response => {
+            console.log("Received response from server.");
+            return response.json();
+        })
+        .then(data => {
+            console.log("Data received:", data);
+
+            const { category, brand } = data;
+            console.log("Categories:", category);
+            console.log("Brands:", brand);
+
+            // If no categories are available, display a message
+if (category.length === 0) {
+    console.log("No categories available. Displaying message.");
+    const option = document.createElement('option');
+    option.disabled = true;
+    option.textContent = 'No Categories Available';
+    categorySelect.appendChild(option);
+} else {
+    // Populate Category dropdown
+    console.log("Populating category dropdown...");
+    category.forEach(categoryItem => {
+        console.log("Adding category:", categoryItem.category_name);
+        const option = document.createElement('option');
+        option.value = categoryItem.category_id;
+        option.textContent = categoryItem.category_name;
+
+        // Check if the current category matches the selected category
+        if (categoryItem.category_id === parseInt(category_id)) {
+            option.selected = true;  // Set the option as selected
+            console.log("Setting category as selected:", categoryItem.category_name);
+        }
+
+        categorySelect.appendChild(option);
+    });
+}
+
+
+            // If no brands are available, display a message
+            if (brand.length === 0) {
+                console.log("No brands available. Displaying message.");
+                const option = document.createElement('option');
+                option.disabled = true;
+                option.textContent = 'No Brands Available';
+                brandSelect.appendChild(option);
+            } else {
+                // Populate Brand dropdown
+                console.log("Populating brand dropdown...");
+                brand.forEach(brandItem => {
+                    console.log("Adding brand:", brandItem.brand_name);
+                    const option = document.createElement('option');
+                    option.value = brandItem.brand_id;
+                    option.textContent = brandItem.brand_name;
+                    brandSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching categories and brands:', error);
+        });
+}
+
+
+function openEditModal(product_id, product_name, brand_name, brand_id, category_id, category_name, quantity_in_stock, price, product_size, product_color, description) {
+    console.log("Opening modal for product ID:", product_id);
+
+    // Set the hidden product ID field in the modal
+    console.log("Setting product ID field...");
+    const productIdField = document.getElementById("edit_product_id");
+    if (productIdField) {
+        productIdField.value = product_id;
+    } else {
+        console.error("Product ID field not found.");
+    }
+
+    // Populate the product name input field
+    console.log("Setting product name field...");
+    const productNameField = document.getElementById("edit_product_name");
+    if (productNameField) {
+        productNameField.value = product_name;
+    } else {
+        console.error("Product name field not found.");
+    }
+
+    // Set category and brand values in the modal
+    console.log("Setting category and brand...");
+    const categorySelect = document.getElementById("edit_category");
+    const brandSelect = document.getElementById("edit_brand");
+
+    if (categorySelect) {
+        categorySelect.value = category_id;  
+        console.log("Selected category:", category_id);
+    } else {
+        console.error("Category dropdown not found.");
+    }
+
+    if (brandSelect) {
+        brandSelect.value = brand_id;
+        console.log("Selected brand:", brand_id);
+    } else {
+        console.error("Brand dropdown not found.");
+    }
+
+    // Set other fields
+    console.log("Setting other fields...");
+    const sizeField = document.getElementById("edit_size");
+    if (sizeField) {
+        sizeField.value = product_size;
+    } else {
+        console.error("Size field not found.");
+    }
+
+    const colorField = document.getElementById("edit_color");
+    if (colorField) {
+        colorField.value = product_color;
+    } else {
+        console.error("Color field not found.");
+    }
+
+    const quantityField = document.getElementById("edit_quantity");
+    if (quantityField) {
+        quantityField.value = quantity_in_stock;
+    } else {
+        console.error("Quantity field not found.");
+    }
+
+    const priceField = document.getElementById("edit_price");
+    if (priceField) {
+        priceField.value = price;
+    } else {
+        console.error("Price field not found.");
+    }
+
+    const descriptionField = document.getElementById("edit_description");
+    if (descriptionField) {
+        descriptionField.value = description;
+    } else {
+        console.error("Description field not found.");
+    }
+
+    // Show the modal
+    console.log("Showing the modal...");
+    $('#edit-stocks').modal('show');
+}
+
 // Function to open the edit modal and populate it with data
 function openEditModal_brand(id, brand, category_id, origin_country, description) {
     // Set the values in the modal fields
@@ -678,91 +883,34 @@ function openEditModal_brand(id, brand, category_id, origin_country, description
     $('#edit-brand').modal('show');
 }
 
-
-
-
-// Function to load categories into the select dropdown
-function loadCategories(selectedCategoryId) {
-    var categorySelect = document.getElementById('edit_category_id');
-    
-    // Clear existing categories
-    categorySelect.innerHTML = '<option selected hidden disabled>Select Category</option>';
-    
-    // Make an AJAX request to fetch categories
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'functions/get_categories.php', true);
-    xhr.onload = function() {
-        if (xhr.status == 200) {
-            var categories = JSON.parse(xhr.responseText);
-            
-            categories.forEach(function(category) {
-                var option = document.createElement('option');
-                option.value = category.category_id;
-                option.textContent = category.category_name;
-                categorySelect.appendChild(option);
-            });
-
-            // Select the category if passed
-            if (selectedCategoryId) {
-                categorySelect.value = selectedCategoryId;
-            }
-        }
-    };
-    xhr.send();
-}
-
-// Function to load brands based on selected category
-function loadBrands(selectedBrandId, categoryId) {
-    var brandSelect = document.getElementById('edit_brand_id');
-    brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>'; // Reset brand options
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'functions/get_brands.php?category_id=' + categoryId, true);
-    xhr.onload = function() {
-        if (xhr.status == 200) {
-            var brands = JSON.parse(xhr.responseText);
-
-            brands.forEach(function(brand) {
-                var option = document.createElement('option');
-                option.value = brand.brand_id;
-                option.textContent = brand.brand_name;
-                brandSelect.appendChild(option);
-            });
-
-            // Set the brand value if available
-            if (selectedBrandId) {
-                brandSelect.value = selectedBrandId;
-            }
-        }
-    };
-    xhr.send();
-}
-
 // Open the modal with pre-filled data
-function openEditModal(product_id, product_name, brand_name, brand_id, category_id, category_name, quantity_in_stock, price, product_size, product_color, description) {
+/*function openEditModal(product_id, product_name, brand_name, brand_id, category_id, category_name, quantity_in_stock, price, product_size, product_color, description) {
     // Set the values in the modal fields
     $('#edit_product_id').val(product_id);
     $('#edit_product_name').val(product_name);
+
+    $('#edit_brand_name').val(brand_name);
+    $('#edit_brand_id').val(brand_id);
+    $('#edit_category_id').val(category_id);
+    $('#edit_category_name').val(category_name);
+
     $('#edit_quantity_in_stock').val(quantity_in_stock);
     $('#edit_price').val(price);
     $('#edit_product_size').val(product_size);
     $('#edit_product_color').val(product_color);
     $('#edit_description').val(description);
 
-    // Load the categories and brands
-    loadCategories(category_id);
-    loadBrands(brand_id, category_id);
-
-    // Show the modal
-    $('#edit-stocks').modal('show');
+    
+    $('#edit-stocks').modal('show'); 
 }
+*/
 
 
 
 
 
 // Function to load categories dynamically via AJAX
-/*function loadCategories(selectedCategoryId) {
+function loadCategories(selectedCategoryId) {
     $.ajax({
         url: 'functions/get_categories.php',  
         method: 'GET',
@@ -784,7 +932,7 @@ function openEditModal(product_id, product_name, brand_name, brand_id, category_
             alert('Failed to load categories.');
         }
     });
-}*/
+}
 
      function removeCategory(category_id) {
          Swal.fire({

@@ -26,13 +26,28 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
 
                 <!-- Product Management -->
-                <li class="nav-item has-treeview <?php echo in_array($current_page, ['stocks-options.php', 'products.php']) ? 'menu-open' : ''; ?>">
-                    <a href="stocks-options.php" class="nav-link <?php echo in_array($current_page, ['stocks-options.php', 'products.php']) ? 'active' : ''; ?>">
+<!--                 <li class="nav-item has-treeview <?php //echo in_array($current_page, ['stocks-options.php', 'products.php']) ? 'menu-open' : ''; ?>">
+                    <a href="stocks-options.php" class="nav-link <?php //echo in_array($current_page, ['stocks-options.php', 'products.php']) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-warehouse"></i>
                         <p>Inventory Options<i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
+                            <a href="stocks-options.php" class="nav-link <?php //echo ($current_page == 'stocks-options.php') ? 'active' : ''; ?>">
+                                <i class="fas fa-tags nav-icon"></i>
+                                <p>Stocks Management</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="products.php" class="nav-link <?php //echo ($current_page == 'products.php') ? 'active' : ''; ?>">
+                                <i class="fas fa-cube nav-icon"></i>
+                                <p>Inventory Logs</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li> -->
+                <li class="nav-item">
                             <a href="stocks-options.php" class="nav-link <?php echo ($current_page == 'stocks-options.php') ? 'active' : ''; ?>">
                                 <i class="fas fa-tags nav-icon"></i>
                                 <p>Stocks Management</p>
@@ -44,10 +59,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 <p>Inventory Logs</p>
                             </a>
                         </li>
-
-                    </ul>
-                </li>
-
                 <!-- Inventory -->
                 <!--<li class="nav-item">
                     <a href="inventory.php" class="nav-link <?php //echo ($current_page == 'inventory.php') ? 'active' : ''; ?>">

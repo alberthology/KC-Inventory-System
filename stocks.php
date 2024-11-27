@@ -51,225 +51,136 @@
            /* Ensures the arrow is vertically aligned */
        }
    </style>
-   <div class="content-wrapper">
+ <?php
+// Ensure that the product_id is set in the URL
+if (isset($_GET['product_id'])) {
+    $product_id = $_GET['product_id'];
 
-       <section class="content">
-           <div class="container-fluid">
-               <div class="row">
-                   <!-- /.col -->
-                   <div class="col-md-12 mt-2">
-                       <div class="card">
-                           <div class="card-header p-3">
-                               <ul class="nav nav-pills">
-                                   <li class="nav-item"><a class="nav-link active" href="#shoes" data-toggle="tab"><b>STOCKS TABLE</b></a></li>
-                                   <!-- <li class="nav-item"><a class="nav-link" href="#bags" data-toggle="tab"><b>BAGS</b></a></li>
-                                   <li class="nav-item"><a class="nav-link" href="#clothes" data-toggle="tab"><b>CLOTHES</b></a></li> -->
-                               </ul>
-                           </div>
-                           <div class="card-body">
-                               <div class="tab-content">
-                                   <div class="active tab-pane" id="shoes">
-                                       <div class="col-12">
-                                           <div class="card">
-                                               <div class="card-header">
-                                                   <div class="row">
-                                                       <div class="col-auto">
-                                                           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-stocks"><i class="fas fa-box"></i> add stocks</button>
-                                                       </div>
-                                                       <div class="col-md-3">
-                                                           <select class="form-control form-control-sm select2" style="width: 100%;">
-                                                               <option selected="selected" disabled>Choose Category</option>
-                                                               <option>Alaska</option>
-                                                               <option>California</option>
-                                                               <option>Delaware</option>
-                                                               <option>Tennessee</option>
-                                                               <option>Texas</option>
-                                                               <option>Washington</option>
-                                                           </select>
-                                                       </div>
-                                                   </div>
-                                                   <!-- /.card-header -->
-                                                   <div class="card-body">
-                                                       <table id="shoes-table" class="table table-bordered table-striped">
-                                                           <thead>
-                                                               <tr>
-                                                                   <th>Code</th>
-                                                                   <th>Brand</th>
-                                                                   <th>Size</th>
-                                                                   <th>Color</th>
-                                                                   <th>Price</th>
-                                                                   <th>Quantity</th>
-                                                                   <th>Action</th>
-                                                               </tr>
-                                                           </thead>
-                                                           <tbody>
-                                                           </tbody>
-                                                       </table>
-                                                   </div>
-                                                   <!-- /.card-body -->
-                                               </div>
-                                               <!-- /.card -->
-                                           </div>
-                                       </div>
-                                   </div>
-                                   <!-- /.tab-content -->
-                               </div>
-                               <!-- add stock modal -->
-                               <div class="modal fade" id="add-stocks">
-                                   <div class="modal-dialog modal-lg">
-                                       <div class="modal-content">
-                                           <div class="modal-header">
-                                               <h4 class="modal-title"><i class="fas fa-box"></i> Add Stocks Modal</h4>
-                                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                   <span aria-hidden="true">&times;</span>
-                                               </button>
-                                           </div>
-                                           <div class="modal-body">
-                                               <form id="stockForm">
-                                                   <div class="container-fluid">
-                                                       <div class="row">
-                                                           <!-- Category Field -->
-                                                           <div class="col-md-4">
-                                                               <div class="form-group">
-                                                                   <label for="categorySelect"><i class="fas fa-tags"></i> Category</label>
-                                                                   <select class="form-control select2" id="categorySelect" style="width: 100%;" required>
-                                                                       <option value="">Select Category</option>
-                                                                       <!-- Add your categories here -->
-                                                                   </select>
-                                                               </div>
-                                                           </div>
-                                                           <!-- Brand Field -->
-                                                           <div class="col-md-4">
-                                                               <div class="form-group">
-                                                                   <label for="brandInput"><i class="fas fa-building"></i> Brand</label>
-                                                                   <select class="form-control select2" id="brandSelect" style="width: 100%;" required>
-                                                                       <option value="">Select Brand</option>
-                                                                   </select>
-                                                               </div>
-                                                           </div>
-                                                           <!-- Size Field -->
-                                                           <div class="col-md-4">
-                                                               <div class="form-group">
-                                                                   <label for="sizeInput"><i class="fas fa-ruler-combined"></i> Size</label>
-                                                                   <select class="form-control select2" id="sizeSelect" style="width: 100%;" required>
-                                                                       <option value="">Select Size</option>
-                                                                   </select>
-                                                               </div>
-                                                           </div>
-                                                       </div>
+    // Query to fetch product data
+    $product_query = "
+        SELECT 
+            p.product_id, p.product_name, p.description, p.product_size, p.product_color, 
+            c.category_id, c.category_name, b.brand_id, b.brand_name, 
+            p.quantity_in_stock, p.price
+        FROM product_table p
+        LEFT JOIN category_table c ON p.category_id = c.category_id
+        LEFT JOIN brand_table b ON p.brand_id = b.brand_id
+        WHERE p.product_id = '$product_id'
+    ";
+    $product_result = mysqli_query($conn, $product_query);
+    
+    // Check if the product exists
+    if (mysqli_num_rows($product_result) > 0) {
+        $product = mysqli_fetch_assoc($product_result);
+    } else {
+        // If no product is found, handle the error
+        echo "Product not found!";
+        exit;
+    }
 
-                                                       <div class="row">
-                                                           <!-- Color Field -->
-                                                           <div class="col-md-4">
-                                                               <div class="form-group">
-                                                                   <label for="colorSelect"><i class="fas fa-palette"></i> Color</label>
-                                                                   <select class="form-control select2" id="colorSelect" style="width: 100%;" required>
-                                                                       <option value="">Select Color</option>
-                                                                       <!-- Add your colors here -->
-                                                                   </select>
-                                                               </div>
-                                                           </div>
-                                                           <!-- Price Field -->
-                                                           <div class="col-md-4">
-                                                               <div class="form-group">
-                                                                   <label for="priceInput"><i class="fas fa-peso-sign"></i> Price</label>
-                                                                   <input type="number" class="form-control" id="priceInput" placeholder="Enter Price" required>
-                                                               </div>
-                                                           </div>
-                                                           <!-- Quantity Field -->
-                                                           <div class="col-md-4">
-                                                               <div class="form-group">
-                                                                   <label for="quantityInput"><i class="fas fa-boxes"></i> Quantity</label>
-                                                                   <input type="number" class="form-control" id="quantityInput" placeholder="Enter Quantity" required>
-                                                               </div>
-                                                           </div>
-                                                       </div>
-                                                   </div>
-                                               </form>
-                                           </div>
-                                           <div class="modal-footer justify-content-between">
-                                               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                               <button type="submit" class="btn btn-primary">Save changes</button>
-                                           </div>
-                                       </div>
-                                       <!-- /.modal-content -->
-                                   </div>
-                                   <!-- /.modal-dialog -->
-                               </div>
+    // Fetch categories
+    $categories_query = "SELECT category_id, category_name FROM category_table";
+    $categories_result = mysqli_query($conn, $categories_query);
+    $categories = [];
+    while ($row = mysqli_fetch_assoc($categories_result)) {
+        $categories[] = $row;
+    }
 
+    // Fetch brands based on the selected category (if needed)
+    $brands_query = "SELECT brand_id, brand_name FROM brand_table";
+    $brands_result = mysqli_query($conn, $brands_query);
+    $brands = [];
+    while ($row = mysqli_fetch_assoc($brands_result)) {
+        $brands[] = $row;
+    }
+} else {
+    // If product_id is not set in the URL, show an error
+    echo "Product ID is missing!";
+    exit;
+}
+?>
 
-                               <div class="modal fade" id="add-category">
-                                   <div class="modal-dialog modal-lg">
-                                       <div class="modal-content">
-                                           <div class="modal-header">
-                                               <h4 class="modal-title"><i class="fas fa-boxes"></i> Add Category Modal</h4>
-                                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                   <span aria-hidden="true">&times;</span>
-                                               </button>
-                                           </div>
-                                           <div class="modal-body">
-                                               <div class="row">
-                                                   <div>
+<!-- Edit Stock Modal -->
+<div class="modal fade" id="edit-stocks">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fas fa-dolly"></i> &nbsp; Edit Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editStockForm" action="functions/edit_sql.php" method="post">
+                    <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
 
-                                                   </div>
-                                               </div>
-                                           </div>
-                                           <div class="modal-footer justify-content-between">
-                                               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                               <button type="button" class="btn btn-primary">Save changes</button>
-                                           </div>
-                                       </div>
-                                       <!-- /.modal-content -->
-                                   </div>
-                                   <!-- /.modal-dialog -->
-                               </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="edit_product_name">Product:</label>
+                            <input type="text" name="product" id="edit_product_name" class="form-control form-control-md" value="<?php echo $product['product_name']; ?>" placeholder="Product Name">
+                        </div>
 
-                           </div>
-                       </div>
+                        <div class="col-md-6">
+                            <label for="edit_category_id">Category:</label>
+                            <select class="form-control form-control-md" name="category_id" id="edit_category_id">
+                                <option selected hidden disabled>Select Category</option>
+                                <?php foreach ($categories as $category): ?>
+                                    <option value="<?php echo $category['category_id']; ?>" <?php echo $product['category_id'] == $category['category_id'] ? 'selected' : ''; ?>>
+                                        <?php echo $category['category_name']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                   </div>
+                        <div class="col-md-6">
+                            <label for="edit_brand_id">Brand:</label>
+                            <select class="form-control form-control-md" name="brand_id" id="edit_brand_id">
+                                <option selected hidden disabled>Select Brand</option>
+                                <?php foreach ($brands as $brand): ?>
+                                    <option value="<?php echo $brand['brand_id']; ?>" <?php echo $product['brand_id'] == $brand['brand_id'] ? 'selected' : ''; ?>>
+                                        <?php echo $brand['brand_name']; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-               </div>
-       </section>
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_product_size">Size:</label>
+                            <input type="text" name="size" class="form-control form-control-md" id="edit_product_size" value="<?php echo $product['product_size']; ?>" placeholder="Input Size">
+                        </div>
 
-   </div>
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_product_color">Color:</label>
+                            <input type="text" name="color" class="form-control form-control-md" id="edit_product_color" value="<?php echo $product['product_color']; ?>" placeholder="Input Color">
+                        </div>
+
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_quantity_in_stock">Quantity in Stock:</label>
+                            <input type="number" name="quantity" class="form-control form-control-md" id="edit_quantity_in_stock" value="<?php echo $product['quantity_in_stock']; ?>" placeholder="Stock Quantity" min="1">
+                        </div>
+
+                        <div class="col-md-6 mt-3">
+                            <label for="edit_price">Price:</label>
+                            <input type="text" name="price" id="edit_price" class="form-control form-control-md" value="<?php echo $product['price']; ?>" placeholder="Product Price">
+                        </div>
+
+                        <div class="col-md-12 mt-3">
+                            <label for="edit_description">Product Description:</label>
+                            <input type="text" name="description" class="description" id="edit_description" value="<?php echo $product['description']; ?>" placeholder="Product Description (optional)">
+                        </div>
+                    </div>
+                    <hr>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between" style="margin-top: 5%;">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" form="editStockForm" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
    <?php
     include 'includes/footer.php';
     ?>
-   <script>
-       $(document).ready(function() {
-           // Initialize shoes-table by default
-           $('#shoes-table').DataTable({
-               "paging": true,
-               "lengthChange": true,
-               "searching": true,
-               "ordering": true,
-               "info": true,
-               "autoWidth": true,
-               "responsive": true,
-               "pageLength": 10 // Display 10 items per page
-           });
-       });
-   </script>
-
-   <script>
-       $(function() {
-           //Initialize Select2 Elements
-           $('.select2').select2()
-
-           //Initialize Select2 Elements
-           $('.select2bs4').select2({
-               theme: 'bootstrap4'
-           })
-       })
-   </script>
-
-   <script>
-       $(document).ready(function() {
-           $('.select2').select2({
-               theme: 'bootstrap4', // Use Bootstrap4 theme
-               width: '100%' // Ensure it fills the width
-           });
-       });
-   </script>

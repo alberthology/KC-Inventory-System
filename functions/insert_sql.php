@@ -4,7 +4,7 @@ include 'db_con.php';
 
 
 // Function to handle the insert and set session messages
-/*function insertRecord($table, $columns, $values, $successMessage, $errorMessage) {
+function insertRecord($table, $columns, $values, $successMessage, $errorMessage) {
     global $conn;
 
    
@@ -20,13 +20,13 @@ include 'db_con.php';
         $_SESSION['message_type'] = "error"; 
         return false;
     }
-}*/
+}
 
 
-function insertRecord($table, $columns, $values, $successMessage, $errorMessage) {
+/*function insertRecord($table, $columns, $values, $successMessage, $errorMessage) {
     global $conn;
 
-    // Split columns and values into arrays
+    
     $columnArray = explode(',', $columns);
     $placeholders = rtrim(str_repeat('?, ', count($values)), ', ');
 
@@ -39,13 +39,13 @@ function insertRecord($table, $columns, $values, $successMessage, $errorMessage)
         $types = '';
         foreach ($values as $value) {
             if (is_numeric($value)) {
-                $types .= 'i'; // Integer
+                $types .= 'i'; 
             } else {
-                $types .= 's'; // String
+                $types .= 's'; 
             }
         }
 
-        // Bind parameters dynamically
+       
         $stmt->bind_param($types, ...$values);
 
         // Execute the query
@@ -59,14 +59,14 @@ function insertRecord($table, $columns, $values, $successMessage, $errorMessage)
             return false;
         }
 
-        // Close the statement
+        
         $stmt->close();
     } else {
         $_SESSION['message'] = "Error preparing query: " . $conn->error;
         $_SESSION['message_type'] = "error";
         return false;
     }
-}
+}*/
 
 
 

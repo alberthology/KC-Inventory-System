@@ -479,8 +479,8 @@ if (mysqli_num_rows($result) > 0) {
                 </button>
             </div>
             <div class="modal-body">
-                <!-- <form id="editStockForm" action="functions/edit_sql.php" method="post"> -->
-                    <!-- Hidden field to store the ID of the record to edit -->
+                <form id="editStockForm" action="functions/edit_sql.php" method="post">
+                    <input type="hidden" name="form_type" value="update_product">
                     <input type="hidden" name="product_id" id="edit_product_id">
 
                     <div class="row">
@@ -516,18 +516,6 @@ if (mysqli_num_rows($result) > 0) {
                             <input type="text" name="price" id="edit_price" class="form-control form-control-md" placeholder="Product Price">
                         </div>
                     </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-6 mt-3">
-
-                            <div class="col-md-12 mt-2">
-                            <input type="number" name="product" id="edit_category" class="form-control form-control-md" placeholder="Category ID">
-                            <button class="btn btn-primary" onclick="fetchCategoryAndBrand()">View More Details</button>
-                        </div>
-
-                        </div>
-
-                    </div>
                     <div class="row">
                         <!-- Category Dropdown -->
                         <div class="col-md-6 mt-3">
@@ -535,17 +523,7 @@ if (mysqli_num_rows($result) > 0) {
                             <select class="form-control form-control-md" name="category_id" id="edit_category_dropdown">
                                 
                                 <!-- Categories will be populated based on selection -->
-                                <?php
-/*                $query = "SELECT * FROM category_table";
-                $result = mysqli_query($conn, $query);
-                if (mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<option value='". $row['category_id'] ."'>". $row['category_name']."</option>";
-                    }
-                } else {
-                    echo "<option disabled>No Categories Available</option>";
-                }*/
-                ?>
+                                
                             </select>
                         </div>
 
@@ -566,8 +544,7 @@ if (mysqli_num_rows($result) > 0) {
                         </div>
                     </div>
                     <hr>
-
-                <!-- </form> -->
+                </form>
             </div>
             <div class="modal-footer justify-content-between" style="margin-top: 5%;">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -705,168 +682,165 @@ $(document).ready(function() {
 
 
 
-function fetchCategoryAndBrand() {
-    const categoryId = document.getElementById("edit_category").value;
-    const categorySelect = document.getElementById("edit_category_dropdown"); // Corrected ID
-    const brandSelect = document.getElementById("edit_brand");
+// function fetchCategoryAndBrand() {
+//     const categoryId = document.getElementById("edit_category").value;
+//     const categorySelect = document.getElementById("edit_category_dropdown"); // Corrected ID
+//     const brandSelect = document.getElementById("edit_brand");
 
-    console.log("Fetching categories and brands for category ID:", categoryId);
+//     console.log("Fetching categories and brands for category ID:", categoryId);
 
-    // Clear previous options in the category select dropdown
-    console.log("Clearing previous category options...");
-    // categorySelect.innerHTML = '<option selected hidden disabled>Select Category</option>';
+//     // Clear previous options in the category select dropdown
+//     console.log("Clearing previous category options...");
+//     // categorySelect.innerHTML = '<option selected hidden disabled>Select Category</option>';
 
-    // Clear previous brand options
-    console.log("Clearing previous brand options...");
-    // brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>';
+//     // Clear previous brand options
+//     console.log("Clearing previous brand options...");
+//     // brandSelect.innerHTML = '<option selected hidden disabled>Select Brand</option>';
 
-    // Fetch data from the server
-    console.log("Sending request to fetch data...");
-    fetch(`functions/fetch_categories.php?category_id=${categoryId}`)
-        .then(response => {
-            console.log("Received response from server.");
-            return response.json();
-        })
-        .then(data => {
-            console.log("Data received:", data);
+//     // Fetch data from the server
+//     console.log("Sending request to fetch data...");
+//     fetch(`functions/fetch_categories.php?category_id=${categoryId}`)
+//         .then(response => {
+//             console.log("Received response from server.");
+//             return response.json();
+//         })
+//         .then(data => {
+//             console.log("Data received:", data);
 
-            const { category, brand } = data;
-            console.log("Categories:", category);
-            console.log("Brands:", brand);
+//             const { category, brand } = data;
+//             console.log("Categories:", category);
+//             console.log("Brands:", brand);
 
-            // If no categories are available, display a message
-if (category.length === 0) {
-    console.log("No categories available. Displaying message.");
-    const option = document.createElement('option');
-    option.disabled = true;
-    option.textContent = 'No Categories Available';
-    categorySelect.appendChild(option);
-} else {
-    // Populate Category dropdown
-    console.log("Populating category dropdown...");
-    category.forEach(categoryItem => {
-        console.log("Adding category:", categoryItem.category_name);
-        const option = document.createElement('option');
-        option.value = categoryItem.category_id;
-        option.textContent = categoryItem.category_name;
+//             // If no categories are available, display a message
+// if (category.length === 0) {
+//     console.log("No categories available. Displaying message.");
+//     const option = document.createElement('option');
+//     option.disabled = true;
+//     option.textContent = 'No Categories Available';
+//     categorySelect.appendChild(option);
+// } else {
+//     // Populate Category dropdown
+//     console.log("Populating category dropdown...");
+//     category.forEach(categoryItem => {
+//         console.log("Adding category:", categoryItem.category_name);
+//         const option = document.createElement('option');
+//         option.value = categoryItem.category_id;
+//         option.textContent = categoryItem.category_name;
 
-        // Check if the current category matches the selected category
-        if (categoryItem.category_id === parseInt(category_id)) {
-            option.selected = true;  // Set the option as selected
-            console.log("Setting category as selected:", categoryItem.category_name);
-        }
+//         // Check if the current category matches the selected category
+//         if (categoryItem.category_id === parseInt(category_id)) {
+//             option.selected = true;  // Set the option as selected
+//             console.log("Setting category as selected:", categoryItem.category_name);
+//         }
 
-        categorySelect.appendChild(option);
-    });
-}
+//         categorySelect.appendChild(option);
+//     });
+// }
 
 
-            // If no brands are available, display a message
-            if (brand.length === 0) {
-                console.log("No brands available. Displaying message.");
-                const option = document.createElement('option');
-                option.disabled = true;
-                option.textContent = 'No Brands Available';
-                brandSelect.appendChild(option);
-            } else {
-                // Populate Brand dropdown
-                console.log("Populating brand dropdown...");
-                brand.forEach(brandItem => {
-                    console.log("Adding brand:", brandItem.brand_name);
-                    const option = document.createElement('option');
-                    option.value = brandItem.brand_id;
-                    option.textContent = brandItem.brand_name;
-                    brandSelect.appendChild(option);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching categories and brands:', error);
-        });
-}
+//             // If no brands are available, display a message
+//             if (brand.length === 0) {
+//                 console.log("No brands available. Displaying message.");
+//                 const option = document.createElement('option');
+//                 option.disabled = true;
+//                 option.textContent = 'No Brands Available';
+//                 brandSelect.appendChild(option);
+//             } else {
+//                 // Populate Brand dropdown
+//                 console.log("Populating brand dropdown...");
+//                 brand.forEach(brandItem => {
+//                     console.log("Adding brand:", brandItem.brand_name);
+//                     const option = document.createElement('option');
+//                     option.value = brandItem.brand_id;
+//                     option.textContent = brandItem.brand_name;
+//                     brandSelect.appendChild(option);
+//                 });
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error fetching categories and brands:', error);
+//         });
+// }
+
+
+
 
 
 function openEditModal(product_id, product_name, brand_name, brand_id, category_id, category_name, quantity_in_stock, price, product_size, product_color, description) {
     console.log("Opening modal for product ID:", product_id);
 
     // Set the hidden product ID field in the modal
-    console.log("Setting product ID field...");
     const productIdField = document.getElementById("edit_product_id");
-    if (productIdField) {
-        productIdField.value = product_id;
-    } else {
-        console.error("Product ID field not found.");
-    }
+    if (productIdField) productIdField.value = product_id;
 
     // Populate the product name input field
-    console.log("Setting product name field...");
     const productNameField = document.getElementById("edit_product_name");
-    if (productNameField) {
-        productNameField.value = product_name;
-    } else {
-        console.error("Product name field not found.");
-    }
-
-    // Set category and brand values in the modal
-    console.log("Setting category and brand...");
-    const categorySelect = document.getElementById("edit_category");
-    const brandSelect = document.getElementById("edit_brand");
-
-    if (categorySelect) {
-        categorySelect.value = category_id;  
-        console.log("Selected category:", category_id);
-    } else {
-        console.error("Category dropdown not found.");
-    }
-
-    if (brandSelect) {
-        brandSelect.value = brand_id;
-        console.log("Selected brand:", brand_id);
-    } else {
-        console.error("Brand dropdown not found.");
-    }
+    if (productNameField) productNameField.value = product_name;
 
     // Set other fields
-    console.log("Setting other fields...");
     const sizeField = document.getElementById("edit_size");
-    if (sizeField) {
-        sizeField.value = product_size;
-    } else {
-        console.error("Size field not found.");
-    }
+    if (sizeField) sizeField.value = product_size;
 
     const colorField = document.getElementById("edit_color");
-    if (colorField) {
-        colorField.value = product_color;
-    } else {
-        console.error("Color field not found.");
-    }
+    if (colorField) colorField.value = product_color;
 
     const quantityField = document.getElementById("edit_quantity");
-    if (quantityField) {
-        quantityField.value = quantity_in_stock;
-    } else {
-        console.error("Quantity field not found.");
-    }
+    if (quantityField) quantityField.value = quantity_in_stock;
 
     const priceField = document.getElementById("edit_price");
-    if (priceField) {
-        priceField.value = price;
-    } else {
-        console.error("Price field not found.");
-    }
+    if (priceField) priceField.value = price;
 
     const descriptionField = document.getElementById("edit_description");
-    if (descriptionField) {
-        descriptionField.value = description;
-    } else {
-        console.error("Description field not found.");
+    if (descriptionField) descriptionField.value = description;
+
+    // Populate category dropdown
+    const categorySelect = document.getElementById("edit_category_dropdown");
+    if (categorySelect) {
+        console.log("Fetching categories...");
+        fetch('functions/get_categories.php')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch categories');
+                return response.json();
+            })
+            .then(data => {
+                categorySelect.innerHTML = '<option value="" disabled>Select a category</option>';
+                data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.category_id;
+                    option.textContent = category.category_name;
+                    if (category.category_id === category_id) option.selected = true;
+                    categorySelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching categories:", error));
+    }
+
+    // Populate brand dropdown
+    const brandSelect = document.getElementById("edit_brand");
+    if (brandSelect) {
+        console.log("Fetching brands...");
+        fetch('functions/get_brand.php')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch brands');
+                return response.json();
+            })
+            .then(data => {
+                brandSelect.innerHTML = '<option value="" disabled>Select a brand</option>';
+                data.forEach(brand => {
+                    const option = document.createElement('option');
+                    option.value = brand.brand_id;
+                    option.textContent = brand.brand_name;
+                    if (brand.brand_id === brand_id) option.selected = true;
+                    brandSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching brands:", error));
     }
 
     // Show the modal
-    console.log("Showing the modal...");
     $('#edit-stocks').modal('show');
 }
+
 
 // Function to open the edit modal and populate it with data
 function openEditModal_brand(id, brand, category_id, origin_country, description) {
@@ -1131,4 +1105,11 @@ function removeProduct(product_id) {
         }
     });
 }
+
+
+
+
+
+
+
  </script>

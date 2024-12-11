@@ -3,6 +3,7 @@ session_start();
 include 'db_con.php';
 
 // Function to handle updating a record in the database
+// Include the function
 function editRecord($table, $columns, $whereCondition, $successMessage, $errorMessage) {
     global $conn;
 
@@ -50,6 +51,66 @@ function editRecord($table, $columns, $whereCondition, $successMessage, $errorMe
         $_SESSION['message_type'] = "error";
     }
 }
+
+// Process the form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['form_type'])) {
+
+    $formType = $_POST['form_type'];
+    if ($formType == 'update_product') {
+
+
+    // Retrieve form values
+    $product_id = $_POST['product_id'];
+    $product_name = $_POST['product'];
+    $size = $_POST['size'];
+    $color = $_POST['color'];
+    $quantity = $_POST['quantity'];
+    $price = $_POST['price'];
+    $category_id = $_POST['category_id'];
+    $brand_id = $_POST['brand_id'];
+
+    // Define the columns to update
+    $columns = [
+        'product_name' => $product_name,
+        'size' => $size,
+        'color' => $color,
+        'quantity' => $quantity,
+        'price' => $price,
+        'category_id' => $category_id,
+        'brand_id' => $brand_id
+    ];
+
+    // Define the WHERE condition
+    $whereCondition = "product_id = $product_id";
+
+    // Call the editRecord function
+    editRecord(
+        'product_table', // Replace with your table name
+        $columns,
+        $whereCondition,
+        'Product updated successfully!',
+        'Failed to update product: '
+    );
+
+    // Redirect to the page with a success/error message
+    header("Location: products.php");
+    exit();
+    }
+} else {
+    $_SESSION['message'] = "Invalid request!";
+    $_SESSION['message_type'] = "error";
+    header("Location: ../stocks-options.php");
+    exit();
+}
+
+
+
+
+
+
+
+
+
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['form_type'])) {
 

@@ -16,9 +16,9 @@
                      <div class="card">
                          <div class="card-header p-3">
                              <ul class="nav nav-pills">
-                                 <li class="nav-item"><a class="nav-link active" href="#category" data-toggle="tab"><b>CATEGORY</b></a></li>
+                                 <li class="nav-item"><a class="nav-link tbl active" href="#category" data-toggle="tab"><b>BRAND LIST</b></a></li>
                                  <!-- <li class="nav-item"><a class="nav-link" href="#brand" data-toggle="tab"><b>BRAND</b></a></li> -->
-                                 <li class="nav-item"><a class="nav-link" href="#product" data-toggle="tab"><b>PRODUCT</b></a></li>
+                                 <li class="nav-item"><a class="nav-link tbl" href="#product" data-toggle="tab"><b>PRODUCT LIST</b></a></li>
                              </ul>
                          </div>
                          <div class="card-body">
@@ -29,7 +29,7 @@
                                              <div class="card-header">
                                                  <div class="row">
                                                      <div class="col-auto">
-                                                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-category"><i class="fas fa-plus"></i>  &nbsp Product Brand</button>
+                                                         <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#add-category"><i class="fas fa-plus"></i>  &nbsp Brand</button>
                                                      </div>
                                                  </div>
                                                  <!-- /.card-header -->
@@ -252,7 +252,7 @@ if (mysqli_num_rows($result) > 0) {
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form id="editStockForm" action="functions/edit_sql.php" method="post">
+                                        <form id="editBrandForm" action="functions/edit_sql.php" method="post">
                                             <!-- Hidden field to store the ID of the record to edit -->
                                         <input type="hidden" name="form_type" value="update_brand">
                                             <input type="hidden" name="brand_id" id="edit_brand_id">
@@ -260,18 +260,18 @@ if (mysqli_num_rows($result) > 0) {
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <label for="edit_brand_name">Brand Name</label>
-                                                    <input type="text" name="brand" id="edit_brand_name" class="form-control form-control-md" placeholder="Brand Name">
+                                                    <input type="text" name="brand" id="edit_brand_name" class="form-control form-control-md uppercase-input" placeholder="Brand Name">
                                                 </div>
                                                 <div class="col-md-12">
                                                     <label for="edit_category_id">Category</label>
-                                                    <select class="form-control form-control-md" name="category_id" id="edit_category_id">
+                                                    <select class="form-control form-control-md uppercase-input" name="category_id" id="edit_category_id">
                                                         <option selected hidden disabled>Select Category</option>
                                                         <!-- Categories will be populated here by JavaScript -->
                                                     </select>
                                                 </div>
                                                 <div class="col-md-12">
                                                     <label for="edit_origin_country">Origin Country</label>
-                                                    <input type="text" name="origin_country" id="edit_origin_country" class="form-control form-control-md" placeholder="Originated Country">
+                                                    <input type="text" name="origin_country" id="edit_origin_country" class="form-control form-control-md uppercase-input" placeholder="Originated Country">
                                                 </div>
                                                 <div class="col-md-12">
                                                     <label for="edit_description">Description</label>
@@ -282,7 +282,7 @@ if (mysqli_num_rows($result) > 0) {
                                     </div>
                                     <div class="modal-footer justify-content-between">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                        <button type="submit" form="editStockForm" class="btn btn-primary">Save Changes</button>
+                                        <button type="submit" form="editBrandForm" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </div>
                             </div>
@@ -315,29 +315,29 @@ if (mysqli_num_rows($result) > 0) {
                                             <form action="functions/insert_sql.php" method="post">
                                                 <div class="row">
                                                     <div class="col-md-12">
-                                                        <input type="text" name="category" class="form-control form-control-md" placeholder="Category">
+                                                        <input type="text" name="category" class="form-control form-control-md uppercase-input" placeholder="Category">
                                                     </div>
                                                     <div class="col-md-12">
-                                                        <input type="text" name="brand" class="form-control form-control-md" placeholder="Brand">
+                                                        <input type="text" name="brand" class="form-control form-control-md uppercase-input" placeholder="Brand">
                                                     </div>
                                                     <div class="col-md-12">
-                                                        <input type="text" name="origin_country" class="form-control form-control-md" placeholder="Originated Country (Optional)">
+                                                        <input type="text" name="origin_country" class="form-control form-control-md uppercase-input" placeholder="Originated Country (Optional)">
                                                     </div>
                                                     <div class="col-md-12 mb-5">
-
-                                                        <input type="text" name="description" class="description" placeholder="Brand Description (Optional)">
+                                                        <input type="text" name="description" class="form-control form-control-md uppercase-input" placeholder="Brand Description (Optional)">
                                                     </div>
-                                                 </div>
-                                                 <hr>
-                                                 <div class="row">
-                                                     <div class="col-md-6">
-                                                         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
-                                                     </div>
-                                                     <div class="col-md-6">
-                                                         <button type="submit" name="submit-category" class="btn btn-primary btn-sm" style="float: right;">Add</button>
-                                                     </div>
-                                                 </div>
-                                             </form>
+                                                </div>
+                                                <hr>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <button type="submit" name="submit-category" class="btn btn-primary btn-sm" style="float: right;">Add</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+
                                          </div>
                                      </div>
                                      <!-- /.modal-content -->
@@ -345,7 +345,7 @@ if (mysqli_num_rows($result) > 0) {
                                  <!-- /.modal-dialog -->
                              </div>
 
-                             <!-- add stock modal -->
+                            <!-- add stock modal -->
                             <div class="modal fade" id="add-product">
                                 <div class="modal-dialog modal-md">
                                     <div class="modal-content">
@@ -360,11 +360,11 @@ if (mysqli_num_rows($result) > 0) {
                                             <form action="functions/insert_sql.php" method="post">
                                                 <div class="row">
                                                     <div class="col-md-12">
-                                                        <input type="text" name="product" class="form-control form-control-md" placeholder="Product Name">
+                                                        <input type="text" name="product" class="form-control form-control-md uppercase-input" placeholder="Product Name">
                                                     </div>
 
                                                     <div class="col-md-12">
-    <select class="form-control form-control-md" name="category_id" id="category_id">
+    <select class="form-control form-control-md uppercase-input" name="category_id" id="category_id">
         <option selected hidden disabled>Select Category</option>
         <?php
         // Query to fetch data from the category_table
@@ -385,7 +385,7 @@ if (mysqli_num_rows($result) > 0) {
 </div>
 
 <div class="col-md-12">
-    <select class="form-control form-control-md" name="brand_id" id="brand_id">
+    <select class="form-control form-control-md uppercase-input" name="brand_id" id="brand_id">
         <option selected hidden disabled>Select Brand</option>
         <!-- Brands will be populated based on the category selected -->
     </select>
@@ -431,18 +431,18 @@ if (mysqli_num_rows($result) > 0) {
 
 </script>
                                                     <div class="col-md-6">
-                                                        <input type="text" name="size" class="form-control form-control-md" placeholder="Input Size">
+                                                        <input type="text" name="size" class="form-control form-control-md uppercase-input" placeholder="Input Size">
                                                         
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <input type="text" name="color" class="form-control form-control-md" placeholder="Input Color">
+                                                        <input type="text" name="color" class="form-control form-control-md uppercase-input" placeholder="Input Color">
                                                         
                                                     </div>
                                                     <div class="col-md-12 mt-3">
-                                                        <input type="number" name="quantity" class="form-control form-control-md" placeholder="Stock Quantity" min="1">
+                                                        <input type="number" name="quantity" class="form-control form-control-md uppercase-input" placeholder="Stock Quantity" min="1">
                                                     </div>
                                                     <div class="col-md-12">
-                                                        <input type="text" name="price" id="price" class="form-control form-control-md" placeholder="Product Price">
+                                                        <input type="text" name="price" id="price" class="form-control form-control-md uppercase-input" placeholder="Product Price">
                                                     </div>
 
                                                     <div class="col-md-12">
@@ -487,7 +487,7 @@ if (mysqli_num_rows($result) > 0) {
                         <!-- Product Name -->
                         <div class="col-md-12">
                             <label for="edit_product_name">Product Name:</label>
-                            <input type="text" name="product" id="edit_product_name" class="form-control form-control-md" placeholder="Product Name">
+                            <input type="text" name="product" id="edit_product_name" class="form-control form-control-md uppercase-input" placeholder="Product Name">
                         </div>
 
 
@@ -495,32 +495,32 @@ if (mysqli_num_rows($result) > 0) {
                         <!-- Product Size -->
                         <div class="col-md-6 mt-3">
                             <label for="edit_size">Size:</label>
-                            <input type="text" name="size" class="form-control form-control-md" id="edit_size" placeholder="Product Size">
+                            <input type="text" name="size" class="form-control form-control-md uppercase-input" id="edit_size" placeholder="Product Size">
                         </div>
 
                         <!-- Product Color -->
                         <div class="col-md-6 mt-3">
                             <label for="edit_color">Color:</label>
-                            <input type="text" name="color" class="form-control form-control-md" id="edit_color" placeholder="Product Color">
+                            <input type="text" name="color" class="form-control form-control-md uppercase-input" id="edit_color" placeholder="Product Color">
                         </div>
 
                         <!-- Quantity in Stock -->
                         <div class="col-md-6 mt-3">
                             <label for="edit_quantity">Quantity in Stock:</label>
-                            <input type="number" name="quantity" class="form-control form-control-md" id="edit_quantity" placeholder="Stock Quantity" min="1">
+                            <input type="number" name="quantity" class="form-control form-control-md uppercase-input" id="edit_quantity" placeholder="Stock Quantity" min="1">
                         </div>
 
                         <!-- Price -->
                         <div class="col-md-6 mt-3">
                             <label for="edit_price">Price:</label>
-                            <input type="text" name="price" id="edit_price" class="form-control form-control-md" placeholder="Product Price">
+                            <input type="text" name="price" id="edit_price" class="form-control form-control-md uppercase-input" placeholder="Product Price">
                         </div>
                     </div>
                     <div class="row">
                         <!-- Category Dropdown -->
                         <div class="col-md-6 mt-3">
                             <label for="edit_category">Category:</label>
-                            <select class="form-control form-control-md" name="category_id" id="edit_category_dropdown">
+                            <select class="form-control form-control-md uppercase-input" name="category_id" id="edit_category_dropdown">
                                 
                                 <!-- Categories will be populated based on selection -->
                                 
@@ -531,7 +531,7 @@ if (mysqli_num_rows($result) > 0) {
                         <!-- Brand Dropdown -->
                         <div class="col-md-6 mt-3">
                             <label for="edit_brand">Brand:</label>
-                            <select class="form-control form-control-md" name="brand_id" id="edit_brand">
+                            <select class="form-control form-control-md uppercase-input" name="brand_id" id="edit_brand">
                                 <option selected hidden disabled>Select Brand</option>
                                 <!-- Brands will be populated dynamically -->
                             </select>
@@ -574,6 +574,11 @@ if (mysqli_num_rows($result) > 0) {
     ?>
 
  <script>
+    document.querySelectorAll('.uppercase-input').forEach(function(input) {
+        input.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    });
 
 $(document).ready(function() {
     var brandTable;

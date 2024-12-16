@@ -4,6 +4,9 @@ body {
     font-family: 'Poppins', sans-serif !important;
 }
 
+/*.active{
+    background-color: #9b7f31 !important;
+}*/
 
 /* add padding on input */
 
@@ -12,15 +15,10 @@ body {
 }
 
 
-/* add password hide and show icon */
 
-.password__icon {
-    position: absolute;
-    right: 0;
-    padding: 15px 20px;
-    cursor: pointer;
-}
-
+    .uppercase-input {
+        text-transform: uppercase;
+    }
 
 /* backgroun grey */
 
@@ -47,51 +45,7 @@ body {
         overflow-y: hidden;
     }
 
-    /* add circle blue background */
-    .ball {
-        overflow: hidden;
-        transition: margin 1s;
-        width: 600px;
-        height: 600px;
-    }
 
-    .ball.login {
-        margin-left: 50%;
-        margin-top: 5%;
-    }
-
-    /* bouncing effect */
-    .bounce {
-        animation: bounce 2s infinite alternate;
-        -webkit-animation: bounce 2s infinite alternate;
-    }
-
-    @keyframes bounce {
-        from {
-            transform: translateY(0px);
-        }
-
-        to {
-            transform: translateY(-35px);
-        }
-    }
-
-    @-webkit-keyframes bounce {
-        from {
-            transform: translateY(0px);
-        }
-
-        to {
-            transform: translateY(-35px);
-        }
-    }
-
-    /* login form active */
-    .login__form.active {
-        opacity: 1;
-        margin-left: 10% !important;
-    }
-}
 
 @media (max-width: 768px) {
     .container .col-12.p-5 {
@@ -101,24 +55,4 @@ body {
     body {
         overflow-x: hidden;
     }
-}
-
-/* login form default */
-
-.login__form {
-    position: absolute;
-    width: 100%;
-    height: 100vh;
-    margin-left: -100%;
-    opacity: 0;
-    transition: margin 1s, opacity .5s;
-    z-index: 1;
-}
-
-
-/* login form active */
-
-.login__form.active {
-    opacity: 1;
-    margin-left: 0%;
 }

@@ -52,60 +52,91 @@ function editRecord($table, $columns, $whereCondition, $successMessage, $errorMe
     }
 }
 
-// Process the form submission
+
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['form_type'])) {
-
     $formType = $_POST['form_type'];
+
     if ($formType == 'update_product') {
+        // Retrieve form inputs
+        $productId = $_POST['product_id'];
+        $productName = $_POST['product'];
+        $size = $_POST['size'];
+        $color = $_POST['color'];
+        $quantity = $_POST['quantity'];
+        $price = $_POST['price'];
+        $categoryId = $_POST['category_id'];
+        $brandId = $_POST['brand_id'];
+        $description = $_POST['description'];
 
+        // Fetch current product details for comparison
+        $sql = "SELECT quantity_in_stock, price FROM product_table WHERE product_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $currentProduct = $result->fetch_assoc();
+        $stmt->close();
 
-    // Retrieve form values
-    $product_id = $_POST['product_id'];
-    $product_name = $_POST['product'];
-    $size = $_POST['size'];
-    $color = $_POST['color'];
-    $quantity = $_POST['quantity'];
-    $price = $_POST['price'];
-    $category_id = $_POST['category_id'];
-    $brand_id = $_POST['brand_id'];
+        // Check if quantity or price changed
+        $quantityChanged = ($quantity != $currentProduct['quantity_in_stock']);
+        $priceChanged = ($price != $currentProduct['price']);
 
-    // Define the columns to update
-    $columns = [
-        'product_name' => $product_name,
-        'size' => $size,
-        'color' => $color,
-        'quantity' => $quantity,
-        'price' => $price,
-        'category_id' => $category_id,
-        'brand_id' => $brand_id
-    ];
+        // Build the columns for the update query
+        $columns = [
+            'product_name' => $productName,
+            'product_size' => $size,
+            'product_color' => $color,
+            'quantity_in_stock' => $quantity,
+            'price' => $price,
+            'category_id' => $categoryId,
+            'brand_id' => $brandId,
+            'description' => $description
+        ];
 
-    // Define the WHERE condition
-    $whereCondition = "product_id = $product_id";
+        // Perform the update using the editRecord function
+        $whereCondition = "product_id = $productId";
+        $successMessage = "Product updated successfully!";
+        $errorMessage = "Error updating product!";
+        editRecord('product_table', $columns, $whereCondition, $successMessage, $errorMessage);
 
-    // Call the editRecord function
-    editRecord(
-        'product_table', // Replace with your table name
-        $columns,
-        $whereCondition,
-        'Product updated successfully!',
-        'Failed to update product: '
-    );
+        // Insert into inventory_transaction_table if quantity or price changed
+        if ($quantityChanged || $priceChanged) {
+            $transactionType = $quantityChanged ? 'purchase' : 'price_update'; // Differentiate transaction types
+            $quantityDifference = $quantityChanged ? $quantity - $currentProduct['quantity_in_stock'] : 0;
 
-    // Redirect to the page with a success/error message
-    header("Location: products.php");
-    exit();
+            // Insert transaction
+            $transactionSQL = "INSERT INTO inventory_transaction_table 
+                (product_id, user_id, transaction_type, quantity, transaction_date, transaction_amount) 
+                VALUES (?, ?, ?, ?, NOW(), ?)";
+
+            $transactionAmount = $quantityDifference * $price; // Calculate total amount for stock change
+            // $userId = $_SESSION['user_id']; // Use session user_id in production
+            $userId = 1; // Temporary placeholder
+
+            $transactionStmt = $conn->prepare($transactionSQL);
+            $transactionStmt->bind_param(
+                'iisid',
+                $productId,
+                $userId,
+                $transactionType,
+                $quantityDifference,
+                $transactionAmount
+            );
+            $transactionStmt->execute();
+            $transactionStmt->close();
+        }
+
+        // Redirect after completion
+        header("Location: ../stocks-options.php");
+        exit();
     }
 } else {
     $_SESSION['message'] = "Invalid request!";
     $_SESSION['message_type'] = "error";
-    header("Location: ../stocks-options.php");
+    header("Location: ../transactions.php");
     exit();
 }
-
-
-
-
 
 
 

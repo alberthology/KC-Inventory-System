@@ -28,9 +28,9 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                      <div class="card">
                          <div class="card-header p-3">
                              <ul class="nav nav-pills">
-                                 <li class="nav-item"><a class="nav-link active" href="#order" data-toggle="tab"><b>Order Transactions</b></a></li>
-                                 <li class="nav-item"><a class="nav-link" href="#ongoing" data-toggle="tab"><b>Partially Paid Orders</b></a></li>
-                                 <li class="nav-item"><a class="nav-link" href="#completed" data-toggle="tab"><b>Completed Orders</b></a></li>
+                                 <li class="nav-item"><a class="nav-link tbl active" href="#order" data-toggle="tab"><b>Order Transactions</b></a></li>
+                                 <li class="nav-item"><a class="nav-link tbl" href="#ongoing" data-toggle="tab"><b>Partially Paid Orders</b></a></li>
+                                 <li class="nav-item"><a class="nav-link tbl" href="#completed" data-toggle="tab"><b>Completed Orders</b></a></li>
                              </ul>
                          </div>
                          <div class="card-body">

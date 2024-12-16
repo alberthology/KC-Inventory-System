@@ -19,7 +19,13 @@ body {
     padding-left: 0 !important; /* Remove default body padding */
     overflow-x: hidden; /* Disable horizontal overflow (optional) */
 }
+.nav-item .active{
+    background-color: #9b7f31 !important;
+}
 
+.nav-item .tbl:hover{
+    color: #d4bb77 !important;
+}
 
 .nav-sidebar {
     display: flex;
@@ -28,12 +34,6 @@ body {
 }
 
 
-.col-md-12{
-    margin-bottom: 3%;
-}
-.col-md-12{
-    margin-bottom: 3%;
-}
 
 .description {
     width: 100%;                  /* Make it stretch full width */

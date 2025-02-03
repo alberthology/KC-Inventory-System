@@ -23,9 +23,14 @@ body {
     background-color: #9b7f31 !important;
 }
 
-.nav-item .tbl:hover{
+.dropdown-item .nav-item .tbl:hover{
     color: #d4bb77 !important;
 }
+
+.dropdown-item:hover{
+    background-color: #d4bb77 !important;
+}
+
 
 .nav-sidebar {
     display: flex;

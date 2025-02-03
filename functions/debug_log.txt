@@ -1,0 +1,8 @@
+Array
+(
+    [product_id] => 38
+)
+Array
+(
+    [product_id] => 38
+)

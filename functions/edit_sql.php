@@ -256,6 +256,72 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['form_type'])) {
     $_SESSION['message_type'] = "error";
     header("Location: ../transactions.php");
     exit();
+$conn->close();
+}
+
+
+
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['form_type'])) {
+    $formType = $_POST['form_type'];
+
+    if ($formType == 'update_user') {
+        // Get the data from the form
+        $id = $_POST['id'];
+        $full_name = $_POST['Fullname'];
+        $uname = $_POST['username'];
+        $role = $_POST['role'];
+        $email = $_POST['email'];
+        $pass = $_POST['password'];
+
+        // Check if a new password is provided, and hash it if so
+        if (!empty($pass)) {
+            $hashedPassword = password_hash($pass, PASSWORD_DEFAULT);  // Hash the new password
+        } else {
+            // If password is empty, retain the current password (don't update it)
+            $hashedPassword = null; // Will be handled in the SQL query later
+        }
+
+        $columns = [
+            'full_name' => $full_name,
+            'email' => $email,
+            'username' => $uname,
+            'password' => $pass,
+            'role' => $role
+        ];
+
+        // Only add the hashed password to the columns if a new password is provided
+        if ($hashedPassword) {
+            $columns['password'] = $hashedPassword;
+        }
+
+        // Debugging: Check if $columns has correct data
+        var_dump($columns); // This will print the content of $columns to the page, so you can inspect the values.
+
+        $whereCondition = "user_id = $id";
+        // Use the editRecord function to update the user
+        editRecord(
+            'user_table',          // Table name
+            $columns,            // Columns and their new values
+            $whereCondition,                 // Pass the id directly
+            "Your User Account updated successfully!",  // Success message
+            "Notice! Error updating your user details! Please try again."  // Error message
+        );
+
+        header("Location: ../profile.php");
+        exit();
+    } else {
+        $_SESSION['message'] = "Missing form data!";
+        $_SESSION['message_type'] = "error";
+        header("Location: ../profile.php");
+        exit();
+    }
+} else {
+    $_SESSION['message'] = "Invalid request!";
+    $_SESSION['message_type'] = "error";
+    header("Location: ../profile.php");
+    exit();
 }
 
 $conn->close();

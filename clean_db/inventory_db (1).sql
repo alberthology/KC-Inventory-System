@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Feb 03, 2025 at 11:09 PM
+-- Generation Time: Jan 02, 2025 at 04:16 PM
 -- Server version: 8.3.0
 -- PHP Version: 8.2.18
 
@@ -36,15 +36,7 @@ CREATE TABLE IF NOT EXISTS `brand_table` (
   `country_of_origin` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`brand_id`),
   KEY `fk_product_category` (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `brand_table`
---
-
-INSERT INTO `brand_table` (`brand_id`, `brand_name`, `category_id`, `description`, `country_of_origin`) VALUES
-(39, 'BRAND 1-1', 32, '', ''),
-(40, 'BRAND X', 33, '', '');
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -58,15 +50,7 @@ CREATE TABLE IF NOT EXISTS `category_table` (
   `category_name` varchar(100) NOT NULL,
   `description` text,
   PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `category_table`
---
-
-INSERT INTO `category_table` (`category_id`, `category_name`, `description`) VALUES
-(32, 'CATEGORY 1', NULL),
-(33, 'CATEGORY X', NULL);
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -82,24 +66,7 @@ CREATE TABLE IF NOT EXISTS `customer_table` (
   `email` varchar(100) DEFAULT NULL,
   `address` text,
   PRIMARY KEY (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `customer_table`
---
-
-INSERT INTO `customer_table` (`customer_id`, `customer_name`, `contact_number`, `email`, `address`) VALUES
-(67, 'Joshua Abelgas', '091237894503', NULL, NULL),
-(68, 'Denver Smith', '12442134213', NULL, NULL),
-(69, 'Freda Sundemo', '09161352790', NULL, NULL),
-(70, 'Dawid Podsiadto', '09335267381', NULL, NULL),
-(71, 'Kenia OS', '0912890241', NULL, NULL),
-(72, 'MKTO', '123213123123', NULL, NULL),
-(73, 'Benson Boone', '2451412', NULL, NULL),
-(74, 'Jake Miller', '1244512412', NULL, NULL),
-(75, 'Illenium', '12904781209', NULL, NULL),
-(76, 'Hayley Williams', '214214213', NULL, NULL),
-(77, 'Major Lazer', '2152134123', NULL, NULL);
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -112,36 +79,14 @@ CREATE TABLE IF NOT EXISTS `inventory_transaction_table` (
   `transaction_id` int NOT NULL AUTO_INCREMENT,
   `product_id` int DEFAULT NULL,
   `user_id` int DEFAULT NULL,
-  `transaction_type` enum('Purchase','Sale','Return') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `transaction_type` enum('Purchase','Sale','Return') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `quantity` int DEFAULT NULL,
   `transaction_date` datetime DEFAULT CURRENT_TIMESTAMP,
   `transaction_amount` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`transaction_id`),
   KEY `product_id` (`product_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `inventory_transaction_table`
---
-
-INSERT INTO `inventory_transaction_table` (`transaction_id`, `product_id`, `user_id`, `transaction_type`, `quantity`, `transaction_date`, `transaction_amount`) VALUES
-(39, 46, 1, 'Purchase', 15, '2025-01-03 09:00:44', 120.00),
-(42, 49, 4, 'Purchase', 15, '2025-01-03 09:06:57', 300.00),
-(43, 46, 1, 'Sale', 2, '2025-01-03 09:09:25', 16.00),
-(44, 49, 6, 'Sale', 1, '2025-01-03 09:13:01', 20.00),
-(45, 50, 4, 'Purchase', 6, '2025-01-04 09:40:35', 1200.00),
-(46, 50, 4, 'Sale', 2, '2025-01-04 09:42:42', 400.00),
-(47, 50, 1, 'Purchase', 2, '2025-01-04 09:43:39', 400.00),
-(48, 50, 4, 'Sale', 1, '2025-01-04 09:45:19', 200.00),
-(49, 50, 4, 'Sale', 1, '2025-01-13 22:29:41', 200.00),
-(50, 46, 4, 'Sale', 1, '2025-01-13 23:30:32', 8.00),
-(51, 50, 1, 'Purchase', 1, '2025-01-13 23:31:52', 200.00),
-(52, 46, 1, 'Sale', 1, '2025-01-14 15:54:07', 8.00),
-(53, 49, 1, 'Sale', 1, '2025-01-14 16:22:58', 20.00),
-(54, 46, 1, 'Sale', 1, '2025-01-14 16:28:12', 8.00),
-(55, 50, 1, 'Sale', 1, '2025-01-14 16:47:35', 200.00),
-(56, 46, 1, 'Sale', 1, '2025-01-14 16:55:01', 8.00);
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -161,24 +106,7 @@ CREATE TABLE IF NOT EXISTS `order_item_table` (
   PRIMARY KEY (`order_item_id`),
   KEY `order_id` (`order_id`),
   KEY `product_id` (`product_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `order_item_table`
---
-
-INSERT INTO `order_item_table` (`order_item_id`, `order_id`, `product_id`, `quantity`, `unit_price`, `total_price`, `payment`) VALUES
-(69, 63, 46, 2, 8.00, 16.00, 16.00),
-(70, 64, 49, 1, 20.00, 20.00, 20.00),
-(71, 65, 50, 2, 200.00, 400.00, 400.00),
-(72, 66, 50, 1, 200.00, 200.00, 200.00),
-(73, 67, 50, 1, 200.00, 200.00, 100.00),
-(74, 68, 46, 1, 8.00, 8.00, 8.00),
-(75, 69, 46, 1, 8.00, 8.00, 8.00),
-(76, 70, 49, 1, 20.00, 20.00, 20.00),
-(77, 71, 46, 1, 8.00, 8.00, 8.00),
-(78, 72, 50, 1, 200.00, 200.00, 200.00),
-(79, 73, 46, 1, 8.00, 8.00, 8.00);
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -192,27 +120,10 @@ CREATE TABLE IF NOT EXISTS `order_table` (
   `customer_id` int NOT NULL,
   `order_date` datetime DEFAULT CURRENT_TIMESTAMP,
   `total_amount` decimal(10,2) DEFAULT NULL,
-  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   KEY `customer_id` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `order_table`
---
-
-INSERT INTO `order_table` (`order_id`, `customer_id`, `order_date`, `total_amount`, `status`) VALUES
-(63, 67, '2025-01-03 09:09:25', 16.00, 'Completed'),
-(64, 68, '2025-01-03 09:13:01', 20.00, 'Completed'),
-(65, 69, '2025-01-04 09:42:42', 400.00, 'Completed'),
-(66, 70, '2025-01-04 09:45:19', 200.00, 'Completed'),
-(67, 71, '2025-01-13 22:29:41', 200.00, 'Ongoing'),
-(68, 72, '2025-01-13 23:30:32', 8.00, 'Completed'),
-(69, 73, '2025-01-14 15:54:07', 8.00, 'Completed'),
-(70, 74, '2025-01-14 16:22:58', 20.00, 'Completed'),
-(71, 75, '2025-01-14 16:28:12', 8.00, 'Completed'),
-(72, 76, '2025-01-14 16:47:35', 200.00, 'Completed'),
-(73, 77, '2025-01-14 16:55:01', 8.00, 'Completed');
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -236,16 +147,7 @@ CREATE TABLE IF NOT EXISTS `product_table` (
   KEY `category_id` (`category_id`),
   KEY `supplier_id` (`supplier_id`),
   KEY `fk_product_brand` (`brand_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `product_table`
---
-
-INSERT INTO `product_table` (`product_id`, `product_name`, `product_size`, `product_color`, `category_id`, `description`, `quantity_in_stock`, `price`, `supplier_id`, `brand_id`) VALUES
-(46, 'PRODUCT A1', 'DEFUALT', 'DEFUALT', 32, '', 9, 8.00, NULL, 39),
-(49, 'PRODUCT A2', 'DEFAULT', 'DEFAULT', 32, '', 13, 20.00, NULL, 39),
-(50, 'PRODUCT X', 'DEFAULT', 'DEFAULT', 33, '', 4, 200.00, NULL, 40);
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -264,7 +166,7 @@ CREATE TABLE IF NOT EXISTS `purchase_item_table` (
   PRIMARY KEY (`purchase_item_id`),
   KEY `purchase_id` (`purchase_id`),
   KEY `product_id` (`product_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -282,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `purchase_table` (
   `status` enum('completed','pending','cancelled') DEFAULT NULL,
   PRIMARY KEY (`purchase_id`),
   KEY `supplier_id` (`supplier_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -299,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `supplier_table` (
   `email` varchar(100) DEFAULT NULL,
   `address` text,
   PRIMARY KEY (`supplier_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -312,13 +214,13 @@ CREATE TABLE IF NOT EXISTS `user_table` (
   `user_id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `role` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `full_name` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user_table`

@@ -1,5 +1,4 @@
  <?php
-    session_start();
     include 'functions/db_con.php';
     include 'includes/header.php';
     include 'includes/nav.php';
@@ -93,7 +92,6 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                 $orderDate = new DateTime($row['order_date']);
                 $orderDateFormatted = $orderDate->format('g:i A, l, F j, Y'); // Format: MM dd, yyyy HH:mm pm
                 // Assume $row['order_date'] contains the order date in 'Y-m-d H:i:s' format.
-                $orderDate = new DateTime($row['order_date']);
                 // $now = new DateTime();
 
                 // Calculate the time difference
@@ -216,8 +214,8 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                                                 LEFT JOIN customer_table c ON i.customer_id = c.customer_id
                                                 LEFT JOIN category_table v ON p.category_id = v.category_id
                                                 LEFT JOIN brand_table b ON p.brand_id = b.brand_id
-                                                WHERE o.total_price != o.payment ORDER BY i.order_date DESC"; // Assumed status is 'ongoing'
-
+                                                WHERE o.total_price != o.payment 
+                                                ORDER BY i.order_date DESC"; 
                                             $result = mysqli_query($conn, $query);
                                              
                                             // Check if any orders exist
@@ -273,11 +271,11 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                                                     echo "<tr id='order-row-{$row['order_item_id']}'>
                                                             <td>{$orderCode}</td>
                                                             <td>{$row['customer_name']}</td>
-                                                            <td>{$row['quantity']} {$row['product_name']}, for ₱ {$unit_price} each</td>
+                                                            <td>{$row['quantity']} {$row['product_name']}, for ₱ {$unit_price} each, a total amount of ₱ <u>{$formatted_total_amount}</u></td>
                                                             <td>₱ {$formatted_payment}</td>
                                                             <td>{$orderDateFormatted}</td>
                                                             <td style='text-align:center;'>
-                                                                <button class='btn btn-primary' onclick='openEditModal({$row['order_item_id']},\"{$row['order_id']}\",\"{$row['customer_id']}\",\"{$row['category_id']}\",\"{$row['brand_id']}\",\"{$row['product_id']}\",\"{$row['customer_name']}\",\"{$row['contact_number']}\",\"{$row['category_name']}\",\"{$row['brand_name']}\",\"{$row['product_name']}\",\"{$row['product_size']}\",\"{$row['product_color']}\",\"{$row['status']}\",\"{$row['quantity']}\",\"{$row['price']}\",\"{$row['unit_price']}\",\"{$formatted_total_amount}\",\"{$formatted_payment}\")'>
+                                                                <button class='btn btn-primary btn-sm' onclick='openEditModal({$row['order_item_id']},\"{$row['order_id']}\",\"{$row['customer_id']}\",\"{$row['category_id']}\",\"{$row['brand_id']}\",\"{$row['product_id']}\",\"{$row['customer_name']}\",\"{$row['contact_number']}\",\"{$row['category_name']}\",\"{$row['brand_name']}\",\"{$row['product_name']}\",\"{$row['product_size']}\",\"{$row['product_color']}\",\"{$row['status']}\",\"{$row['quantity']}\",\"{$row['price']}\",\"{$row['unit_price']}\",\"{$formatted_total_amount}\",\"{$formatted_payment}\")'>
                                                                     Update Payment
                                                                 </button>
                                                             </td>
@@ -332,8 +330,8 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
 
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label for="edit_price">Price:</label>
-                                        <input type="text" name="payment" id="edit_price" class="form-control form-control-md" placeholder="Payment" disabled>
+                                                <label for="edit_price">Total Price:</label>
+                                        <input type="text" name="payment" id="total_amount" class="form-control form-control-md" placeholder="Payment" disabled>
 
                                                 
                                             </div>
@@ -379,13 +377,13 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                                                         <thead>
                                                             <tr>
                                                                 <th rowspan="2">Customer</th>
-                                                                <th colspan="4">Order Details</th>
+                                                                <th colspan="3">Order Details</th>
                                                                 <th rowspan="2">Action</th>
                                                             </tr>
                                                             <tr>
                                                                <th>Product</th>
                                                                 <th>Total Amount</th>
-                                                                <th>Payment</th>
+                                                                <!-- <th>Payment</th> -->
                                                                 <th>Date Ordered</th> 
                                                             </tr>
                                                         </thead>
@@ -474,12 +472,13 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                                             }
                                                         echo "<tr id='order-row-{$row['order_item_id']}'>
                                                                 <td>{$row['customer_name']}</td>
-                                                                <td>{$row['product_name']}</td>
+                                                                <td>{$row['quantity']} {$row['product_name']}</td>
                                                                 <td>₱ {$formatted_item_total_price}</td>
-                                                                <td>₱ {$formatted_payment}</td>
+                                                                
                                                                 <td>{$orderDateFormatted}</td>
                                                                 <td style='text-align:center;'>";?>
-                                                                <button class="btn btn-primary" onclick="openViewDetailsModal(
+
+                                                                <button class="btn btn-primary btn-sm" onclick="openViewDetailsModal(
                                                                 <?php echo $row['order_item_id']; ?>,
                                                                 '<?php echo $row['order_id']; ?>',
                                                                 '<?php echo $row['customer_id']; ?>',
@@ -497,7 +496,7 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                                                                 <?php echo $row['quantity']; ?>,
                                                                 <?php echo $row['price']; ?>,
                                                                 <?php echo $row['unit_price']; ?>,
-                                                                '<?php echo $formatted_total_amount; ?>',
+                                                                '<?php echo $formatted_item_total_price;?>',
                                                                 '<?php echo $formatted_payment; ?>'
                                                             )">
                                                                 View Details
@@ -605,10 +604,10 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                     <div class="row">
                         <h5 class="col-12"> &nbsp Customer Information:</h5>
                         <div class="col-md-6 mb-3"> <!-- Added mb-3 here for spacing -->
-                            <input type="text" name="customer_name" class="form-control form-control-md" placeholder="Customer Name">
+                            <input type="text" name="customer_name" class="form-control form-control-md" placeholder="Customer Name" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number">
+                            <input type="text" name="contact_number" class="form-control form-control-md" placeholder="Contact Number" required>
                         </div>
 <!--                         <div class="col-md-6 mb-3">
                             <input type="text" name="email" class="form-control form-control-md" placeholder="Email">
@@ -626,7 +625,7 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
     <div class="row">
         <h5 class="col-12"> &nbsp Item Detail:</h5>
         <div class="col-md-4 mb-3">
-            <select class="form-control form-control-md" name="category_id[]" id="categorySelect-0" onchange="fetchBrand(0)">
+            <select class="form-control form-control-md" name="category_id[]" id="categorySelect-0" onchange="fetchBrand(0)" required>
                 <option selected hidden disabled>Product Category</option>
                 <?php
                 $query = "SELECT * FROM category_table";
@@ -643,31 +642,31 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
         </div>
 
         <div class="col-md-4 mb-3">
-            <select class="form-control form-control-md" name="brand_id[]" id="brandSelect-0" onchange="fetchProducts(0)">
+            <select class="form-control form-control-md" name="brand_id[]" id="brandSelect-0" onchange="fetchProducts(0)" required>
                 <option selected hidden disabled>Brand</option>
             </select>
         </div>
 
         <div class="col-md-4 mb-3">
-            <select class="form-control form-control-md" name="product_name[]" id="productSelect-0" onchange="fetchSize(0)">
+            <select class="form-control form-control-md" name="product_name[]" id="productSelect-0" onchange="fetchSize(0)" required>
                 <option selected hidden disabled>Select Item</option>
             </select>
         </div>
 
         <div class="col-md-4 mb-3">
-            <select class="form-control form-control-md" name="product_size[]" id="sizeSelect-0" onchange="fetchColor(0)">
+            <select class="form-control form-control-md" name="product_size[]" id="sizeSelect-0" onchange="fetchColor(0)" required>
                 <option selected hidden disabled> Size Available</option>
             </select>
         </div>
 
         <div class="col-md-4 mb-3">
-            <select class="form-control form-control-md" name="product_color[]" id="colorSelect-0" onchange="fetchPrice(0)">
+            <select class="form-control form-control-md" name="product_color[]" id="colorSelect-0" onchange="fetchPrice(0)" required>
                 <option selected hidden disabled>Color Available</option>
             </select>
         </div>
 
         <div class="col-md-4 mb-3">
-            <select class="form-control form-control-md" name="order_table_status[]" id="statusSelect-0" onchange="handlePaymentStatusChange(0)">
+            <select class="form-control form-control-md" name="order_table_status[]" id="statusSelect-0" onchange="handlePaymentStatusChange(0)" required>
                 <option selected hidden disabled>Payment Status</option>
                 <option value="Completed">Full Payment</option>
                 <option value="Ongoing">Partial Payment</option>
@@ -678,7 +677,7 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
     <div class="row">
         <div class="col-md-4 mb-3">
             <label for="quantityInput-0"> Quantity </label>
-            <input type="number" class="form-control" name="quantity[]" id="quantityInput-0" placeholder="Quantity" value="1" oninput="fetchPrice(0)">
+            <input type="number" class="form-control" name="quantity[]" id="quantityInput-0" placeholder="Quantity" value="1" min="1" oninput="fetchPrice(0)" required>
         </div>
         
 
@@ -688,7 +687,7 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
         </div>
         <div class="col-md-4 mb-3">
             <label for="paymentInput-0"> Payment </label>
-            <input type="text" class="form-control" name="payment[]" id="paymentInput-0" placeholder="Payment (₱)" oninput="validatePaymentInput(this)">
+            <input type="text" class="form-control" name="payment[]" id="paymentInput-0" placeholder="Payment (₱)" oninput="validatePaymentInput(this)" required>
         </div>
     </div>
 </div>
@@ -833,9 +832,9 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                             const product_color = document.getElementById(`colorSelect-${itemId}`).value;
                             const product_size = document.getElementById(`sizeSelect-${itemId}`).value;
                             const priceInput = document.getElementById(`priceInput-${itemId}`);
-                            const quantityInput = document.getElementById(`quantityInput-${itemId}`); // Assuming quantity is also an input field
+                            const quantityInput = document.getElementById(`quantityInput-${itemId}`);
                             const paymentInput = document.getElementById(`paymentInput-${itemId}`);
-
+                            
                             fetch(`functions/fetch_price.php?product_color=${product_color}&product_name=${product_name}&product_size=${product_size}`)
                                 .then(response => response.json())
                                 .then(data => {
@@ -843,20 +842,30 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                                         priceInput.value = data.price;
 
                                         // Calculate total price (price * quantity)
-                                        const quantity = parseInt(quantityInput.value) || 1; // Default to 1 if quantity is not set
+                                        const quantity = parseInt(quantityInput.value) || 1;
                                         const totalPrice = data.price * quantity;
 
                                         // If "Full Payment" is selected, set payment to the full price (totalPrice)
                                         if (document.getElementById(`statusSelect-${itemId}`).value === "Completed") {
-                                            paymentInput.value = totalPrice; // Set payment to full amount
+                                            paymentInput.value = totalPrice;
                                         }
                                     } else {
                                         priceInput.value = 'Price Not Available';
                                         paymentInput.value = '';
                                     }
+
+                                    // Fetch and set the maximum available quantity (quantity_in_stock)
+                                    if (data.quantity_in_stock !== undefined) {
+                                        quantityInput.max = data.quantity_in_stock; // Set the max limit for quantity
+                                        // Optionally, if the quantity is greater than the stock, set it to the max available
+                                        if (parseInt(quantityInput.value) > data.quantity_in_stock) {
+                                            quantityInput.value = data.quantity_in_stock;
+                                        }
+                                    }
                                 })
                                 .catch(error => console.error('Error fetching price:', error));
                         }
+
 
                         // Handle the change in payment status (Full Payment or Partial Payment)
                         function handlePaymentStatusChange(itemId) {
@@ -1037,7 +1046,7 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                          "paging": true,
                          "lengthChange": true,
                          "searching": true,
-                         "ordering": true,
+                         "ordering": false,
                          "info": true,
                          "autoWidth": true,
                          "responsive": true,
@@ -1055,7 +1064,7 @@ function generateOrderCode($category_id, $brand_id, $product_id, $customer_id, $
                          "paging": true,
                          "lengthChange": true,
                          "searching": true,
-                         "ordering": true,
+                         "ordering": false,
                          "info": true,
                          "autoWidth": true,
                          "responsive": true,
@@ -1106,6 +1115,8 @@ function openEditModal(
     }).format(total_item_price);
 
     $('#edit_total_item_price').text(formatted_total_item_price);
+
+    $('#total_amount').val(total_item_price);
 
     // Generate order code
     let orderNumber = generateOrderCode(category_id, brand_id, product_id, customer_id, order_id, order_item_id);

@@ -67,6 +67,14 @@ if (isset($_POST['submit-category'])) {
     $origin_country = $_POST['origin_country'];
     $description = $_POST['description'];
 
+    // Check for empty required fields
+    if (empty($category) || empty($brand)) {
+        $_SESSION['message'] = "Category and Brand fields are required!";
+        $_SESSION['message_type'] = "error";
+        header("Location: ../stocks-options.php");
+        exit();
+    }
+    
     // Check if category already exists
     $query = "SELECT category_id FROM category_table WHERE category_name = ?";
     $stmt = $conn->prepare($query);
@@ -221,8 +229,8 @@ if (isset($_POST['submit-order'])) {
                     $transaction_type = 'sale'; // Set transaction type as 'sale'
                     $transaction_date = date('Y-m-d H:i:s');
                     $transaction_amount = $quantity * $price;
-                    // $user_id = $_SESSION['user_id'];
-                    $user_id = "1";
+                    $user_id = $_SESSION['id'];
+                    // $user_id = "1";
 
                     insertRecord(
                         'inventory_transaction_table',
@@ -288,8 +296,8 @@ if (isset($_POST['submit-product'])) {
 
         // Insert record into the inventory_transaction_table
         $transaction_type = 'purchase'; // Setting transaction type as 'purchase'
-        // $user_id = $_SESSION['user_id']; 
-        $user_id = "1"; 
+        $user_id = $_SESSION['id']; 
+        // $user_id = "1"; 
 
         $result = insertRecord(
             'inventory_transaction_table',
@@ -321,6 +329,80 @@ if (isset($_POST['submit-product'])) {
         exit();
     }
 }
+
+if (isset($_POST['submit-user'])) {
+    $full_name = $_POST['fullname'];
+    $email = $_POST['email'];
+    $role = $_POST['role'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Check if a new password is provided, and hash it if so
+    if (!empty($password)) {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);  // Hash the new password
+    } else {
+        // If password is empty, retain the current password (don't update it)
+        $hashedPassword = null; // Will be handled in the SQL query later
+    }
+
+    // Prepare the columns and values
+    $columns = [
+        'full_name' => $full_name,
+        'email' => $email,
+        'username' => $username,
+        'role' => $role,
+    ];
+
+    // Only add the hashed password to the columns if a new password is provided
+    if ($hashedPassword) {
+        $columns['password'] = $hashedPassword;
+    } else {
+        // If no password is provided, you might need to handle this case depending on your logic
+        // (e.g., leaving the password as is or updating it)
+    }
+
+    // Debugging: Check if $columns has correct data
+    var_dump($columns); // This will print the content of $columns to the page, so you can inspect the values.
+
+    try {
+        // Dynamically create the columns and values for SQL
+        $columnNames = implode(", ", array_keys($columns));
+        $columnValues = implode(", ", array_map(function ($value) {
+            return "'" . $value . "'"; // Ensures string values are enclosed in quotes
+        }, array_values($columns)));
+
+        // Insert record into the user_table
+        $user_id = insertRecord(
+            'user_table',
+            $columnNames,
+            $columnValues,
+            "User Account added successfully!",
+            "Error adding User Account! Please try again."
+        );
+
+        if (!$user_id) {
+            throw new Exception("Failed to insert into user_table.");
+        }
+
+        // Commit the transaction if both inserts succeed
+        $conn->commit();
+
+        // Redirect to users.php
+        header("Location: ../users.php");
+        exit();
+    } catch (Exception $e) {
+        // Rollback the transaction if any operation fails
+        $conn->rollback();
+        $_SESSION['message'] = "Transaction failed: " . $e->getMessage();
+        $_SESSION['message_type'] = "error";
+
+        // Redirect to the same page to show the error message
+        header("Location: ../users.php");
+        exit();
+    }
+}
+
+
 
 /*if (isset($_POST['submit-brand'])) {
     $brand = $_POST['brand'];

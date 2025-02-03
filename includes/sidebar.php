@@ -82,14 +82,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <p>Suppliers</p>
                     </a>
                 </li> -->
-
-                <!-- Users -->
-                <li class="nav-item">
-                    <a href="users.php" class="nav-link <?php echo ($current_page == 'users.php') ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>Users</p>
-                    </a>
-                </li>
             </ul>
         </nav>
     </div>

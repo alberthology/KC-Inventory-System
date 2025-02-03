@@ -208,6 +208,15 @@ if ($result) {
                       <!-- /.col -->
                       <div class="col-md-4">
                         <p class="text-center"><strong>Progression Report (ongoing..)</strong></p>
+                        <div class="progress-group">
+                          ongoing..
+                          <span class="float-end"><b>0</b>/0</span>
+                          <div class="progress progress-sm">
+                            <div class="progress-bar text-bg-primary" style="width: 0%"></div>
+                          </div>
+                        </div>
+                        <!-- /.progress-group -->
+
                         <?php 
 
                     $query_total = "SELECT COUNT(*) AS total_complete_purchase 
@@ -226,27 +235,35 @@ if ($result) {
                         ?>
 
                         <div class="progress-group">
-                          Completed Purchase
+                          Complete Purchase
                           <span class="float-end"><b><?php echo $new_orders_count;?></b>/<?php echo $total_complete_purchase;?></span>
                           <div class="progress progress-sm">
                             <div class="progress-bar text-bg-danger" style="width: <?php  if ($total_complete_purchase != 0) {echo $completed_order_percent;}else{ echo "0"; }?>%"></div>
                           </div>
                         </div>
-
-
-
+                        <!-- /.progress-group -->
                         <div class="progress-group">
-                          <span class="progress-text">Partial Purchases</span>
+                          <span class="progress-text">ongoing..</span>
                           <span class="float-end"><b>0</b>/0</span>
                           <div class="progress progress-sm">
                             <div class="progress-bar text-bg-success" style="width: 0%"></div>
                           </div>
                         </div>
-
+                        <!-- /.progress-group -->
+                        <div class="progress-group">
+                          ongoing..
+                          <span class="float-end"><b>0</b>/0</span>
+                          <div class="progress progress-sm">
+                            <div class="progress-bar text-bg-warning" style="width: 0%"></div>
+                          </div>
+                        </div>
+                        <!-- /.progress-group -->
                       </div>
+                      <!-- /.col -->
                     </div>
+                    <!--end::Row-->
                   </div>
-
+                  <!-- ./card-body -->
                   <div class="card-footer">
                     <!--begin::Row-->
                     <div class="row">
@@ -264,7 +281,7 @@ if ($result) {
                         <div class="text-center border-end">
                           <span class="text-info"> <i class="bi bi-caret-left-fill"></i> 0% </span>
                           <h5 class="fw-bold mb-0">ongoing..</h5>
-                          <span class="text-uppercase">Top Selling Products</span>
+                          <span class="text-uppercase">TOTAL COST</span>
                         </div>
                       </div>
                       <!-- /.col -->
@@ -274,17 +291,17 @@ if ($result) {
                             <i class="bi bi-caret-up-fill"></i> 0%
                           </span>
                           <h5 class="fw-bold mb-0">ongoing..</h5>
-                          <span class="text-uppercase">Monthly Sales Growth</span>
+                          <span class="text-uppercase">TOTAL PROFIT</span>
                         </div>
                       </div>
                       <!-- /.col -->
                       <div class="col-md-3 col-6">
                         <div class="text-center">
-                          <span class="text-primary">
+                          <span class="text-danger">
                             <i class="bi bi-caret-down-fill"></i> 0%
                           </span>
                           <h5 class="fw-bold mb-0">ongoing..</h5>
-                          <span class="text-uppercase">Completed orders</span>
+                          <span class="text-uppercase">GOAL COMPLETIONS</span>
                         </div>
                       </div>
                     </div>

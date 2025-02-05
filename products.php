@@ -66,13 +66,13 @@
                     echo '</div>'; // Close previous day's timeline group
                 }
                 $current_date = $transaction_date;
-                echo "
+?>
                 <div class='tab-pane' id='timeline'>
                     <div class='timeline timeline-inverse'>
                         <div class='time-label'>
-                            <span class='bg-success'>{$transaction_date}</span>
+                            <span class='bg-success'><?php echo $transaction_date; ?></span>
                         </div>
-                ";
+<?php
             }
 
             // Format transaction details
@@ -131,9 +131,11 @@
                 </div>
             </div>
             <?php
-        }
+        }?>
 
-        if ($current_date !== null) {
+    </div>
+</div>
+        <?php if ($current_date !== null) {
             echo '</div> '; // Close the last timeline group
         }
 
@@ -148,17 +150,15 @@
         ?>
 
 
-    </div>
-</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
-
     </div>
-
 </div>
 
 

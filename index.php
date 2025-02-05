@@ -29,7 +29,7 @@
                     $query = "SELECT COUNT(*) AS total_orders 
                     FROM order_item_table o 
                     LEFT JOIN order_table i ON o.order_id = i.order_id
-                    WHERE MONTH(i.order_date) = MONTH(CURDATE()) AND YEAR(i.order_date) = YEAR(CURDATE()) AND o.total_price = o.payment;";
+                    WHERE o.total_price = o.payment;";
                     $result = mysqli_query($conn, $query);
                     $row = mysqli_fetch_assoc($result);
                     $new_orders_count = $row['total_orders'];
@@ -39,9 +39,7 @@
                         SELECT SUM(o.total_price) AS total_sales 
                         FROM order_item_table o
                         LEFT JOIN order_table i ON o.order_id = i.order_id
-                        WHERE 
-                            MONTH(i.order_date) = MONTH(CURDATE()) 
-                            AND YEAR(i.order_date) = YEAR(CURDATE()) 
+
                             /*AND o.total_price = o.payment*/;
                     ";
 
@@ -62,7 +60,7 @@
                     $query3 = "SELECT COUNT(*) AS pending_orders 
                     FROM order_item_table o 
                     LEFT JOIN order_table i ON o.order_id = i.order_id
-                    WHERE MONTH(i.order_date) = MONTH(CURDATE()) AND YEAR(i.order_date) = YEAR(CURDATE()) AND o.total_price != o.payment;";
+                    WHERE o.total_price != o.payment;";
                     $result3 = mysqli_query($conn, $query3);
                     $row3 = mysqli_fetch_assoc($result3);
                     $pendeing_orders_count = $row3['pending_orders'];
@@ -71,10 +69,7 @@
                     SELECT SUM(o.total_price - o.payment) AS pending_amount 
                     FROM order_item_table o
                     LEFT JOIN order_table i ON o.order_id = i.order_id
-                    WHERE 
-                        MONTH(i.order_date) = MONTH(CURDATE()) 
-                        AND YEAR(i.order_date) = YEAR(CURDATE()) 
-                        AND o.total_price != o.payment;
+                    WHERE o.total_price != o.payment;
                 ";
 
                 // Execute the query

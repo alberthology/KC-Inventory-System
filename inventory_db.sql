@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Feb 03, 2025 at 11:09 PM
+-- Generation Time: Feb 06, 2025 at 09:08 AM
 -- Server version: 8.3.0
--- PHP Version: 8.2.18
+-- PHP Version: 8.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `customer_table` (
   `email` varchar(100) DEFAULT NULL,
   `address` text,
   PRIMARY KEY (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `customer_table`
@@ -99,7 +99,13 @@ INSERT INTO `customer_table` (`customer_id`, `customer_name`, `contact_number`, 
 (74, 'Jake Miller', '1244512412', NULL, NULL),
 (75, 'Illenium', '12904781209', NULL, NULL),
 (76, 'Hayley Williams', '214214213', NULL, NULL),
-(77, 'Major Lazer', '2152134123', NULL, NULL);
+(77, 'Major Lazer', '2152134123', NULL, NULL),
+(78, 'Jayde', '12345678912', NULL, NULL),
+(79, 'Bowjaaey', '654643218', NULL, NULL),
+(80, 'Janjan', '2313213', NULL, NULL),
+(81, 'Troy Sivan', '1324654654', NULL, NULL),
+(82, 'Jonathan Doe', '2313213', NULL, NULL),
+(83, 'Ed Sheeran', '456455231', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -119,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `inventory_transaction_table` (
   PRIMARY KEY (`transaction_id`),
   KEY `product_id` (`product_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `inventory_transaction_table`
@@ -141,7 +147,15 @@ INSERT INTO `inventory_transaction_table` (`transaction_id`, `product_id`, `user
 (53, 49, 1, 'Sale', 1, '2025-01-14 16:22:58', 20.00),
 (54, 46, 1, 'Sale', 1, '2025-01-14 16:28:12', 8.00),
 (55, 50, 1, 'Sale', 1, '2025-01-14 16:47:35', 200.00),
-(56, 46, 1, 'Sale', 1, '2025-01-14 16:55:01', 8.00);
+(56, 46, 1, 'Sale', 1, '2025-01-14 16:55:01', 8.00),
+(57, 50, 1, 'Purchase', 4, '2025-02-06 14:58:56', 800.00),
+(58, 49, 4, 'Sale', 2, '2025-02-06 15:00:58', 40.00),
+(59, 50, 4, 'Sale', 2, '2025-02-06 15:17:12', 400.00),
+(60, 46, 4, 'Sale', 4, '2025-02-06 16:17:55', 32.00),
+(61, 50, 4, 'Sale', 6, '2025-02-06 16:44:48', 1200.00),
+(62, 50, 1, 'Purchase', 11, '2025-02-06 16:45:05', 2200.00),
+(63, 50, 4, 'Sale', 4, '2025-02-06 16:49:05', 800.00),
+(64, 50, 4, 'Sale', 3, '2025-02-06 16:58:12', 600.00);
 
 -- --------------------------------------------------------
 
@@ -161,7 +175,7 @@ CREATE TABLE IF NOT EXISTS `order_item_table` (
   PRIMARY KEY (`order_item_id`),
   KEY `order_id` (`order_id`),
   KEY `product_id` (`product_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `order_item_table`
@@ -178,7 +192,13 @@ INSERT INTO `order_item_table` (`order_item_id`, `order_id`, `product_id`, `quan
 (76, 70, 49, 1, 20.00, 20.00, 20.00),
 (77, 71, 46, 1, 8.00, 8.00, 8.00),
 (78, 72, 50, 1, 200.00, 200.00, 200.00),
-(79, 73, 46, 1, 8.00, 8.00, 8.00);
+(79, 73, 46, 1, 8.00, 8.00, 8.00),
+(80, 74, 49, 2, 20.00, 40.00, 40.00),
+(81, 75, 50, 2, 200.00, 400.00, 120.00),
+(82, 76, 46, 4, 8.00, 32.00, 32.00),
+(83, 77, 50, 6, 200.00, 1200.00, 1200.00),
+(84, 78, 50, 4, 200.00, 800.00, 500.00),
+(85, 79, 50, 3, 200.00, 600.00, 20.00);
 
 -- --------------------------------------------------------
 
@@ -195,7 +215,7 @@ CREATE TABLE IF NOT EXISTS `order_table` (
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   KEY `customer_id` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `order_table`
@@ -212,7 +232,13 @@ INSERT INTO `order_table` (`order_id`, `customer_id`, `order_date`, `total_amoun
 (70, 74, '2025-01-14 16:22:58', 20.00, 'Completed'),
 (71, 75, '2025-01-14 16:28:12', 8.00, 'Completed'),
 (72, 76, '2025-01-14 16:47:35', 200.00, 'Completed'),
-(73, 77, '2025-01-14 16:55:01', 8.00, 'Completed');
+(73, 77, '2025-01-14 16:55:01', 8.00, 'Completed'),
+(74, 78, '2025-02-06 15:00:58', 40.00, 'Completed'),
+(75, 79, '2025-02-06 15:17:12', 400.00, 'Ongoing'),
+(76, 80, '2025-02-06 16:17:55', 32.00, 'Completed'),
+(77, 81, '2025-02-06 16:44:48', 1200.00, 'Completed'),
+(78, 82, '2025-02-06 16:49:05', 800.00, 'Ongoing'),
+(79, 83, '2025-02-06 16:58:12', 600.00, 'Ongoing');
 
 -- --------------------------------------------------------
 
@@ -243,8 +269,8 @@ CREATE TABLE IF NOT EXISTS `product_table` (
 --
 
 INSERT INTO `product_table` (`product_id`, `product_name`, `product_size`, `product_color`, `category_id`, `description`, `quantity_in_stock`, `price`, `supplier_id`, `brand_id`) VALUES
-(46, 'PRODUCT A1', 'DEFUALT', 'DEFUALT', 32, '', 9, 8.00, NULL, 39),
-(49, 'PRODUCT A2', 'DEFAULT', 'DEFAULT', 32, '', 13, 20.00, NULL, 39),
+(46, 'PRODUCT A1', 'DEFUALT', 'DEFUALT', 32, '', 5, 8.00, NULL, 39),
+(49, 'PRODUCT A2', 'DEFAULT', 'DEFAULT', 32, '', 11, 20.00, NULL, 39),
 (50, 'PRODUCT X', 'DEFAULT', 'DEFAULT', 33, '', 4, 200.00, NULL, 40);
 
 -- --------------------------------------------------------

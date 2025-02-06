@@ -229,7 +229,7 @@ if ($result) {
 
 
                         <div class="progress-group">
-                          <span class="progress-text">Partial Purchases</span>
+                          <span class="progress-text">Partial Purchases for this month: </span>
                           <span class="float-end"><b>0</b>/0</span>
                           <div class="progress progress-sm">
                             <div class="progress-bar text-bg-success" style="width: 0%"></div>
@@ -266,6 +266,7 @@ if ($result) {
                             // Calculate Monthly Sales Growth %
                         if ($previous_sales > 0) {
                             $growth_percentage = (($current_sales - $previous_sales) / $previous_sales) * 100;
+                            $growth_value = $current_sales - $previous_sales;
                             // $growth_percentage = 20;
 
                         } else {
@@ -284,13 +285,26 @@ if ($result) {
                     <div class="row">
                       <div class="col-md-3 col-6">
                         <div class="text-center border-end">
-                          <span class="<?php echo ($growth_percentage >= 50) ? 'text-success' : (($growth_percentage >= 1) ? 'text-warning' : 'text-danger'); ?>">
+                          <span class="text-success">
+                            <i class="fas <?php echo ($growth_percentage >= 1) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> 
+                              <?php echo round($growth_percentage,2); ?> %
+                          </span>
+                          <h5 class="fw-bold mb-0">₱<?php echo number_format($current_sales,2);?></h5>
+                          <span class="text-uppercase">TOTAL MONTHLY SALES</span>
+                        </div>
+                      </div>
+                      <!-- /.col -->
+                      <div class="col-md-3 col-6">
+                        <div class="text-center border-end">
+                          <span class="<?php echo ($growth_percentage >= 50) ? 'text-success' : (($growth_percentage >= 1) ? 'text-secondary' : 'text-danger'); ?>">
                               <i class="fas <?php echo ($growth_percentage >= 1) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> 
-                              <?php echo round($growth_percentage,2); ?>%
+                              <!-- <?php //echo round($growth_percentage,2); ?> % -->
+                              <?php echo ($growth_percentage < 0) ? '0' : round($growth_percentage,2); ?> %
                           </span>
 
-                          <h5 class="fw-bold mb-0">₱<?php echo number_format($current_sales,2);?></h5>
-                          <span class="text-uppercase">MONTHLY SALES GROWTH</span>
+                          <!-- <h5 class="fw-bold mb-0">₱<?php //echo number_format($current_sales,2);?></h5> -->
+                          <h5 class="fw-bold mb-0">₱<?php echo ($growth_percentage < 0) ? '0' : number_format($growth_value,2);?></h5>
+                          <span class="text-uppercase">SALES GROWTH</span>
                         </div>
                       </div>
                       <!-- /.col -->
@@ -354,16 +368,7 @@ WHERE o.total_price = o.payment;
                           <span class="text-uppercase">MONTHLY REVENUE</span>
                         </div>
                       </div>
-                      <!-- /.col -->
-                      <div class="col-md-3 col-6">
-                        <div class="text-center border-end">
-                          <span class="text-success">
-                            <i class="bi bi-caret-up-fill"></i> 0%
-                          </span>
-                          <h5 class="fw-bold mb-0">ongoing..</h5>
-                          <span class="text-uppercase">Top Selling Products</span>
-                        </div>
-                      </div>
+
                       <!-- /.col -->
                       <div class="col-md-3 col-6">
                         <div class="text-center">

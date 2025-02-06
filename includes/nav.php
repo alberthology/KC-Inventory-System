@@ -115,7 +115,7 @@ $order_dates = [];
 </a>
 
 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-    <span class="dropdown-header"><?php echo $notif_count; ?> Notifications</span>
+    <span class="dropdown-header"><?php //echo $notif_count; ?> Notifications</span>
     <div class="dropdown-divider"></div>
 
     <?php

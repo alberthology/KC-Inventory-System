@@ -46,6 +46,21 @@ if (!function_exists('numberToWords')) {
     }
 }
 
+if (!function_exists('formatNumber')) {
+
+function formatNumber($num) {
+    if ($num >= 1000000000) { // 1 Billion or more
+        return floor($num / 1000000000 * 10) / 10 . "B";
+    } elseif ($num >= 1000000) { // 1 Million or more
+        return floor($num / 1000000 * 10) / 10 . "M";
+    } elseif ($num >= 1000) { // 1 Thousand or more
+        return floor($num / 1000 * 10) / 10 . "K";
+    }
+    return number_format($num, 2); // Keep 2 decimal places for smaller numbers
+}
+
+
+}
 
 
 

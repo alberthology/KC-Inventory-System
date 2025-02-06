@@ -38,9 +38,7 @@
                     $query2 = "
                         SELECT SUM(o.total_price) AS total_sales 
                         FROM order_item_table o
-                        LEFT JOIN order_table i ON o.order_id = i.order_id
-
-                            /*AND o.total_price = o.payment*/;
+                        LEFT JOIN order_table i ON o.order_id = i.order_id /*AND o.total_price = o.payment*/
                     ";
 
                     // Execute the query
@@ -139,7 +137,8 @@ if ($result) {
                   <div class="col-lg-3 col-6">
                     <div class="small-box bg-success">
                       <div class="inner">
-                        <h3>₱ <?php echo $new_orders_count2; ?>
+                        <h3>₱ <?php  $formatted_sales = formatNumber($new_orders_count2);
+                              echo $formatted_sales; ?>
                           <!-- <sup style="font-size: 20px"></sup> -->
                         </h3>
 
@@ -169,7 +168,7 @@ if ($result) {
                     <!-- small box -->
                     <div class="small-box bg-danger">
                       <div class="inner">
-                        <h3>₱ <?php echo $pending_amount; ?></h3>
+                        <h3>₱ <?php echo number_format($pending_amount,2); ?></h3>
 
                         <p>Total Pending Amount <small class="text">(Total Of Amount To Be Paid)</small></p>
                       </div>
@@ -207,8 +206,7 @@ if ($result) {
 
                     $query_total = "SELECT COUNT(*) AS total_complete_purchase 
                     FROM order_item_table o 
-                    LEFT JOIN order_table i ON o.order_id = i.order_id
-                    WHERE MONTH(i.order_date) = MONTH(CURDATE()) AND YEAR(i.order_date) = YEAR(CURDATE());";
+                    LEFT JOIN order_table i ON o.order_id = i.order_id";
                     $result5 = mysqli_query($conn, $query_total);
                     $row5 = mysqli_fetch_assoc($result5);
                     $total_complete_purchase = $row5['total_complete_purchase'];
@@ -242,34 +240,128 @@ if ($result) {
                     </div>
                   </div>
 
+<?php
+                    $monthly_query2 = "
+                        SELECT 
+                            SUM(CASE WHEN MONTH(i.order_date) = MONTH(CURDATE()) 
+                                     AND YEAR(i.order_date) = YEAR(CURDATE()) 
+                                     THEN o.total_price ELSE 0 END) AS current_month_sales,
+
+                            SUM(CASE WHEN MONTH(i.order_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) 
+                                     AND YEAR(i.order_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
+                                     THEN o.total_price ELSE 0 END) AS previous_month_sales
+
+                        FROM order_item_table o
+                        LEFT JOIN order_table i ON o.order_id = i.order_id;
+                        ";
+                    // Execute the query
+                    $exec2 = mysqli_query($conn, $monthly_query2);
+
+                    // Check for query errors
+                    if ($exec2) {
+                        $fetch2 = mysqli_fetch_assoc($exec2);
+                        $current_sales = $fetch2['current_month_sales'] ?? 0;
+                        $previous_sales = $fetch2['previous_month_sales'] ?? 0;
+
+                            // Calculate Monthly Sales Growth %
+                        if ($previous_sales > 0) {
+                            $growth_percentage = (($current_sales - $previous_sales) / $previous_sales) * 100;
+                            // $growth_percentage = 20;
+
+                        } else {
+                            $growth_percentage = ($current_sales > 0) ? 100 : 0; // If no previous sales, assume 100% growth if sales exist
+                        }
+
+                    } else {
+                        // Log or display error for debugging
+                        error_log("Query failed: " . mysqli_error($conn));
+                        $monthly_orders_count2 = 0;
+                        echo "Query failed: " . mysqli_error($conn);
+                    }
+?>
                   <div class="card-footer">
                     <!--begin::Row-->
                     <div class="row">
                       <div class="col-md-3 col-6">
                         <div class="text-center border-end">
-                          <span class="text-success">
-                            <i class="bi bi-caret-up-fill"></i> 0%
+                          <span class="<?php echo ($growth_percentage >= 50) ? 'text-success' : (($growth_percentage >= 1) ? 'text-warning' : 'text-danger'); ?>">
+                              <i class="fas <?php echo ($growth_percentage >= 1) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> 
+                              <?php echo round($growth_percentage,2); ?>%
                           </span>
-                          <h5 class="fw-bold mb-0">ongoing..</h5>
-                          <span class="text-uppercase">TOTAL REVENUE</span>
+
+                          <h5 class="fw-bold mb-0">₱<?php echo number_format($current_sales,2);?></h5>
+                          <span class="text-uppercase">MONTHLY SALES GROWTH</span>
+                        </div>
+                      </div>
+                      <!-- /.col -->
+
+<?php
+                    $monthly_query3 = "
+SELECT 
+    SUM(CASE 
+            WHEN MONTH(i.order_date) = MONTH(CURDATE()) 
+            AND YEAR(i.order_date) = YEAR(CURDATE()) 
+            THEN o.total_price 
+            ELSE 0 
+        END) AS current_month_sales,
+
+    SUM(CASE 
+            WHEN MONTH(i.order_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) 
+            AND YEAR(i.order_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
+            THEN o.total_price 
+            ELSE 0 
+        END) AS previous_month_sales
+
+FROM order_item_table o
+LEFT JOIN order_table i ON o.order_id = i.order_id
+WHERE o.total_price = o.payment;
+
+                        ";
+                    // Execute the query
+                    $exec3 = mysqli_query($conn, $monthly_query3);
+
+                    // Check for query errors
+                    if ($exec3) {
+                        $fetch3 = mysqli_fetch_assoc($exec3);
+                        $current_revenue = $fetch3['current_month_sales'] ?? 0;
+                        $previous_revenue = $fetch3['previous_month_sales'] ?? 0;
+
+                            // Calculate Monthly Sales Growth %
+                        if ($previous_sales > 0) {
+                            $revenue_percentage = (($current_revenue - $previous_revenue) / $previous_revenue) * 100;
+                            // $revenue_percentage = 30;
+
+                        } else {
+                            $revenue_percentage = ($current_revenue > 0) ? 100 : 0; // If no previous sales, assume 100% growth if sales exist
+                        }
+
+                    } else {
+                        // Log or display error for debugging
+                        error_log("Query failed: " . mysqli_error($conn));
+                        $current_revenue = 0;
+                        echo "Query failed: " . mysqli_error($conn);
+                    }
+?>
+
+                      <div class="col-md-3 col-6">
+                        <div class="text-center border-end">
+                          <span class="<?php echo ($revenue_percentage >= 50) ? 'text-success' : (($revenue_percentage >= 1) ? 'text-warning' : 'text-danger'); ?>">
+                              <i class="fas <?php echo ($revenue_percentage >= 1) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> 
+                              <?php echo round($revenue_percentage,2); ?>%
+                          </span>
+
+                          <h5 class="fw-bold mb-0">₱<?php echo number_format($current_revenue,2);?></h5>
+                          <span class="text-uppercase">MONTHLY REVENUE</span>
                         </div>
                       </div>
                       <!-- /.col -->
                       <div class="col-md-3 col-6">
                         <div class="text-center border-end">
-                          <span class="text-info"> <i class="bi bi-caret-left-fill"></i> 0% </span>
+                          <span class="text-success">
+                            <i class="bi bi-caret-up-fill"></i> 0%
+                          </span>
                           <h5 class="fw-bold mb-0">ongoing..</h5>
                           <span class="text-uppercase">Top Selling Products</span>
-                        </div>
-                      </div>
-                      <!-- /.col -->
-                      <div class="col-md-3 col-6">
-                        <div class="text-center border-end">
-                          <span class="text-success">
-                            <i class="bi bi-caret-up-fill"></i> 0%
-                          </span>
-                          <h5 class="fw-bold mb-0">ongoing..</h5>
-                          <span class="text-uppercase">Monthly Sales Growth</span>
                         </div>
                       </div>
                       <!-- /.col -->
@@ -279,7 +371,7 @@ if ($result) {
                             <i class="bi bi-caret-down-fill"></i> 0%
                           </span>
                           <h5 class="fw-bold mb-0">ongoing..</h5>
-                          <span class="text-uppercase">Completed orders</span>
+                          <span class="text-uppercase">OVERALL REVENUE</span>
                         </div>
                       </div>
                     </div>

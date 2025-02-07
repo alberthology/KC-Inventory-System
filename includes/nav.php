@@ -110,7 +110,7 @@ $order_dates = [];
         $order_notif_count = 1;
     }
 
-    $notif_count = $low_stock_count + $transaction_notif_count + $order_notif_count ;
+    // $notif_count = $low_stock_count + $transaction_notif_count + $order_notif_count ;
     ?>
 </a>
 

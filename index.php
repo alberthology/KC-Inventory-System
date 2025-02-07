@@ -263,7 +263,7 @@ if ($result) {
                         $fetch2 = mysqli_fetch_assoc($exec2);
                         $current_sales = $fetch2['current_month_sales'] ?? 0;
                         $previous_sales = $fetch2['previous_month_sales'] ?? 0;
-
+                        $growth_value = 0;
                             // Calculate Monthly Sales Growth %
                         if ($previous_sales > 0) {
                             $growth_percentage = (($current_sales - $previous_sales) / $previous_sales) * 100;

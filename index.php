@@ -25,14 +25,20 @@
                 <div class="col-lg-3 col-6">
                     <!-- small box -->
                     <?php
-                    // Query to count new orders
-                    $query = "SELECT COUNT(*) AS total_orders 
-                    FROM order_item_table o 
-                    LEFT JOIN order_table i ON o.order_id = i.order_id
-                    WHERE o.total_price = o.payment;";
+                    $query = "
+                        SELECT 
+                            COUNT(*) AS total_orders,
+                            COUNT(CASE WHEN MONTH(i.order_date) = MONTH(CURDATE()) 
+                                AND YEAR(i.order_date) = YEAR(CURDATE()) THEN 1 END) AS current_orders
+                        FROM order_item_table o
+                        INNER JOIN order_table i ON o.order_id = i.order_id
+                        WHERE o.total_price = o.payment";  // Only count fully paid orders
+
                     $result = mysqli_query($conn, $query);
                     $row = mysqli_fetch_assoc($result);
-                    $new_orders_count = $row['total_orders'];
+                    $total_orders = $row['total_orders'];
+                    $current_orders = $row['current_orders'];
+
 
                     // Query to calculate total sales for the current month where orders are fully paid
                     $query2 = "
@@ -55,13 +61,19 @@
                     }
 
 
-                    $query3 = "SELECT COUNT(*) AS pending_orders 
-                    FROM order_item_table o 
-                    LEFT JOIN order_table i ON o.order_id = i.order_id
-                    WHERE o.total_price != o.payment;";
+                    $query3 = "
+                      SELECT 
+                          COUNT(*) AS pending_orders,
+                          COUNT(CASE WHEN MONTH(i.order_date) = MONTH(CURDATE()) 
+                              AND YEAR(i.order_date) = YEAR(CURDATE()) THEN 1 END) AS current_pending_orders
+                      FROM order_item_table o
+                      INNER JOIN order_table i ON o.order_id = i.order_id
+                      WHERE o.total_price != o.payment
+                      ";
                     $result3 = mysqli_query($conn, $query3);
                     $row3 = mysqli_fetch_assoc($result3);
                     $pendeing_orders_count = $row3['pending_orders'];
+                    $current_pending_orders = $row3['current_pending_orders'];
 
                     $query4 = "
                     SELECT SUM(o.total_price - o.payment) AS pending_amount 
@@ -124,8 +136,8 @@ if ($result) {
 
                     <div class="small-box bg-info">
                         <div class="inner">
-                            <h3><?php echo $new_orders_count; ?></h3>
-                            <p>Total Orders Completed <small class="text">(Total Items Sold)</small></p>
+                            <h3><?php echo $current_orders; ?> </h3>
+                            <h5> Orders Completed For This Month</h5><h5>A total of <b><?php echo $total_orders; ?></b> completed purchase</h5>
                         </div>
                         <div class="icon">
                             <i class="fas fa-shopping-cart"></i>
@@ -156,7 +168,7 @@ if ($result) {
                       <div class="inner">
                         <h3><?php echo $pendeing_orders_count; ?></h3>
 
-                        <p>Pending Transactions <small class="text-muted">(Total Of Partially Paid Items)</small></p>
+                        <h5>Pending Purchase For This Month</h5><h5>A total of <b><?php echo $total_orders; ?></b> pending orders</h5>
                       </div>
                       <div class="icon">
                         <i class="fas fa-exclamation-circle"></i>
@@ -212,7 +224,7 @@ if ($result) {
                     $total_complete_purchase = $row5['total_complete_purchase'];
                     if ($total_complete_purchase != 0) {
                       // code...
-                    $completed_order_percent = round(($new_orders_count/$total_complete_purchase) * 100,2);
+                    $completed_order_percent = round(($total_orders/$total_complete_purchase) * 100,2);
                     }
 
 
@@ -220,22 +232,11 @@ if ($result) {
 
                         <div class="progress-group">
                           Completed Purchase
-                          <span class="float-end"><b><?php echo $new_orders_count;?></b>/<?php echo $total_complete_purchase;?></span>
+                          <span class="float-end"><b><?php echo $total_orders;?></b>/<?php echo $total_complete_purchase;?></span>
                           <div class="progress progress-sm">
                             <div class="progress-bar text-bg-danger" style="width: <?php  if ($total_complete_purchase != 0) {echo $completed_order_percent;}else{ echo "0"; }?>%"></div>
                           </div>
                         </div>
-
-
-
-                        <div class="progress-group">
-                          <span class="progress-text">Partial Purchases for this month: </span>
-                          <span class="float-end"><b>0</b>/0</span>
-                          <div class="progress progress-sm">
-                            <div class="progress-bar text-bg-success" style="width: 0%"></div>
-                          </div>
-                        </div>
-
                       </div>
                     </div>
                   </div>
@@ -252,7 +253,7 @@ if ($result) {
                                      THEN o.total_price ELSE 0 END) AS previous_month_sales
 
                         FROM order_item_table o
-                        LEFT JOIN order_table i ON o.order_id = i.order_id;
+                        LEFT JOIN order_table i ON o.order_id = i.order_id
                         ";
                     // Execute the query
                     $exec2 = mysqli_query($conn, $monthly_query2);
@@ -369,13 +370,32 @@ WHERE o.total_price = o.payment;
                         </div>
                       </div>
 
+<?php
+                    $monthly_query4 = "
+                        SELECT SUM(o.payment) AS total_revenue 
+                        FROM order_item_table o
+                        LEFT JOIN order_table i ON o.order_id = i.order_id";
+                    // Execute the query
+                    $exec4 = mysqli_query($conn, $monthly_query4);
+
+                    // Check for query errors
+                    if ($exec4) {
+                        $fetch4 = mysqli_fetch_assoc($exec4);
+                        $count4 = $fetch4['total_revenue'] ?? 0; // Default to 0 if no data
+                    } else {
+                        // Log or display error for debugging
+                        error_log("Query failed: " . mysqli_error($conn));
+                        $count4 = 0;
+                    }
+?>
                       <!-- /.col -->
                       <div class="col-md-3 col-6">
                         <div class="text-center">
                           <span class="text-primary">
-                            <i class="bi bi-caret-down-fill"></i> 0%
+                            <!-- <i class="bi bi-caret-down-fill"></i> 0% -->
+                            <br>
                           </span>
-                          <h5 class="fw-bold mb-0">ongoing..</h5>
+                          <h5 class="fw-bold mb-0">₱<?php echo number_format($count4,2); ?></h5>
                           <span class="text-uppercase">OVERALL REVENUE</span>
                         </div>
                       </div>
@@ -408,14 +428,20 @@ WHERE o.total_price = o.payment;
 fetch('functions/monthly_report_script.php') // Replace with your actual PHP file path
   .then((response) => response.json())
   .then((data) => {
-    const {categories, sales_data } = data;
+    const { categories, sales_data } = data;
+
+    // Convert sales data to numeric values (just for charting purposes)
+    const numeric_sales_data = sales_data.map(value => {
+      // Remove currency symbol and commas to convert back to numeric values
+      return parseFloat(value.replace(/[₱,]/g, ''));
+    });
 
     // Chart options
     const sales_chart_options = {
       series: [
         {
           name: 'Total Sales',
-          data: sales_data, // Inject PHP data
+          data: numeric_sales_data, // Use numeric sales data for chart
         },
       ],
       chart: {
@@ -434,11 +460,24 @@ fetch('functions/monthly_report_script.php') // Replace with your actual PHP fil
       },
       xaxis: {
         type: 'category', // Use 'category' for string-based x-axis
-        categories: categories, // Inject PHP data
+        categories: categories, // Inject PHP data for months
+      },
+      yaxis: {
+        labels: {
+          formatter: function (value) {
+            // Format the Y-axis labels with commas and currency symbol
+            return "₱" + value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          },
+        },
       },
       tooltip: {
         x: {
           format: 'MMMM yyyy',
+        },
+        y: {
+          formatter: function (val) {
+            return "₱" + val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          },
         },
       },
     };
@@ -451,6 +490,8 @@ fetch('functions/monthly_report_script.php') // Replace with your actual PHP fil
     sales_chart.render();
   })
   .catch((error) => console.error('Error fetching data:', error));
+
+
 
 
       //---------------------------

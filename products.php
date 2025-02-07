@@ -72,6 +72,7 @@
                         <div class='time-label'>
                             <span class='bg-success'><?php echo $transaction_date; ?></span>
                         </div>
+
 <?php
             }
 
@@ -150,6 +151,7 @@
         ?>
 
 
+                                        </div>
                                     </div>
                                 </div>
                             </div>

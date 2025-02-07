@@ -53,11 +53,14 @@
                                                                 if (mysqli_num_rows($result) > 0) {
                                                                     // Iterate through each user and display in the table
                                                                     while ($row = mysqli_fetch_assoc($result)) {
+                                                                        $datetime = new DateTime($row['created_at']);
+                                                                        $formattedDate = $datetime->format('F j, Y, g:i A');
+
                                                                         echo "<tr id='user-row-{$row['user_id']}'>
                                                                                 <td>{$row['full_name']}</td>
                                                                                 <td>{$row['role']}</td>
                                                                                 <td>{$row['email']}</td>
-                                                                                <td>{$row['created_at']}</td>
+                                                                                <td>{$formattedDate}</td>
                                                                                 <td style='text-align:center;'>
                                                                                     <button class='btn btn-danger btn-sm' onclick='removeUser({$row['user_id']})'>
                                                                                         <i class='fas fa-trash'></i>

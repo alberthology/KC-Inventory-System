@@ -17,8 +17,14 @@ $categories = [];
 
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $categories[] = $row['month'];
-        $sales_data[] = $row['total_sales'];
+        $datetime = new DateTime($row['month']);
+        $formattedDate = $datetime->format('F, Y');
+
+        // Format the total sales with currency symbol and 2 decimal places
+        $formattedSales = "₱" . number_format($row['total_sales'], 2);
+
+        $categories[] = $formattedDate;
+        $sales_data[] = $formattedSales;
     }
 }
 

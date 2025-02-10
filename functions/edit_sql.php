@@ -111,8 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['form_type'])) {
                 VALUES (?, ?, ?, ?, NOW(), ?)";
 
             $transactionAmount = $quantityDifference * $price; // Calculate total amount for stock change
-            // $userId = $_SESSION['user_id']; // Use session user_id in production
-            $userId = 1; // Temporary placeholder
+            $userId = $_SESSION['id']; // Use session user_id in production
+            // $userId = 1; // Temporary placeholder
 
             $transactionStmt = $conn->prepare($transactionSQL);
             $transactionStmt->bind_param(

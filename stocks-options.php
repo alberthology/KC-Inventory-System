@@ -123,7 +123,7 @@ if ($run) {
                                                             <tr>
                                                                 <!-- <th>Product Code</th> -->
                                                                 <th>Product</th>
-                                                                <th>Brand</th>
+                                                                <th>Color</th>
                                                                 <th>Quantity</th>
                                                                 <th>Price</th>
                                                                 <th>Action</th>
@@ -164,14 +164,14 @@ if (mysqli_num_rows($result) > 0) {
 
 
         echo "<tr id='product-row-{$row['product_id']}'>
-    <td>{$row['product_name']}</td>
-    <td>{$row['brand_name']}</td>
+    <td>{$row['brand_name']} {$row['product_name']}</td>
+    <td>{$row['product_color']}</td>
     <td {$quantity_color}>{$row['quantity_in_stock']}</td>
     <td>{$formatted_price}</td>
     <td style='text-align:center;'>
         <button class='btn btn-primary btn-sm' onclick='openEditModal(
             {$row['product_id']}, 
-            \"{$row['product_name']}\", 
+            \"{$row['product_name']}\" , 
             \"{$row['brand_name']}\", 
             \"{$row['brand_id']}\", 
             \"{$row['category_id']}\", 

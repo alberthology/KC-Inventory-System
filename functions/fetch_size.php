@@ -7,7 +7,7 @@ if (isset($_GET['product_name'])) {
     // $product_name = 'Air Max 270';
 
     // Fetch product sizes and colors based on product_name
-    $query = "SELECT product_size, product_color FROM product_table WHERE product_name LIKE ?";
+    $query = "SELECT product_size, product_color FROM product_table WHERE product_name LIKE ? GROUP BY product_size ORDER BY MIN(product_id) ASC";
     $product_name = '%'.$product_name.'%'; // Add wildcards before binding
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $product_name);

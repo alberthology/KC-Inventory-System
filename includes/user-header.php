@@ -1,7 +1,13 @@
 <?php
 
 //  start session
-include '..\functions/auth_check_admin.php';
+include '..\functions/auth_check_user.php';
+
+
+if (!isset($_SESSION['Name'])) {
+    header("Location: ../login.php");
+    exit();
+}
 include '..\functions/db_con.php';
 
 ?>

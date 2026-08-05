@@ -1,8 +1,8 @@
  <?php
-    include 'functions/db_con.php';
-    include 'includes/header.php';
-    include 'includes/nav.php';
-    include 'includes/sidebar.php';
+    include '..\functions/db_con.php';
+    include '..\includes/header.php';
+    include '..\includes/nav.php';
+    include '..\includes/sidebar.php';
     ?>
 
  <div class="content-wrapper">
@@ -27,7 +27,7 @@
                                              <div class="card-header">
                                                  <div class="row">
                                                      <div class="col-auto">
-                                                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-user"><i class="fas fa-plus"></i>  &nbsp User Account</button>
+                                                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add-user"><i class="fas fa-plus"></i> &nbsp User Account</button>
                                                      </div>
                                                  </div>
                                                  <!-- /.card-header -->
@@ -82,39 +82,39 @@
                                      </div>
                                  </div>
                              </div>
-                             
-                            <div class="modal fade" id="add-user">
-                                <div class="modal-dialog modal-md">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h4 class="modal-title"><i class="fas fa-tags"></i> Add Another User Account</h4>
 
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="functions/insert_sql.php" method="post">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="fullname" class="form-control form-control-md mb-3" placeholder="Fullname" required>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="email" class="form-control form-control-md mb-3" placeholder="Email" required>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <select name="role" class="form-control form-control-md mb-3" required>
-                                                            <option selected hidden disabled>Select Role</option>
-                                                            <option>Admin</option>
-                                                            <option>Manager</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="text" name="username" class="form-control form-control-md mb-3" placeholder="User Name" required>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <input type="password" name="password" class="form-control form-control-md mb-3" placeholder="Password" required>
-                                                    </div>
+                             <div class="modal fade" id="add-user">
+                                 <div class="modal-dialog modal-md">
+                                     <div class="modal-content">
+                                         <div class="modal-header">
+                                             <h4 class="modal-title"><i class="fas fa-tags"></i> Add Another User Account</h4>
+
+                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                 <span aria-hidden="true">&times;</span>
+                                             </button>
+                                         </div>
+                                         <div class="modal-body">
+                                             <form action="../functions/insert_sql.php" method="post">
+                                                 <div class="row">
+                                                     <div class="col-md-12">
+                                                         <input type="text" name="fullname" class="form-control form-control-md mb-3" placeholder="Fullname" required>
+                                                     </div>
+                                                     <div class="col-md-12">
+                                                         <input type="email" name="email" class="form-control form-control-md mb-3" placeholder="Email" required>
+                                                     </div>
+                                                     <div class="col-md-12">
+                                                         <select name="role" class="form-control form-control-md mb-3" required>
+                                                             <option selected hidden disabled>Select Role</option>
+                                                             <option>admin</option>
+                                                             <option>user</option>
+                                                         </select>
+                                                     </div>
+                                                     <div class="col-md-12">
+                                                         <input type="text" name="username" class="form-control form-control-md mb-3" placeholder="User Name" required>
+                                                     </div>
+                                                     <div class="col-md-12">
+                                                         <input type="password" name="password" class="form-control form-control-md mb-3" placeholder="Password" required>
+                                                     </div>
                                                  </div>
                                                  <hr>
                                                  <div class="row">
@@ -147,7 +147,7 @@
 
 
  <?php
-    include 'includes/footer.php';
+    include '..\includes/footer.php';
     include 'message.php';
     ?>
 
@@ -166,7 +166,7 @@
          });
      });
 
-    function removeUser(user_id) {
+     function removeUser(user_id) {
          Swal.fire({
              title: 'Are you sure?',
              text: "You won't be able to revert this!",
@@ -175,13 +175,13 @@
              confirmButtonColor: '#3085d6',
              cancelButtonColor: '#d33',
              confirmButtonText: 'Confirm',
-             width: '30%',  // Adjust the width here
+             width: '30%', // Adjust the width here
 
          }).then((result) => {
              if (result.isConfirmed) {
                  // Perform AJAX request to remove user
                  var xhr = new XMLHttpRequest();
-                 xhr.open("POST", "functions/delete_sql.php", true);
+                 xhr.open("POST", "../functions/delete_sql.php", true);
                  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                  xhr.onreadystatechange = function() {
                      if (xhr.readyState == 4 && xhr.status == 200) {
@@ -225,5 +225,4 @@
              }
          });
      }
-
  </script>

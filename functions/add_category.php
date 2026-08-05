@@ -18,7 +18,7 @@ if (isset($_POST['submit-category'])) {
     }
 
     // Redirect to stocks-options.php
-    header("Location: ../stocks-options.php");
+    header("Location: ../admin/stocks-options.php");
     exit();
 }
 

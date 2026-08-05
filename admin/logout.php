@@ -67,7 +67,7 @@ echo "
         toastr.success('Logged Out Successfully!', 'Success');
         
         setTimeout(function() {
-            window.location.replace('index.php');
+            window.location.replace('../index.php');
         }, 1000); // Redirect after 1 second
     });
 </script>";

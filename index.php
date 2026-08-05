@@ -1,511 +1,749 @@
- <?php
-    include 'includes/header.php';
-    include 'includes/nav.php';
-    include 'includes/sidebar.php';
-    ?>
+<?php
+session_start();
 
- <div class="content-wrapper">
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Dashboard</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
+
+?>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KC'Closet Inventory System</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/closet.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <!-- Add Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #392614;
+            position: relative;
+            /* Remove overflow: hidden; to allow scrolling */
+        }
+
+
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .gradient-sphere {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.5;
+            animation: moveSphere 20s infinite ease-in-out;
+        }
+
+        .sphere-1 {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(45deg, #dab659, #dab659);
+            top: -300px;
+            left: -300px;
+            animation-delay: -5s;
+        }
+
+        .sphere-2 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(45deg, brown, yellow);
+            bottom: -250px;
+            right: -250px;
+            animation-delay: -2s;
+        }
+
+        .sphere-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, white, gray);
+            top: 50%;
+            left: 30%;
+            animation-delay: -8s;
+        }
+
+        @keyframes moveSphere {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+
+            25% {
+                transform: translate(100px, 50px) rotate(90deg) scale(1.1);
+            }
+
+            50% {
+                transform: translate(50px, 100px) rotate(180deg) scale(1);
+            }
+
+            75% {
+                transform: translate(-50px, 50px) rotate(270deg) scale(0.9);
+            }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: floatParticle 8s infinite linear;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 2;
+            width: auto;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 3rem;
+            color: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideIn 0.6s ease-out forwards;
+        }
+
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(to right,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent);
+            transform: skewX(-15deg);
+            transition: 0.5s;
+        }
+
+        .login-container:hover::before {
+            left: 100%;
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .login-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            transition: color 0.3s ease;
+        }
+
+        .form-input:focus+.input-icon {
+            color: white;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right,
+                    transparent,
+                    rgba(255, 255, 255, 0.8),
+                    transparent);
+            transition: 0.5s;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-button:hover::before {
+            left: 100%;
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .social-button {
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-button::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(100%);
+            transition: 0.3s ease;
+        }
+
+        .social-button:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .social-button:hover::before {
+            transform: translateY(0);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+
+        .additional-options {
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .additional-options a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .additional-options a:hover {
+            opacity: 0.8;
+        }
+
+        .error-message {
+            color: #ff4477;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes ripple {
+            to {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 1280px) {
+            .login-container {
+                margin: 1rem;
+                padding: 1rem;
+                max-width: 300px;
+                max-height: 1000px;
+            }
+
+            img {
+                width: 50%;
+            }
+
+            .login-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="animated-background">
+        <div class="gradient-sphere sphere-1"></div>
+        <div class="gradient-sphere sphere-2"></div>
+        <div class="gradient-sphere sphere-3"></div>
+        <div class="particles" id="particles"></div>
     </div>
-     <div class="content">
-         <div class="container-fluid">
-             <div class="row">
-                <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <?php
-                    $query = "
-                        SELECT 
-                            COUNT(*) AS total_orders,
-                            COUNT(CASE WHEN MONTH(i.order_date) = MONTH(CURDATE()) 
-                                AND YEAR(i.order_date) = YEAR(CURDATE()) THEN 1 END) AS current_orders
-                        FROM order_item_table o
-                        INNER JOIN order_table i ON o.order_id = i.order_id
-                        WHERE o.total_price = o.payment";  // Only count fully paid orders
 
-                    $result = mysqli_query($conn, $query);
-                    $row = mysqli_fetch_assoc($result);
-                    $total_orders = $row['total_orders'];
-                    $current_orders = $row['current_orders'];
-
-
-                    // Query to calculate total sales for the current month where orders are fully paid
-                    $query2 = "
-                        SELECT SUM(o.total_price) AS total_sales 
-                        FROM order_item_table o
-                        LEFT JOIN order_table i ON o.order_id = i.order_id /*AND o.total_price = o.payment*/
-                    ";
-
-                    // Execute the query
-                    $result2 = mysqli_query($conn, $query2);
-
-                    // Check for query errors
-                    if ($result2) {
-                        $row2 = mysqli_fetch_assoc($result2);
-                        $new_orders_count2 = $row2['total_sales'] ?? 0; // Default to 0 if no data
-                    } else {
-                        // Log or display error for debugging
-                        error_log("Query failed: " . mysqli_error($conn));
-                        $new_orders_count2 = 0;
-                    }
-
-
-                    $query3 = "
-                      SELECT 
-                          COUNT(*) AS pending_orders,
-                          COUNT(CASE WHEN MONTH(i.order_date) = MONTH(CURDATE()) 
-                              AND YEAR(i.order_date) = YEAR(CURDATE()) THEN 1 END) AS current_pending_orders
-                      FROM order_item_table o
-                      INNER JOIN order_table i ON o.order_id = i.order_id
-                      WHERE o.total_price != o.payment
-                      ";
-                    $result3 = mysqli_query($conn, $query3);
-                    $row3 = mysqli_fetch_assoc($result3);
-                    $pendeing_orders_count = $row3['pending_orders'];
-                    $current_pending_orders = $row3['current_pending_orders'];
-
-                    $query4 = "
-                    SELECT SUM(o.total_price - o.payment) AS pending_amount 
-                    FROM order_item_table o
-                    LEFT JOIN order_table i ON o.order_id = i.order_id
-                    WHERE o.total_price != o.payment;
-                ";
-
-                // Execute the query
-                $result4 = mysqli_query($conn, $query4);
-
-                // Check for query errors
-                if ($result4) {
-                    $row4 = mysqli_fetch_assoc($result4);
-                    $pending_amount = $row4['pending_amount'] ?? 0; // Default to 0 if no data
-
-                    $pending_amount; // Display the pending amount
-                } else {
-                    // Log or display error for debugging
-                    error_log("Query failed: " . mysqli_error($conn));
-                    $pending_amount = 0;
-                }
-
-/*=================================== future study ====================================*/
-
-/*$query = "
-    SELECT 
-        COUNT(CASE WHEN o.total_price = o.payment THEN 1 END) AS total_orders,
-        SUM(CASE WHEN o.total_price = o.payment THEN o.total_price ELSE 0 END) AS total_sales,
-        COUNT(CASE WHEN o.total_price != o.payment THEN 1 END) AS pending_orders,
-        SUM(CASE WHEN o.total_price != o.payment THEN o.total_price - o.payment ELSE 0 END) AS pending_amount
-    FROM order_item_table o
-    LEFT JOIN order_table i ON o.order_id = i.order_id
-    WHERE 
-        MONTH(i.order_date) = MONTH(CURDATE()) 
-        AND YEAR(i.order_date) = YEAR(CURDATE());
-";
-
-$result = mysqli_query($conn, $query);
-
-// Check for query errors
-if ($result) {
-    $row = mysqli_fetch_assoc($result);
-    $new_orders_count = $row['total_orders'] ?? 0;
-    $total_sales = $row['total_sales'] ?? 0;
-    $pending_orders_count = $row['pending_orders'] ?? 0;
-    $pending_amount = $row['pending_amount'] ?? 0;
-
-    echo "New Orders: $new_orders_count<br>";
-    echo "Total Sales: $total_sales<br>";
-    echo "Pending Orders: $pending_orders_count<br>";
-    echo "Pending Amount: $pending_amount<br>";
-} else {
-    // Log or display error for debugging
-    error_log("Query failed: " . mysqli_error($conn));
-}
-*/
-
-                    ?>
-
-                    <div class="small-box bg-info">
-                        <div class="inner">
-                            <h3><?php echo $current_orders; ?> </h3>
-                            <h5> Orders Completed For This Month</h5><h5>A total of <b><?php echo $total_orders; ?></b> completed purchase</h5>
-                        </div>
-                        <div class="icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                        <a href="transactions.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-
-                  </div>
-                  <div class="col-lg-3 col-6">
-                    <div class="small-box bg-success">
-                      <div class="inner">
-                        <h3>₱ <?php  $formatted_sales = formatNumber($new_orders_count2);
-                              echo $formatted_sales; ?>
-                          <!-- <sup style="font-size: 20px"></sup> -->
-                        </h3>
-
-                        <p>Total Sales <small class="text">(Total Amount Sold)</small></p>
-                      </div>
-                      <div class="icon">
-                        <i class="fas fa-dollar-sign"></i>
-                      </div>
-                      <a href="transactions.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                  </div>
-                  <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-warning">
-                      <div class="inner">
-                        <h3><?php echo $pendeing_orders_count; ?></h3>
-
-                        <h5>Pending Purchase For This Month</h5><h5>A total of <b><?php echo $total_orders; ?></b> pending orders</h5>
-                      </div>
-                      <div class="icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                      </div>
-                      <a href="transactions.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                  </div>
-                  <div class="col-lg-3 col-6">
-                    <!-- small box -->
-                    <div class="small-box bg-danger">
-                      <div class="inner">
-                        <h3>₱ <?php echo number_format($pending_amount,2); ?></h3>
-
-                        <p>Total Pending Amount <small class="text">(Total Of Amount To Be Paid)</small></p>
-                      </div>
-                      <div class="icon">
-                        <i class="fas fa-hand-holding-usd"></i>
-                      </div>
-                      <a href="transactions.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-                    </div>
-                  </div>
-
-            </div>
-            <!--begin::Row-->
-
-
-            <div class="row">
-              <div class="col-md-12">
-                <div class="card mb-4">
-                  <div class="card-header">
-                    <h5 class="card-title">Monthly Recap Report</h5>
-                  </div>
-                  <!-- /.card-header -->
-                  <div class="card-body">
-                    <!--begin::Row-->
-                    <div class="row">
-                      <div class="col-md-8">
-                        <p class="text-center">
-                          <strong>Here are the sales report as of this Month of <?php echo date('F, Y');  ?></strong>
-                        </p>
-                        <div id="sales-chart"></div>
-                      </div>
-                      <!-- /.col -->
-                      <div class="col-md-4">
-                        <p class="text-center"><strong>Progression Report (ongoing..)</strong></p>
-                        <?php 
-
-                    $query_total = "SELECT COUNT(*) AS total_complete_purchase 
-                    FROM order_item_table o 
-                    LEFT JOIN order_table i ON o.order_id = i.order_id";
-                    $result5 = mysqli_query($conn, $query_total);
-                    $row5 = mysqli_fetch_assoc($result5);
-                    $total_complete_purchase = $row5['total_complete_purchase'];
-                    if ($total_complete_purchase != 0) {
-                      // code...
-                    $completed_order_percent = round(($total_orders/$total_complete_purchase) * 100,2);
-                    }
-
-
-                        ?>
-
-                        <div class="progress-group">
-                          Completed Purchase
-                          <span class="float-end"><b><?php echo $total_orders;?></b>/<?php echo $total_complete_purchase;?></span>
-                          <div class="progress progress-sm">
-                            <div class="progress-bar text-bg-danger" style="width: <?php  if ($total_complete_purchase != 0) {echo $completed_order_percent;}else{ echo "0"; }?>%"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-<?php
-                    $monthly_query2 = "
-                        SELECT 
-                            SUM(CASE WHEN MONTH(i.order_date) = MONTH(CURDATE()) 
-                                     AND YEAR(i.order_date) = YEAR(CURDATE()) 
-                                     THEN o.total_price ELSE 0 END) AS current_month_sales,
-
-                            SUM(CASE WHEN MONTH(i.order_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) 
-                                     AND YEAR(i.order_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
-                                     THEN o.total_price ELSE 0 END) AS previous_month_sales
-
-                        FROM order_item_table o
-                        LEFT JOIN order_table i ON o.order_id = i.order_id
-                        ";
-                    // Execute the query
-                    $exec2 = mysqli_query($conn, $monthly_query2);
-
-                    // Check for query errors
-                    if ($exec2) {
-                        $fetch2 = mysqli_fetch_assoc($exec2);
-                        $current_sales = $fetch2['current_month_sales'] ?? 0;
-                        $previous_sales = $fetch2['previous_month_sales'] ?? 0;
-                        $growth_value = 0;
-                            // Calculate Monthly Sales Growth %
-                        if ($previous_sales > 0) {
-                            $growth_percentage = (($current_sales - $previous_sales) / $previous_sales) * 100;
-                            $growth_value = $current_sales - $previous_sales;
-                            // $growth_percentage = 20;
-
-                        } else {
-                            $growth_percentage = ($current_sales > 0) ? 100 : 0; // If no previous sales, assume 100% growth if sales exist
-                        }
-
-                    } else {
-                        // Log or display error for debugging
-                        error_log("Query failed: " . mysqli_error($conn));
-                        $monthly_orders_count2 = 0;
-                        echo "Query failed: " . mysqli_error($conn);
-                    }
-?>
-                  <div class="card-footer">
-                    <!--begin::Row-->
-                    <div class="row">
-                      <div class="col-md-3 col-6">
-                        <div class="text-center border-end">
-                          <span class="text-success">
-                            <i class="fas <?php echo ($growth_percentage >= 1) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> 
-                              <?php echo round($growth_percentage,2); ?> %
-                          </span>
-                          <h5 class="fw-bold mb-0">₱<?php echo number_format($current_sales,2);?></h5>
-                          <span class="text-uppercase">TOTAL MONTHLY SALES</span>
-                        </div>
-                      </div>
-                      <!-- /.col -->
-                      <div class="col-md-3 col-6">
-                        <div class="text-center border-end">
-                          <span class="<?php echo ($growth_percentage >= 50) ? 'text-success' : (($growth_percentage >= 1) ? 'text-secondary' : 'text-danger'); ?>">
-                              <i class="fas <?php echo ($growth_percentage >= 1) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> 
-                              <!-- <?php //echo round($growth_percentage,2); ?> % -->
-                              <?php echo ($growth_percentage < 0) ? '0' : round($growth_percentage,2); ?> %
-                          </span>
-
-                          <!-- <h5 class="fw-bold mb-0">₱<?php //echo number_format($current_sales,2);?></h5> -->
-                          <h5 class="fw-bold mb-0">₱<?php echo ($growth_percentage < 0) ? '0' : number_format($growth_value,2);?></h5>
-                          <span class="text-uppercase">SALES GROWTH</span>
-                        </div>
-                      </div>
-                      <!-- /.col -->
-
-<?php
-                    $monthly_query3 = "
-SELECT 
-    SUM(CASE 
-            WHEN MONTH(i.order_date) = MONTH(CURDATE()) 
-            AND YEAR(i.order_date) = YEAR(CURDATE()) 
-            THEN o.total_price 
-            ELSE 0 
-        END) AS current_month_sales,
-
-    SUM(CASE 
-            WHEN MONTH(i.order_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) 
-            AND YEAR(i.order_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
-            THEN o.total_price 
-            ELSE 0 
-        END) AS previous_month_sales
-
-FROM order_item_table o
-LEFT JOIN order_table i ON o.order_id = i.order_id
-WHERE o.total_price = o.payment;
-
-                        ";
-                    // Execute the query
-                    $exec3 = mysqli_query($conn, $monthly_query3);
-
-                    // Check for query errors
-                    if ($exec3) {
-                        $fetch3 = mysqli_fetch_assoc($exec3);
-                        $current_revenue = $fetch3['current_month_sales'] ?? 0;
-                        $previous_revenue = $fetch3['previous_month_sales'] ?? 0;
-
-                            // Calculate Monthly Sales Growth %
-                        if ($previous_sales > 0) {
-                            $revenue_percentage = (($current_revenue - $previous_revenue) / $previous_revenue) * 100;
-                            // $revenue_percentage = 30;
-
-                        } else {
-                            $revenue_percentage = ($current_revenue > 0) ? 100 : 0; // If no previous sales, assume 100% growth if sales exist
-                        }
-
-                    } else {
-                        // Log or display error for debugging
-                        error_log("Query failed: " . mysqli_error($conn));
-                        $current_revenue = 0;
-                        echo "Query failed: " . mysqli_error($conn);
-                    }
-?>
-
-                      <div class="col-md-3 col-6">
-                        <div class="text-center border-end">
-                          <span class="<?php echo ($revenue_percentage >= 50) ? 'text-success' : (($revenue_percentage >= 1) ? 'text-warning' : 'text-danger'); ?>">
-                              <i class="fas <?php echo ($revenue_percentage >= 1) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> 
-                              <?php echo round($revenue_percentage,2); ?>%
-                          </span>
-
-                          <h5 class="fw-bold mb-0">₱<?php echo number_format($current_revenue,2);?></h5>
-                          <span class="text-uppercase">MONTHLY REVENUE</span>
-                        </div>
-                      </div>
-
-<?php
-                    $monthly_query4 = "
-                        SELECT SUM(o.payment) AS total_revenue 
-                        FROM order_item_table o
-                        LEFT JOIN order_table i ON o.order_id = i.order_id";
-                    // Execute the query
-                    $exec4 = mysqli_query($conn, $monthly_query4);
-
-                    // Check for query errors
-                    if ($exec4) {
-                        $fetch4 = mysqli_fetch_assoc($exec4);
-                        $count4 = $fetch4['total_revenue'] ?? 0; // Default to 0 if no data
-                    } else {
-                        // Log or display error for debugging
-                        error_log("Query failed: " . mysqli_error($conn));
-                        $count4 = 0;
-                    }
-?>
-                      <!-- /.col -->
-                      <div class="col-md-3 col-6">
-                        <div class="text-center">
-                          <span class="text-primary">
-                            <!-- <i class="bi bi-caret-down-fill"></i> 0% -->
-                            <br>
-                          </span>
-                          <h5 class="fw-bold mb-0">₱<?php echo number_format($count4,2); ?></h5>
-                          <span class="text-uppercase">OVERALL REVENUE</span>
-                        </div>
-                      </div>
-                    </div>
-                    <!--end::Row-->
-                  </div>
-                  <!-- /.card-footer -->
-                </div>
-                <!-- /.card -->
-              </div>
-              <!-- /.col -->
-            </div>
-            <script
-      src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
-      integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
-      crossorigin="anonymous"
-    ></script>
-<script>
-
-      /* apexcharts
-       * -------
-       * Here we will create a few charts using apexcharts
-       */
-
-      //-----------------------
-      // - MONTHLY SALES CHART -
-      //-----------------------
-
-// Fetch data from PHP
-fetch('functions/monthly_report_script.php') // Replace with your actual PHP file path
-  .then((response) => response.json())
-  .then((data) => {
-    const { categories, sales_data } = data;
-
-    // Convert sales data to numeric values (just for charting purposes)
-    const numeric_sales_data = sales_data.map(value => {
-      // Remove currency symbol and commas to convert back to numeric values
-      return parseFloat(value.replace(/[₱,]/g, ''));
-    });
-
-    // Chart options
-    const sales_chart_options = {
-      series: [
-        {
-          name: 'Total Sales',
-          data: numeric_sales_data, // Use numeric sales data for chart
-        },
-      ],
-      chart: {
-        height: 180,
-        type: 'area',
-        toolbar: {
-          show: false,
-        },
-      },
-      colors: ['#0d6efd'],
-      dataLabels: {
-        enabled: false,
-      },
-      stroke: {
-        curve: 'smooth',
-      },
-      xaxis: {
-        type: 'category', // Use 'category' for string-based x-axis
-        categories: categories, // Inject PHP data for months
-      },
-      yaxis: {
-        labels: {
-          formatter: function (value) {
-            // Format the Y-axis labels with commas and currency symbol
-            return "₱" + value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          },
-        },
-      },
-      tooltip: {
-        x: {
-          format: 'MMMM yyyy',
-        },
-        y: {
-          formatter: function (val) {
-            return "₱" + val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          },
-        },
-      },
-    };
-
-    // Render the chart
-    const sales_chart = new ApexCharts(
-      document.querySelector('#sales-chart'),
-      sales_chart_options,
-    );
-    sales_chart.render();
-  })
-  .catch((error) => console.error('Error fetching data:', error));
-
-
-
-
-      //---------------------------
-      // - END MONTHLY SALES CHART -
-      //---------------------------
-    </script>
-
+    <div class="login-container">
+        <div class="login-header">
+            <!-- <h1>Welcome</h1> -->
+            <img src="assets/images/closet.png" alt="..." class="img-fluid img-circle">
         </div>
 
+        <!-- <form id="loginForm" onsubmit="return handleLogin(event)" method="POST" action="login.php"> -->
+        <form id="loginForm" method="POST" action="index.php">
+            <div class="form-group">
+                <input
+                    type="email"
+                    class="form-input"
+                    id="email"
+                    name="email"
+                    placeholder="Email address"
+                    required>
+                <i class="input-icon fas fa-envelope"></i>
+                <span class="error-message" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <input
+                    type="password"
+                    class="form-input"
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                    required>
+                <i class="input-icon fas fa-lock"></i>
+                <span class="error-message" id="passwordError"></span>
+            </div>
+
+            <input type="submit" value="Log In" name="login" class="submit-button">
+        </form>
+
+        <?php
+        // Check if the form is submitted
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $dbname = "inventory_db";
+
+            // Database connection
+            $conn = new mysqli($servername, $username, $password, $dbname);
+
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+
+            // Sanitize and retrieve user inputs
+            $email = $conn->real_escape_string($_POST['email']);
+            $pass = $conn->real_escape_string($_POST['password']);
+
+            // Query to check user credentials
+            $sqli = "SELECT * FROM user_table WHERE email=?";
+            $stmt = $conn->prepare($sqli);
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $results = $stmt->get_result();
+
+            if ($results->num_rows > 0) {
+                $user = $results->fetch_assoc();
+
+                // Verify the password
+                if (password_verify($pass, $user['password'])) {
+                    // Set session variables
+                    $_SESSION["Name"] = $user['full_name'];
+                    $_SESSION["email"] = $user['email'];
+                    $_SESSION["role"] = $user['role'];
+                    $_SESSION["username"] = $user['username'];
+                    $_SESSION["id"] = $user['user_id'];
+                    $_SESSION["created_at"] = $user['created_at'];
+
+                    // Determine redirect path based on role
+                    if ($user['role'] === 'admin' || $user['role'] === 'developer') {
+                        $redirect_url = 'admin/index.php';
+                    } elseif ($user['role'] === 'user') {
+                        $redirect_url = 'user/stocks-options.php';
+                    } else {
+                        // Unknown/invalid role - treat as error
+                        $error_message = "Invalid email or password.";
+                        $redirect_url = null;
+                    }
+
+                    if ($redirect_url !== null) {
+                        // Toastr Success Message and Redirect
+                        echo "
+            <script type='text/javascript'>
+                toastr.options = {
+                    'closeButton': true,              
+                    'progressBar': true,              
+                    'positionClass': 'toast-top-right', 
+                    'timeOut': '5000',                 
+                    'extendedTimeOut': '1000',         
+                    'showEasing': 'swing',
+                    'hideEasing': 'linear',
+                    'showMethod': 'fadeIn',
+                    'hideMethod': 'fadeOut'
+                };
+                toastr.success('Logged in successfully!', 'Success');
+                setTimeout(function() {
+                    window.location.replace('$redirect_url');
+                }, 2000);
+            </script>";
+                        exit;
+                    }
+                } else {
+                    $error_message = "Invalid email or password.";
+                }
+            } else {
+                $error_message = "Invalid email or password.";
+            }
+
+            $conn->close();
+        }
+
+        // Display error message if login failed
+        if (!empty($error_message)) {
+            echo "
+        <script type='text/javascript'>
+            Swal.fire({
+                title: 'Login Failed',
+                text: '$error_message',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        </script>";
+        }
+        ?>
+
+        <div class="additional-options">
+            <hr>
+            <!-- <a href="#" onclick="handleForgotPassword()">Forgot password?</a> -->
+            <p style="margin-top: 1rem">
+                Don't have an account or forgot password?
+            </p>
+            <p style="margin-top: 1rem">
+                Please refer to the
+                <a href="#" onclick="handleSignUp()">Admin</a>
+            </p>
+        </div>
     </div>
+</body>
+<script type="text/javascript">
+    // Create floating particles
+    function createParticles() {
+        const container = document.getElementById('particles');
+        const particleCount = 50;
 
-</div>
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 8 + 's';
+            particle.style.opacity = Math.random() * 0.5 + 0.2;
+
+            container.appendChild(particle);
+        }
+    }
+
+    // Handle form submission
+    /*function handleLogin(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Validate inputs
+        if (!isValidEmail(email)) {
+            showError('emailError', 'Invalid email format');
+            return;
+        }
+        if (password.trim() === '') {
+            showError('passwordError', 'Password is required');
+            return;
+        }
+
+        // Perform AJAX request
+        fetch('login.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect on success
+                window.location.href = "index.php";
+            } else {
+                // Show error message
+                Swal.fire({
+                    title: 'Login Failed',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }*/
+
+    // Helper functions
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function showError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
 
 
- <?php
-    include 'includes/footer.php';
-    ?>
+    // Handle social login buttons
+    function handleSocialLogin(provider) {
+        alert(`${provider} login would be implemented here`);
+    }
+
+    // Handle forgot password
+    function handleForgotPassword() {
+        alert('Password reset would be implemented here');
+    }
+
+    // Handle sign up
+    /*        function handleSignUp() {
+                alert('Sign up would be implemented here');
+            }*/
+
+    function handleSignUp() {
+        Swal.fire({
+            title: "<h5>Contact Admin Via:</h5>",
+            // text: "Contact Admin Through..",
+            html: `
+                  <a href='https://www.facebook.com/profile.php?id=100090597152087' class='btn btn-dark' target="_blank"><i class="fab fa-facebook" ></i></a>
+                  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=dole10.markseneres@gmail.com" class="btn btn-dark" target="_blank"><i class="fab fa-google"></i></a>
+  `,
+            showClass: {
+                popup: `
+                  animate__animated
+                  animate__fadeInUp
+                  animate__faster
+                `
+            },
+            hideClass: {
+                popup: `
+                  animate__animated
+                  animate__fadeOutDown
+                  animate__faster
+                `
+            },
+            confirmButtonColor: "#737373"
+        });
+    }
+
+    // Add mouse move effect for gradient spheres
+    document.addEventListener('mousemove', (e) => {
+        const spheres = document.querySelectorAll('.gradient-sphere');
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+
+        spheres.forEach((sphere, index) => {
+            const speed = (index + 1) * 20;
+            const xOffset = (0.5 - x) * speed;
+            const yOffset = (0.5 - y) * speed;
+
+            sphere.style.transform = `translate(${xOffset}px, ${yOffset}px) scale(${1 + (index * 0.1)})`;
+        });
+    });
+
+    // Add smooth reveal animation for form elements
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize particles
+        createParticles();
+
+        // Animate form elements
+        const elements = document.querySelectorAll('.form-group, .submit-button, .divider, .social-login, .additional-options');
+        elements.forEach((element, index) => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                element.style.transition = 'all 0.6s ease-out';
+                element.style.opacity = '1';
+                element.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+
+        // Add input focus effects
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('focused');
+            });
+
+            input.addEventListener('blur', () => {
+                if (!input.value) {
+                    input.parentElement.classList.remove('focused');
+                }
+            });
+        });
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.submit-button, .social-button').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.width = '0';
+            ripple.style.height = '0';
+            ripple.style.background = 'rgba(255, 255, 255, 0.4)';
+            ripple.style.borderRadius = '50%';
+            ripple.style.transform = 'translate(-50%, -50%)';
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            ripple.style.animation = 'ripple 0.6s ease-out';
+
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+</script>
+
+</html>

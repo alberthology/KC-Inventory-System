@@ -3,53 +3,53 @@ session_start();
 include 'db_con.php';
 
 
-function insertRecord($table, $columns, $values, $successMessage, $errorMessage) {
+function insertRecord($table, $columns, $values, $successMessage, $errorMessage)
+{
     global $conn;
 
-    // Check if $values is an array for prepared statements
     if (is_array($values)) {
         $placeholders = rtrim(str_repeat('?, ', count($values)), ', ');
         $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
 
-        // Prepare the SQL query
         if ($stmt = $conn->prepare($sql)) {
-            // Determine the types of the parameters for bind_param
             $types = '';
             foreach ($values as $value) {
-                if (is_numeric($value)) {
-                    $types .= 'i'; // Integer type
+                if (is_int($value)) {
+                    $types .= 'i';
+                } elseif (is_float($value)) {
+                    $types .= 'd';
                 } else {
-                    $types .= 's'; // String type
+                    $types .= 's';
                 }
             }
 
-            // Bind parameters and execute the statement
             $stmt->bind_param($types, ...$values);
 
             if ($stmt->execute()) {
                 $_SESSION['message'] = $successMessage;
                 $_SESSION['message_type'] = "success";
-                return $conn->insert_id; // Return the auto-generated ID
+                $insertId = $conn->insert_id;
+                $stmt->close();
+                return $insertId;
             } else {
                 $_SESSION['message'] = $errorMessage . $stmt->error;
                 $_SESSION['message_type'] = "error";
+                $stmt->close();
                 return false;
             }
-
-            $stmt->close();
         } else {
             $_SESSION['message'] = "Error preparing query: " . $conn->error;
             $_SESSION['message_type'] = "error";
             return false;
         }
     } else {
-        // Handle raw SQL string values (backward compatibility)
+        // Backward compatibility - raw SQL string (still vulnerable, avoid using this path)
         $sql = "INSERT INTO $table ($columns) VALUES ($values)";
 
         if ($conn->query($sql) === TRUE) {
             $_SESSION['message'] = $successMessage;
             $_SESSION['message_type'] = "success";
-            return $conn->insert_id; // Return the auto-generated ID
+            return $conn->insert_id;
         } else {
             $_SESSION['message'] = $errorMessage . $conn->error;
             $_SESSION['message_type'] = "error";
@@ -71,10 +71,10 @@ if (isset($_POST['submit-category'])) {
     if (empty($category) || empty($brand)) {
         $_SESSION['message'] = "Category and Brand fields are required!";
         $_SESSION['message_type'] = "error";
-        header("Location: ../stocks-options.php");
+        header("Location: ../admin/stocks-options.php");
         exit();
     }
-    
+
     // Check if category already exists
     $query = "SELECT category_id FROM category_table WHERE category_name = ?";
     $stmt = $conn->prepare($query);
@@ -98,7 +98,7 @@ if (isset($_POST['submit-category'])) {
 
         if ($brand_inserted) {
             // Redirect to stocks-options.php
-            header("Location: ../stocks-options.php");
+            header("Location: ../admin/stocks-options.php");
             exit();
         }
     } else {
@@ -123,7 +123,7 @@ if (isset($_POST['submit-category'])) {
 
             if ($brand_inserted) {
                 // Redirect to stocks-options.php
-                header("Location: ../stocks-options.php");
+                header("Location: ../admin/stocks-options.php");
                 exit();
             }
         }
@@ -133,126 +133,244 @@ if (isset($_POST['submit-category'])) {
 
 
 // Order processing logic
+// if (isset($_POST['submit-order'])) {
+//     // Step 1: Insert into customer_table
+//     $customer_name = mysqli_real_escape_string($conn, $_POST['customer_name']);
+//     $contact_number = mysqli_real_escape_string($conn, $_POST['contact_number']);
+
+//     // Insert customer record
+//     $customer_id = insertRecord(
+//         'customer_table',
+//         'customer_name, contact_number',
+//         "'$customer_name', '$contact_number'",
+//         "Customer added successfully!",
+//         "Error adding customer! Please try again."
+//     );
+
+//     if ($customer_id) {
+//         // Step 2: Insert into order_table with customer_id and payment status
+//         $order_date = date('Y-m-d H:i:s'); // Store the current date and time
+//         $payment_status = mysqli_real_escape_string($conn, $_POST['order_table_status'][0]); // Get the payment status from the form
+
+//         // Get arrays for product_name, product_color, product_size, quantity, and price
+//         $product_names = $_POST['product_name'];
+//         $product_colors = $_POST['product_color'];
+//         $product_sizes = $_POST['product_size'];
+//         $quantities = $_POST['quantity'];
+//         $prices = $_POST['price'];
+//         $payments = $_POST['payment']; // Get payment values for each product
+
+//         // Calculate the total amount for the order
+//         $total_amount = 0;
+//         foreach ($quantities as $index => $quantity) {
+//             $total_amount += $quantity * $prices[$index]; // Add total price of each product to the overall total amount
+//         }
+
+//         // Insert the order and retrieve the order_id
+//         $order_id = insertRecord(
+//             'order_table',
+//             'customer_id, order_date, total_amount, status',
+//             "'$customer_id', '$order_date', '$total_amount', '$payment_status'",
+//             "Order placed successfully!",
+//             "Error placing order! Please try again."
+//         );
+
+//         if ($order_id) {
+//             // Step 3: Insert each product into order_item_table and log the transaction
+//             foreach ($product_names as $index => $product_name) {
+//                 // Fetch product details
+//                 $product_color = mysqli_real_escape_string($conn, $product_colors[$index]);
+//                 $product_size = mysqli_real_escape_string($conn, $product_sizes[$index]);
+//                 $quantity = mysqli_real_escape_string($conn, $quantities[$index]);
+//                 $price = mysqli_real_escape_string($conn, $prices[$index]);
+//                 $total_price = $quantity * $price;
+//                 $payment = mysqli_real_escape_string($conn, $payments[$index]);
+
+//                 // Query to get the product_id and quantity_in_stock
+//                 $sql = "SELECT product_id, quantity_in_stock FROM product_table WHERE product_name = '$product_name' AND product_color = '$product_color' AND product_size = '$product_size' LIMIT 1";
+//                 $result = mysqli_query($conn, $sql);
+
+//                 if ($result && mysqli_num_rows($result) > 0) {
+//                     $product = mysqli_fetch_assoc($result);
+//                     $product_id = $product['product_id'];
+//                     $stock_quantity = $product['quantity_in_stock'];
+
+//                     // Check if there is enough stock
+//                     if ($stock_quantity < $quantity) {
+//                         // If there is not enough stock, show error message and exit
+//                         $_SESSION['message'] = "Error: Insufficient stock for product $product_name. Available stock: $stock_quantity.";
+//                         $_SESSION['message_type'] = "error";
+//                         header("Location: ../admin/transactions.php"); // Redirect to the order page to show the error
+//                         exit();
+//                     }
+
+//                     // Insert the order item into the database
+//                     $item_values = "'$order_id', '$product_id', '$quantity', '$price', '$total_price', '$payment'";
+//                     insertRecord(
+//                         'order_item_table',
+//                         'order_id, product_id, quantity, unit_price, total_price, payment',
+//                         $item_values,
+//                         "Item added successfully!",
+//                         "Error adding item! Please try again."
+//                     );
+
+//                     // Update the product stock after the order is placed
+//                     $new_stock_quantity = $stock_quantity - $quantity;
+//                     $update_sql = "UPDATE product_table SET quantity_in_stock = '$new_stock_quantity' WHERE product_id = '$product_id'";
+//                     if ($conn->query($update_sql) === FALSE) {
+//                         $_SESSION['message'] = "Error updating stock for product $product_name.";
+//                         $_SESSION['message_type'] = "error";
+//                         header("Location: ../admin/transactions.php");
+//                         exit();
+//                     }
+
+//                     // Insert into inventory_transaction_table
+//                     $transaction_type = 'sale'; // Set transaction type as 'sale'
+//                     $transaction_date = date('Y-m-d H:i:s');
+//                     $transaction_amount = $quantity * $price;
+//                     $user_id = $_SESSION['id'];
+//                     // $user_id = "1";
+
+//                     insertRecord(
+//                         'inventory_transaction_table',
+//                         'product_id, user_id, transaction_type, quantity, transaction_date, transaction_amount',
+//                         "'$product_id', '$user_id', '$transaction_type', '$quantity', '$transaction_date', '$transaction_amount'",
+//                         "Item added successfully!",
+//                         "Error logging transaction!"
+//                     );
+//                 } else {
+//                     // Handle case where product not found
+//                     $_SESSION['message'] = "Error: Product not found in the product table.";
+//                     $_SESSION['message_type'] = "error";
+//                     header("Location: ../admin/transactions.php");
+//                     exit();
+//                 }
+//             }
+//             header("Location: ../admin/transactions.php"); // Redirect to a success page
+//             exit();
+//         }
+//     }
+// }
+
+
+// ==================   updated ordering process
+
+$role = strtolower($_SESSION['role'] ?? '');
+$redirectPath = ($role === 'admin') ? '../admin/transactions.php' : '../user/transactions.php';
+
 if (isset($_POST['submit-order'])) {
-    // Step 1: Insert into customer_table
-    $customer_name = mysqli_real_escape_string($conn, $_POST['customer_name']);
-    $contact_number = mysqli_real_escape_string($conn, $_POST['contact_number']);
-    /*$email = mysqli_real_escape_string($conn, $_POST['email']);
-    $address = mysqli_real_escape_string($conn, $_POST['address']);*/
-    // Insert customer record
+    $customer_name = $_POST['customer_name'];
+    $contact_number = $_POST['contact_number'];
+
     $customer_id = insertRecord(
         'customer_table',
         'customer_name, contact_number',
-        "'$customer_name', '$contact_number'",
+        [$customer_name, $contact_number],
         "Customer added successfully!",
         "Error adding customer! Please try again."
     );
 
     if ($customer_id) {
-        // Step 2: Insert into order_table with customer_id and payment status
-        $order_date = date('Y-m-d H:i:s'); // Store the current date and time
-        $payment_status = mysqli_real_escape_string($conn, $_POST['order_table_status'][0]); // Get the payment status from the form
+        $order_date = date('Y-m-d H:i:s');
+        $payment_status = $_POST['order_table_status'][0];
 
-        // Get arrays for product_name, product_color, product_size, quantity, and price
         $product_names = $_POST['product_name'];
         $product_colors = $_POST['product_color'];
         $product_sizes = $_POST['product_size'];
         $quantities = $_POST['quantity'];
         $prices = $_POST['price'];
-        $payments = $_POST['payment']; // Get payment values for each product
+        $payments = $_POST['payment'];
 
-        // Calculate the total amount for the order
         $total_amount = 0;
         foreach ($quantities as $index => $quantity) {
-            $total_amount += $quantity * $prices[$index]; // Add total price of each product to the overall total amount
+            $total_amount += $quantity * $prices[$index];
         }
 
-        // Insert the order and retrieve the order_id
         $order_id = insertRecord(
             'order_table',
             'customer_id, order_date, total_amount, status',
-            "'$customer_id', '$order_date', '$total_amount', '$payment_status'",
+            [$customer_id, $order_date, (float)$total_amount, $payment_status],
             "Order placed successfully!",
             "Error placing order! Please try again."
         );
 
         if ($order_id) {
-            // Step 3: Insert each product into order_item_table and log the transaction
             foreach ($product_names as $index => $product_name) {
-                // Fetch product details
-                $product_color = mysqli_real_escape_string($conn, $product_colors[$index]);
-                $product_size = mysqli_real_escape_string($conn, $product_sizes[$index]);
-                $quantity = mysqli_real_escape_string($conn, $quantities[$index]);
-                $price = mysqli_real_escape_string($conn, $prices[$index]);
+                $product_color = $product_colors[$index];
+                $product_size = $product_sizes[$index];
+                $quantity = (int)$quantities[$index];
+                $price = (float)$prices[$index];
                 $total_price = $quantity * $price;
-                $payment = mysqli_real_escape_string($conn, $payments[$index]);
+                $payment = (float)$payments[$index];
 
-                // Query to get the product_id and quantity_in_stock
-                $sql = "SELECT product_id, quantity_in_stock FROM product_table WHERE product_name = '$product_name' AND product_color = '$product_color' AND product_size = '$product_size' LIMIT 1";
-                $result = mysqli_query($conn, $sql);
+                // Lookup product using a prepared statement (still needed - it's a SELECT, not an insert)
+                $stmt = $conn->prepare(
+                    "SELECT product_id, quantity_in_stock FROM product_table 
+                     WHERE product_name = ? AND product_color = ? AND product_size = ? LIMIT 1"
+                );
+                $stmt->bind_param("sss", $product_name, $product_color, $product_size);
+                $stmt->execute();
+                $result = $stmt->get_result();
 
-                if ($result && mysqli_num_rows($result) > 0) {
-                    $product = mysqli_fetch_assoc($result);
+                if ($result && $result->num_rows > 0) {
+                    $product = $result->fetch_assoc();
                     $product_id = $product['product_id'];
                     $stock_quantity = $product['quantity_in_stock'];
+                    $stmt->close();
 
-                    // Check if there is enough stock
                     if ($stock_quantity < $quantity) {
-                        // If there is not enough stock, show error message and exit
                         $_SESSION['message'] = "Error: Insufficient stock for product $product_name. Available stock: $stock_quantity.";
                         $_SESSION['message_type'] = "error";
-                        header("Location: ../transactions.php"); // Redirect to the order page to show the error
+                        header("Location: $redirectPath");
                         exit();
                     }
 
-                    // Insert the order item into the database
-                    $item_values = "'$order_id', '$product_id', '$quantity', '$price', '$total_price', '$payment'";
                     insertRecord(
                         'order_item_table',
                         'order_id, product_id, quantity, unit_price, total_price, payment',
-                        $item_values,
+                        [$order_id, $product_id, $quantity, $price, $total_price, $payment],
                         "Item added successfully!",
                         "Error adding item! Please try again."
                     );
 
-                    // Update the product stock after the order is placed
+                    // Update stock (still a raw UPDATE - keep as prepared statement directly, or use editRecord())
                     $new_stock_quantity = $stock_quantity - $quantity;
-                    $update_sql = "UPDATE product_table SET quantity_in_stock = '$new_stock_quantity' WHERE product_id = '$product_id'";
-                    if ($conn->query($update_sql) === FALSE) {
+                    $updateStmt = $conn->prepare("UPDATE product_table SET quantity_in_stock = ? WHERE product_id = ?");
+                    $updateStmt->bind_param("ii", $new_stock_quantity, $product_id);
+                    if (!$updateStmt->execute()) {
                         $_SESSION['message'] = "Error updating stock for product $product_name.";
                         $_SESSION['message_type'] = "error";
-                        header("Location: ../transactions.php");
+                        header("Location: $redirectPath");
                         exit();
                     }
+                    $updateStmt->close();
 
-                    // Insert into inventory_transaction_table
-                    $transaction_type = 'sale'; // Set transaction type as 'sale'
+                    $transaction_type = 'sale';
                     $transaction_date = date('Y-m-d H:i:s');
                     $transaction_amount = $quantity * $price;
                     $user_id = $_SESSION['id'];
-                    // $user_id = "1";
 
                     insertRecord(
                         'inventory_transaction_table',
                         'product_id, user_id, transaction_type, quantity, transaction_date, transaction_amount',
-                        "'$product_id', '$user_id', '$transaction_type', '$quantity', '$transaction_date', '$transaction_amount'",
+                        [$product_id, $user_id, $transaction_type, $quantity, $transaction_date, $transaction_amount],
                         "Item added successfully!",
                         "Error logging transaction!"
                     );
-
                 } else {
-                    // Handle case where product not found
                     $_SESSION['message'] = "Error: Product not found in the product table.";
                     $_SESSION['message_type'] = "error";
-                    header("Location: ../transactions.php");
+                    header("Location: $redirectPath");
                     exit();
                 }
             }
-            header("Location: ../transactions.php"); // Redirect to a success page
+            header("Location: $redirectPath");
             exit();
         }
     }
 }
+
+
 
 
 if (isset($_POST['submit-product'])) {
@@ -296,7 +414,7 @@ if (isset($_POST['submit-product'])) {
 
         // Insert record into the inventory_transaction_table
         $transaction_type = 'purchase'; // Setting transaction type as 'purchase'
-        $user_id = $_SESSION['id']; 
+        $user_id = $_SESSION['id'];
         // $user_id = "1"; 
 
         $result = insertRecord(
@@ -315,9 +433,8 @@ if (isset($_POST['submit-product'])) {
         $conn->commit();
 
         // Redirect to stocks-options.php
-        header("Location: ../stocks-options.php");
+        header("Location: ../admin/stocks-options.php");
         exit();
-
     } catch (Exception $e) {
         // Rollback the transaction if any operation fails
         $conn->rollback();
@@ -325,12 +442,12 @@ if (isset($_POST['submit-product'])) {
         $_SESSION['message_type'] = "error";
 
         // Redirect to the same page to show the error message
-        header("Location: ../stocks-options.php");
+        header("Location: ../admin/stocks-options.php");
         exit();
     }
 }
 
-if (isset($_POST['submit-user'])) {
+/*if (isset($_POST['submit-user'])) {
     $full_name = $_POST['fullname'];
     $email = $_POST['email'];
     $role = $_POST['role'];
@@ -388,7 +505,7 @@ if (isset($_POST['submit-user'])) {
         $conn->commit();
 
         // Redirect to users.php
-        header("Location: ../users.php");
+        header("Location: ../admin/users.php");
         exit();
     } catch (Exception $e) {
         // Rollback the transaction if any operation fails
@@ -400,7 +517,75 @@ if (isset($_POST['submit-user'])) {
         header("Location: ../users.php");
         exit();
     }
+}*/
+
+//////////// updated insert user
+
+
+if (isset($_POST['submit-user'])) {
+    $full_name = trim($_POST['fullname']);
+    $email = trim($_POST['email']);
+    $role = $_POST['role'];
+    $username = trim($_POST['username']);
+    $password = $_POST['password'];
+
+    try {
+        // ---- Check if email already exists ----
+        $checkStmt = $conn->prepare("SELECT user_id FROM user_table WHERE email = ?");
+        $checkStmt->bind_param("s", $email);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result();
+
+        if ($checkResult->num_rows > 0) {
+            // Email already exists - stop here
+            $_SESSION['message'] = "Duplicated Email. Please use a different email.";
+            $_SESSION['message_type'] = "error";
+            header("Location: ../admin/users.php");
+            exit();
+        }
+        $checkStmt->close();
+
+        // ---- Hash password if provided ----
+        $hashedPassword = !empty($password) ? password_hash($password, PASSWORD_DEFAULT) : null;
+
+        if ($hashedPassword === null) {
+            // Password is required for new user creation
+            $_SESSION['message'] = "Password is required to create a new user.";
+            $_SESSION['message_type'] = "error";
+            header("Location: ../admin/users.php");
+            exit();
+        }
+
+        // ---- Insert new user using prepared statement ----
+        $insertStmt = $conn->prepare(
+            "INSERT INTO user_table (full_name, email, username, role, password) VALUES (?, ?, ?, ?, ?)"
+        );
+        $insertStmt->bind_param("sssss", $full_name, $email, $username, $role, $hashedPassword);
+
+        if (!$insertStmt->execute()) {
+            throw new Exception("Failed to insert into user_table: " . $insertStmt->error);
+        }
+
+        $user_id = $conn->insert_id;
+        $insertStmt->close();
+
+        // Commit the transaction
+        $conn->commit();
+
+        $_SESSION['message'] = "User Account added successfully!";
+        $_SESSION['message_type'] = "success";
+
+        header("Location: ../admin/users.php");
+        exit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        $_SESSION['message'] = "Transaction failed: " . $e->getMessage();
+        $_SESSION['message_type'] = "error";
+        header("Location: ../admin/users.php");
+        exit();
+    }
 }
+
 
 
 
@@ -424,4 +609,3 @@ if (isset($_POST['submit-user'])) {
 }*/
 
 $conn->close();
-?>
